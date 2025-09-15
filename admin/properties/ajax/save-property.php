@@ -1,26 +1,24 @@
 <?php
 session_start();
-if(!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+if(!isset($_SESSION['admin_logged_in'])) {
     header("Location: ../../index.php");
     exit();
 }
 
 require_once '../../../config/database.php';
+require_once '../../includes/upload.php'; // Upload fonksiyonları
 
-// POST kontrolü
 if($_SERVER['REQUEST_METHOD'] != 'POST' || !isset($_POST['save_property'])) {
     header("Location: ../add-step1.php");
     exit();
 }
 
 try {
-    // Benzersiz ilan no oluştur
+    // İlan no oluştur
     $ilan_no = 'PLZ-' . date('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
-    
-    // POST verilerini al
     $data = $_POST;
     
-    // Ana ilan verisini ekle (basitleştirilmiş)
+    // İlanı kaydet
     $sql = "INSERT INTO properties (
         ilan_no, ilan_tarihi, baslik, aciklama, fiyat, 
         emlak_tipi, kategori, oda_sayisi, brut_metrekare, net_metrekare,
@@ -40,8 +38,6 @@ try {
     )";
     
     $stmt = $db->prepare($sql);
-    
-    // Parametreleri bağla
     $stmt->execute([
         ':ilan_no' => $ilan_no,
         ':baslik' => $data['baslik'] ?? '',
@@ -74,20 +70,27 @@ try {
     
     $property_id = $db->lastInsertId();
     
+    // Fotoğrafları yükle (eğer varsa)
+    if(isset($_FILES['photos']) && !empty($_FILES['photos']['name'][0])) {
+        $uploadResult = uploadPropertyImages($_FILES['photos'], $property_id, $db);
+        
+        if(!$uploadResult['success'] && count($uploadResult['errors']) > 0) {
+            $_SESSION['photo_errors'] = $uploadResult['errors'];
+        }
+    }
+    
     // Başarı mesajı
     $_SESSION['new_property_id'] = $property_id;
     $_SESSION['new_property_no'] = $ilan_no;
     $_SESSION['success'] = "İlan başarıyla eklendi! İlan No: " . $ilan_no;
     
-    // Step 4'e (Tebrikler) yönlendir
+    // Step 4'e yönlendir
     header("Location: ../add-step4.php");
     exit();
     
 } catch(PDOException $e) {
-    // Hata durumunda
-    $_SESSION['error'] = "Veritabanı Hatası: " . $e->getMessage();
-    echo "HATA: " . $e->getMessage();
-    echo "<br><a href='../add-step3.php'>Geri Dön</a>";
+    $_SESSION['error'] = "Hata: " . $e->getMessage();
+    header("Location: ../add-step3.php");
     exit();
 }
 ?>

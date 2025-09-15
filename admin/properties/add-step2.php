@@ -28,6 +28,68 @@ $ilceler = $db->query("SELECT * FROM ilceler WHERE il_id = 1 ORDER BY ilce_adi")
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İlan Detayları | Plaza Emlak</title>
     <link rel="stylesheet" href="../../assets/css/admin-form.css">
+<style>
+/* Fotoğraf önizleme stilleri */
+.preview-area {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.preview-item {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #e0e0e0;
+    background: #f5f5f5;
+}
+
+.preview-item img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+}
+
+.preview-item .remove-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 25px;
+    height: 25px;
+    background: rgba(231, 76, 60, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-item .remove-btn:hover {
+    background: #c0392b;
+}
+
+.preview-item .photo-number {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.upload-area {
+    transition: all 0.3s;
+}
+</style>
 </head>
 <body>
     <div class="header">
@@ -327,9 +389,10 @@ $ilceler = $db->query("SELECT * FROM ilceler WHERE il_id = 1 ORDER BY ilce_adi")
                     </div>
                 </div>
 
-                <!-- FOTOĞRAFLAR -->
+                <!-- FOTOĞRAFLAR (İsteğe Bağlı) -->
                 <div class="form-section">
-                    <h2 class="section-title">Fotoğraflar</h2>
+                    <h2 class="section-title">Fotoğraflar (İsteğe Bağlı)</h2>
+                    <p style="color: #666; margin-bottom: 15px;">Fotoğrafları daha sonra da ekleyebilirsiniz.</p>
                     <div class="photo-upload">
                         <input type="file" name="photos[]" id="photos" 
                                multiple accept="image/*" style="display:none">
@@ -362,38 +425,126 @@ $ilceler = $db->query("SELECT * FROM ilceler WHERE il_id = 1 ORDER BY ilce_adi")
             </form>
         </div>
     </div>
-<script>
-// İlçe değiştiğinde mahalle getir
-document.getElementById('ilce').addEventListener('change', function() {
-    const ilce = this.value;
-    const mahalleSelect = document.getElementById('mahalle');
+
+    <script>
+    // İlçe değiştiğinde mahalle getir
+    document.getElementById('ilce').addEventListener('change', function() {
+        const ilce = this.value;
+        const mahalleSelect = document.getElementById('mahalle');
+        
+        if(!ilce) {
+            mahalleSelect.innerHTML = '<option value="">Önce ilçe seçin</option>';
+            return;
+        }
+        
+        mahalleSelect.innerHTML = '<option value="">Yükleniyor...</option>';
+        
+        fetch('ajax/get-neighborhoods.php?ilce=' + encodeURIComponent(ilce))
+            .then(response => response.text())
+            .then(data => {
+                mahalleSelect.innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Hata:', error);
+                mahalleSelect.innerHTML = '<option value="">Mahalle yüklenemedi</option>';
+            });
+    });
     
-    if(!ilce) {
-        mahalleSelect.innerHTML = '<option value="">Önce ilçe seçin</option>';
-        return;
+    // Çoklu resim yükleme
+    let selectedFiles = [];
+    const photoInput = document.getElementById('photos');
+    const previewArea = document.getElementById('preview-area');
+    
+    // Dosya seçildiğinde
+    photoInput.addEventListener('change', function(e) {
+        handleFiles(e.target.files);
+    });
+    
+    // Sürükle bırak
+    const uploadArea = document.querySelector('.upload-area');
+    
+    uploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#3498db';
+        this.style.background = '#f0f8ff';
+    });
+    
+    uploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#ddd';
+        this.style.background = '#fafafa';
+    });
+    
+    uploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.style.borderColor = '#ddd';
+        this.style.background = '#fafafa';
+        handleFiles(e.dataTransfer.files);
+    });
+    
+    function handleFiles(files) {
+        for(let i = 0; i < files.length; i++) {
+            if(files[i].type.startsWith('image/')) {
+                if(selectedFiles.length < 50) {
+                    selectedFiles.push(files[i]);
+                    previewImage(files[i], selectedFiles.length - 1);
+                }
+            }
+        }
+        updatePhotoInput();
     }
     
-    mahalleSelect.innerHTML = '<option value="">Yükleniyor...</option>';
+    function previewImage(file, index) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'preview-item';
+            div.innerHTML = `
+                <img src="${e.target.result}" alt="">
+                <button type="button" class="remove-btn" onclick="removeImage(${index})">×</button>
+            `;
+            previewArea.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+    }
     
-    fetch('ajax/get-neighborhoods.php?ilce=' + encodeURIComponent(ilce))
-        .then(response => response.text())
-        .then(data => {
-            mahalleSelect.innerHTML = data;
-        })
-        .catch(error => {
-            console.error('Hata:', error);
-            mahalleSelect.innerHTML = '<option value="">Mahalle yüklenemedi</option>';
+    function removeImage(index) {
+        selectedFiles.splice(index, 1);
+        updatePreview();
+        updatePhotoInput();
+    }
+    
+    function updatePreview() {
+        previewArea.innerHTML = '';
+        selectedFiles.forEach((file, index) => {
+            previewImage(file, index);
         });
-});
-
-// Çoklu resim yükleme
-let selectedFiles = [];
-const photoInput = document.getElementById('photos');
-const previewArea = document.getElementById('preview-area');
+    }
+    
+    function updatePhotoInput() {
+        const dataTransfer = new DataTransfer();
+        selectedFiles.forEach(file => {
+            dataTransfer.items.add(file);
+        });
+        photoInput.files = dataTransfer.files;
+    }
+    
+    // Form gönderilmeden önce kontrol
+    document.getElementById('detailForm').addEventListener('submit', function(e) {
+        if(selectedFiles.length === 0) {
+            if(!confirm('Fotoğraf eklemeden devam etmek istiyor musunuz?')) {
+                e.preventDefault();
+            }
+        }
+    });
+    // Fotoğraf yükleme sistemi
+let selectedPhotos = [];
+const maxPhotos = 50;
+const maxFileSize = 10 * 1024 * 1024; // 10MB
 
 // Dosya seçildiğinde
-photoInput.addEventListener('change', function(e) {
-    handleFiles(e.target.files);
+document.getElementById('photos').addEventListener('change', function(e) {
+    handlePhotoSelection(e.target.files);
 });
 
 // Sürükle bırak
@@ -402,7 +553,7 @@ const uploadArea = document.querySelector('.upload-area');
 uploadArea.addEventListener('dragover', function(e) {
     e.preventDefault();
     this.style.borderColor = '#3498db';
-    this.style.background = '#f0f8ff';
+    this.style.background = '#e3f2fd';
 });
 
 uploadArea.addEventListener('dragleave', function(e) {
@@ -415,64 +566,104 @@ uploadArea.addEventListener('drop', function(e) {
     e.preventDefault();
     this.style.borderColor = '#ddd';
     this.style.background = '#fafafa';
-    handleFiles(e.dataTransfer.files);
+    handlePhotoSelection(e.dataTransfer.files);
 });
 
-function handleFiles(files) {
-    for(let i = 0; i < files.length; i++) {
-        if(files[i].type.startsWith('image/')) {
-            if(selectedFiles.length < 50) {
-                selectedFiles.push(files[i]);
-                previewImage(files[i], selectedFiles.length - 1);
-            }
+// Fotoğraf seçim işlemi
+function handlePhotoSelection(files) {
+    const previewArea = document.getElementById('preview-area');
+    
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // Kontroller
+        if (!file.type.startsWith('image/')) {
+            alert(file.name + ' bir resim dosyası değil!');
+            continue;
         }
+        
+        if (file.size > maxFileSize) {
+            alert(file.name + ' dosyası 10MB\'dan büyük!');
+            continue;
+        }
+        
+        if (selectedPhotos.length >= maxPhotos) {
+            alert('Maksimum 50 fotoğraf yükleyebilirsiniz!');
+            break;
+        }
+        
+        // Listeye ekle
+        selectedPhotos.push(file);
+        
+        // Önizleme göster
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'preview-item';
+            div.setAttribute('data-index', selectedPhotos.length - 1);
+            
+            div.innerHTML = `
+                <img src="${e.target.result}" alt="">
+                <button type="button" class="remove-btn" onclick="removePhoto(${selectedPhotos.length - 1})">×</button>
+                <div class="photo-number">${selectedPhotos.length}</div>
+            `;
+            
+            previewArea.appendChild(div);
+        };
+        reader.readAsDataURL(file);
     }
-    updatePhotoInput();
+    
+    updatePhotoCount();
 }
 
-function previewImage(file, index) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const div = document.createElement('div');
-        div.className = 'preview-item';
-        div.innerHTML = `
-            <img src="${e.target.result}" alt="">
-            <button type="button" class="remove-btn" onclick="removeImage(${index})">×</button>
-        `;
-        previewArea.appendChild(div);
-    };
-    reader.readAsDataURL(file);
+// Fotoğraf silme
+function removePhoto(index) {
+    selectedPhotos.splice(index, 1);
+    refreshPreview();
 }
 
-function removeImage(index) {
-    selectedFiles.splice(index, 1);
-    updatePreview();
-    updatePhotoInput();
-}
-
-function updatePreview() {
+// Önizlemeyi yenile
+function refreshPreview() {
+    const previewArea = document.getElementById('preview-area');
     previewArea.innerHTML = '';
-    selectedFiles.forEach((file, index) => {
-        previewImage(file, index);
+    
+    selectedPhotos.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const div = document.createElement('div');
+            div.className = 'preview-item';
+            
+            div.innerHTML = `
+                <img src="${e.target.result}" alt="">
+                <button type="button" class="remove-btn" onclick="removePhoto(${index})">×</button>
+                <div class="photo-number">${index + 1}</div>
+            `;
+            
+            previewArea.appendChild(div);
+        };
+        reader.readAsDataURL(file);
     });
+    
+    updatePhotoCount();
 }
 
-function updatePhotoInput() {
+// Sayaç güncelle
+function updatePhotoCount() {
+    const uploadText = document.querySelector('.upload-text small');
+    if (uploadText && selectedPhotos.length > 0) {
+        uploadText.textContent = `${selectedPhotos.length} fotoğraf seçildi (Maksimum 50)`;
+    }
+}
+
+// Form gönderilmeden önce
+document.getElementById('detailForm').addEventListener('submit', function(e) {
+    // DataTransfer ile dosyaları input'a aktar
     const dataTransfer = new DataTransfer();
-    selectedFiles.forEach(file => {
+    selectedPhotos.forEach(file => {
         dataTransfer.items.add(file);
     });
-    photoInput.files = dataTransfer.files;
-}
-
-// Form gönderilmeden önce kontrol
-document.getElementById('detailForm').addEventListener('submit', function(e) {
-    if(selectedFiles.length === 0) {
-        if(!confirm('Fotoğraf eklemeden devam etmek istiyor musunuz?')) {
-            e.preventDefault();
-        }
-    }
+    document.getElementById('photos').files = dataTransfer.files;
 });
-</script>
+    </script>
 </body>
 </html>
