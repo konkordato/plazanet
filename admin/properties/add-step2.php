@@ -29,14 +29,12 @@ $ilceler = $db->query("SELECT * FROM ilceler WHERE il_id = 1 ORDER BY ilce_adi")
     <title>İlan Detayları | Plaza Emlak</title>
     <link rel="stylesheet" href="../../assets/css/admin-form.css">
     <style>
-    /* Fotoğraf önizleme stilleri */
     .preview-area {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
         gap: 15px;
         margin-top: 20px;
     }
-
     .preview-item {
         position: relative;
         border-radius: 8px;
@@ -44,14 +42,12 @@ $ilceler = $db->query("SELECT * FROM ilceler WHERE il_id = 1 ORDER BY ilce_adi")
         border: 2px solid #e0e0e0;
         background: #f5f5f5;
     }
-
     .preview-item img {
         width: 100%;
         height: 100px;
         object-fit: cover;
         display: block;
     }
-
     .preview-item .remove-btn {
         position: absolute;
         top: 5px;
@@ -69,23 +65,9 @@ $ilceler = $db->query("SELECT * FROM ilceler WHERE il_id = 1 ORDER BY ilce_adi")
         align-items: center;
         justify-content: center;
     }
-
     .preview-item .remove-btn:hover {
         background: #c0392b;
     }
-
-    .preview-item .photo-number {
-        position: absolute;
-        bottom: 5px;
-        left: 5px;
-        background: rgba(0, 0, 0, 0.7);
-        color: white;
-        padding: 2px 8px;
-        border-radius: 3px;
-        font-size: 12px;
-        font-weight: bold;
-    }
-
     .upload-area {
         transition: all 0.3s;
     }
@@ -145,7 +127,7 @@ $ilceler = $db->query("SELECT * FROM ilceler WHERE il_id = 1 ORDER BY ilce_adi")
                     <div class="form-group">
                         <label class="required">İlan Başlığı</label>
                         <input type="text" name="baslik" maxlength="100" required 
-                               placeholder="Örn: Plaza'dan Merkez'de 3+1 Kiralık Daire">
+                               placeholder="Örn: <?php echo $emlak_tipi == 'arsa' ? 'Satılık İmarlı Arsa' : 'Plaza\'dan Merkez\'de 3+1 Kiralık Daire'; ?>">
                         <small>Maksimum 100 karakter</small>
                     </div>
 
@@ -170,144 +152,225 @@ $ilceler = $db->query("SELECT * FROM ilceler WHERE il_id = 1 ORDER BY ilce_adi")
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="required">Brüt m²</label>
-                            <input type="number" name="brut_metrekare" required>
+                    <?php if($emlak_tipi == 'arsa'): ?>
+                        <!-- ARSA İÇİN ÖZEL ALANLAR -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">m²</label>
+                                <input type="number" name="brut_metrekare" required placeholder="Arsa metrekaresi">
+                            </div>
+                            <div class="form-group">
+                                <label>m² Fiyatı</label>
+                                <input type="number" name="metrekare_fiyat" placeholder="Metrekare başına fiyat">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Net m²</label>
-                            <input type="number" name="net_metrekare">
-                        </div>
-                        <div class="form-group">
-                            <label class="required">Oda Sayısı</label>
-                            <select name="oda_sayisi" required>
-                                <option value="">Seçiniz</option>
-                                <option value="1+0">1+0</option>
-                                <option value="1+1">1+1</option>
-                                <option value="2+1">2+1</option>
-                                <option value="3+1">3+1</option>
-                                <option value="4+1">4+1</option>
-                                <option value="5+1">5+1</option>
-                                <option value="6+1">6+1</option>
-                                <option value="7+1">7+1</option>
-                                <option value="8+1">8+1</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Bina Yaşı</label>
-                            <select name="bina_yasi">
-                                <option value="">Seçiniz</option>
-                                <option value="0">0 (Yeni)</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3-5">3-5</option>
-                                <option value="6-10">6-10</option>
-                                <option value="11-15">11-15</option>
-                                <option value="16-20">16-20</option>
-                                <option value="21-25">21-25</option>
-                                <option value="26-30">26-30</option>
-                                <option value="31+">31 ve üzeri</option>
-                            </select>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>İmar Durumu</label>
+                                <select name="imar_durumu">
+                                    <option value="">Seçiniz</option>
+                                    <option value="İmarlı">İmarlı</option>
+                                    <option value="İmarsız">İmarsız</option>
+                                    <option value="Tarla">Tarla</option>
+                                    <option value="Bağ">Bağ</option>
+                                    <option value="Bahçe">Bahçe</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Ada No</label>
+                                <input type="text" name="ada_no" placeholder="Ada numarası">
+                            </div>
+                            <div class="form-group">
+                                <label>Parsel No</label>
+                                <input type="text" name="parsel_no" placeholder="Parsel numarası">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Bulunduğu Kat</label>
-                            <select name="bulundugu_kat">
-                                <option value="">Seçiniz</option>
-                                <option value="Bodrum">Bodrum</option>
-                                <option value="Zemin">Zemin</option>
-                                <option value="Bahçe Katı">Bahçe Katı</option>
-                                <option value="Giriş Katı">Giriş Katı</option>
-                                <option value="Yüksek Giriş">Yüksek Giriş</option>
-                                <?php for($i=1; $i<=30; $i++): ?>
-                                    <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
-                                <?php endfor; ?>
-                                <option value="31+">31 ve üzeri</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Kat Sayısı</label>
-                            <select name="kat_sayisi">
-                                <option value="">Seçiniz</option>
-                                <?php for($i=1; $i<=30; $i++): ?>
-                                    <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
-                                <?php endfor; ?>
-                                <option value="31+">31 ve üzeri</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Isıtma</label>
-                            <select name="isitma">
-                                <option value="">Seçiniz</option>
-                                <option value="Yok">Yok</option>
-                                <option value="Soba">Soba</option>
-                                <option value="Doğalgaz Sobası">Doğalgaz Sobası</option>
-                                <option value="Kat Kaloriferi">Kat Kaloriferi</option>
-                                <option value="Merkezi">Merkezi</option>
-                                <option value="Merkezi (Pay Ölçer)">Merkezi (Pay Ölçer)</option>
-                                <option value="Kombi (Doğalgaz)">Kombi (Doğalgaz)</option>
-                                <option value="Kombi (Elektrik)">Kombi (Elektrik)</option>
-                                <option value="Yerden Isıtma">Yerden Isıtma</option>
-                                <option value="Klima">Klima</option>
-                            </select>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Pafta No</label>
+                                <input type="text" name="pafta_no" placeholder="Pafta numarası">
+                            </div>
+                            <div class="form-group">
+                                <label>Kaks (Emsal)</label>
+                                <input type="text" name="kaks_emsal" placeholder="Örn: 2.5">
+                            </div>
+                            <div class="form-group">
+                                <label>Gabari</label>
+                                <input type="text" name="gabari" placeholder="Örn: 12.5m">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Banyo Sayısı</label>
-                            <select name="banyo_sayisi">
-                                <option value="">Seçiniz</option>
-                                <option value="0">Yok</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4+</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Balkon</label>
-                            <select name="balkon">
-                                <option value="">Seçiniz</option>
-                                <option value="Var">Var</option>
-                                <option value="Yok">Yok</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Eşyalı</label>
-                            <select name="esyali">
-                                <option value="Hayır">Hayır</option>
-                                <option value="Evet">Evet</option>
-                            </select>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Tapu Durumu</label>
+                                <select name="tapu_durumu">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Müstakil Tapulu">Müstakil Tapulu</option>
+                                    <option value="Kat İrtifaklı">Kat İrtifaklı</option>
+                                    <option value="Kat Mülkiyetli">Kat Mülkiyetli</option>
+                                    <option value="Hisseli">Hisseli</option>
+                                    <option value="Arsa Tapulu">Arsa Tapulu</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Krediye Uygunluk</label>
+                                <select name="krediye_uygun">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Evet">Evet</option>
+                                    <option value="Hayır">Hayır</option>
+                                    <option value="Bilinmiyor">Bilinmiyor</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Takas</label>
+                                <select name="takas">
+                                    <option value="Hayır">Hayır</option>
+                                    <option value="Evet">Evet</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Kullanım Durumu</label>
-                            <select name="kullanim_durumu">
-                                <option value="Boş">Boş</option>
-                                <option value="Kiracılı">Kiracılı</option>
-                                <option value="Mülk Sahibi">Mülk Sahibi</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Site İçerisinde</label>
-                            <select name="site_icerisinde">
-                                <option value="Hayır">Hayır</option>
-                                <option value="Evet">Evet</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <?php if($kategori == 'kiralik'): ?>
-                    <div class="form-group">
-                        <label>Aidat (TL)</label>
-                        <input type="number" name="aidat" placeholder="0">
-                    </div>
+                    <?php else: ?>
+                        <!-- KONUT VE İŞYERİ İÇİN NORMAL ALANLAR -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="required">Brüt m²</label>
+                                <input type="number" name="brut_metrekare" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Net m²</label>
+                                <input type="number" name="net_metrekare">
+                            </div>
+                            <div class="form-group">
+                                <label class="required">Oda Sayısı</label>
+                                <select name="oda_sayisi" required>
+                                    <option value="">Seçiniz</option>
+                                    <option value="1+0">1+0</option>
+                                    <option value="1+1">1+1</option>
+                                    <option value="2+1">2+1</option>
+                                    <option value="3+1">3+1</option>
+                                    <option value="4+1">4+1</option>
+                                    <option value="5+1">5+1</option>
+                                    <option value="6+1">6+1</option>
+                                    <option value="7+1">7+1</option>
+                                    <option value="8+1">8+1</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Bina Yaşı</label>
+                                <select name="bina_yasi">
+                                    <option value="">Seçiniz</option>
+                                    <option value="0">0 (Yeni)</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3-5">3-5</option>
+                                    <option value="6-10">6-10</option>
+                                    <option value="11-15">11-15</option>
+                                    <option value="16-20">16-20</option>
+                                    <option value="21-25">21-25</option>
+                                    <option value="26-30">26-30</option>
+                                    <option value="31+">31 ve üzeri</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Bulunduğu Kat</label>
+                                <select name="bulundugu_kat">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Bodrum">Bodrum</option>
+                                    <option value="Zemin">Zemin</option>
+                                    <option value="Bahçe Katı">Bahçe Katı</option>
+                                    <option value="Giriş Katı">Giriş Katı</option>
+                                    <option value="Yüksek Giriş">Yüksek Giriş</option>
+                                    <?php for($i=1; $i<=30; $i++): ?>
+                                        <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                    <?php endfor; ?>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Kat Sayısı</label>
+                                <select name="kat_sayisi">
+                                    <option value="">Seçiniz</option>
+                                    <?php for($i=1; $i<=30; $i++): ?>
+                                        <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                    <?php endfor; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Isıtma</label>
+                                <select name="isitma">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Yok">Yok</option>
+                                    <option value="Soba">Soba</option>
+                                    <option value="Doğalgaz Sobası">Doğalgaz Sobası</option>
+                                    <option value="Kat Kaloriferi">Kat Kaloriferi</option>
+                                    <option value="Merkezi">Merkezi</option>
+                                    <option value="Merkezi (Pay Ölçer)">Merkezi (Pay Ölçer)</option>
+                                    <option value="Kombi (Doğalgaz)">Kombi (Doğalgaz)</option>
+                                    <option value="Kombi (Elektrik)">Kombi (Elektrik)</option>
+                                    <option value="Yerden Isıtma">Yerden Isıtma</option>
+                                    <option value="Klima">Klima</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Banyo Sayısı</label>
+                                <select name="banyo_sayisi">
+                                    <option value="">Seçiniz</option>
+                                    <option value="0">Yok</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4+</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Balkon</label>
+                                <select name="balkon">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Var">Var</option>
+                                    <option value="Yok">Yok</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Eşyalı</label>
+                                <select name="esyali">
+                                    <option value="Hayır">Hayır</option>
+                                    <option value="Evet">Evet</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Kullanım Durumu</label>
+                                <select name="kullanim_durumu">
+                                    <option value="Boş">Boş</option>
+                                    <option value="Kiracılı">Kiracılı</option>
+                                    <option value="Mülk Sahibi">Mülk Sahibi</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Site İçerisinde</label>
+                                <select name="site_icerisinde">
+                                    <option value="Hayır">Hayır</option>
+                                    <option value="Evet">Evet</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <?php if($kategori == 'kiralik'): ?>
+                        <div class="form-group">
+                            <label>Aidat (TL)</label>
+                            <input type="number" name="aidat" placeholder="0">
+                        </div>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
 
@@ -403,156 +466,6 @@ $ilceler = $db->query("SELECT * FROM ilceler WHERE il_id = 1 ORDER BY ilce_adi")
         </div>
     </div>
 
-    <script>
-    // İlçe değiştiğinde mahalle getir
-    document.getElementById('ilce').addEventListener('change', function() {
-        const ilce = this.value;
-        const mahalleSelect = document.getElementById('mahalle');
-        
-        if(!ilce) {
-            mahalleSelect.innerHTML = '<option value="">Önce ilçe seçin</option>';
-            return;
-        }
-        
-        mahalleSelect.innerHTML = '<option value="">Yükleniyor...</option>';
-        
-        fetch('ajax/get-neighborhoods.php?ilce=' + encodeURIComponent(ilce))
-            .then(response => response.text())
-            .then(data => {
-                mahalleSelect.innerHTML = data;
-            })
-            .catch(error => {
-                console.error('Hata:', error);
-                mahalleSelect.innerHTML = '<option value="">Mahalle yüklenemedi</option>';
-            });
-    });
-    
-    // Fotoğraf yükleme sistemi
-    let selectedFiles = [];
-    const maxFiles = 50;
-    const maxFileSize = 10 * 1024 * 1024; // 10MB
-    
-    // DOM elementleri
-    const photoInput = document.getElementById('photos');
-    const uploadArea = document.querySelector('.upload-area');
-    const previewArea = document.getElementById('preview-area');
-    
-    // Dosya seçildiğinde
-    photoInput.addEventListener('change', function(e) {
-        handleFiles(e.target.files);
-    });
-    
-    // Sürükle bırak eventleri
-    uploadArea.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        this.style.borderColor = '#3498db';
-        this.style.background = '#e3f2fd';
-    });
-    
-    uploadArea.addEventListener('dragleave', function(e) {
-        e.preventDefault();
-        this.style.borderColor = '#ddd';
-        this.style.background = '#fafafa';
-    });
-    
-    uploadArea.addEventListener('drop', function(e) {
-        e.preventDefault();
-        this.style.borderColor = '#ddd';
-        this.style.background = '#fafafa';
-        handleFiles(e.dataTransfer.files);
-    });
-    
-    // Dosyaları işle
-    function handleFiles(files) {
-        for(let i = 0; i < files.length; i++) {
-            const file = files[i];
-            
-            // Tip kontrolü
-            if(!file.type.startsWith('image/')) {
-                alert(file.name + ' bir resim dosyası değil!');
-                continue;
-            }
-            
-            // Boyut kontrolü
-            if(file.size > maxFileSize) {
-                alert(file.name + ' dosyası 10MB\'dan büyük!');
-                continue;
-            }
-            
-            // Maksimum dosya kontrolü
-            if(selectedFiles.length >= maxFiles) {
-                alert('Maksimum 50 fotoğraf yükleyebilirsiniz!');
-                break;
-            }
-            
-            selectedFiles.push(file);
-            previewImage(file, selectedFiles.length - 1);
-        }
-        updatePhotoInput();
-        updatePhotoCount();
-    }
-    
-    // Resim önizleme
-    function previewImage(file, index) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const div = document.createElement('div');
-            div.className = 'preview-item';
-            div.innerHTML = `
-                <img src="${e.target.result}" alt="">
-                <button type="button" class="remove-btn" onclick="removeImage(${index})">×</button>
-                <div class="photo-number">${index + 1}</div>
-            `;
-            previewArea.appendChild(div);
-        };
-        reader.readAsDataURL(file);
-    }
-    
-    // Resmi kaldır
-    function removeImage(index) {
-        selectedFiles.splice(index, 1);
-        updatePreview();
-        updatePhotoInput();
-        updatePhotoCount();
-    }
-    
-    // Önizlemeyi güncelle
-    function updatePreview() {
-        previewArea.innerHTML = '';
-        selectedFiles.forEach((file, index) => {
-            previewImage(file, index);
-        });
-    }
-    
-    // Input'u güncelle
-    function updatePhotoInput() {
-        const dataTransfer = new DataTransfer();
-        selectedFiles.forEach(file => {
-            dataTransfer.items.add(file);
-        });
-        photoInput.files = dataTransfer.files;
-    }
-    
-    // Sayacı güncelle
-    function updatePhotoCount() {
-        const uploadText = document.querySelector('.upload-text small');
-        if(uploadText && selectedFiles.length > 0) {
-            uploadText.textContent = `${selectedFiles.length} fotoğraf seçildi (Maksimum 50)`;
-        }
-    }
-    
-    // Form gönderilmeden önce - DÜZELTİLMİŞ KOD
-    document.getElementById('detailForm').addEventListener('submit', function(e) {
-        // Sadece uyarı ver, engelleme sadece iptal edilirse
-        if(selectedFiles.length === 0) {
-            if(!confirm('Fotoğraf eklemeden devam etmek istiyor musunuz?')) {
-                e.preventDefault();
-                return false;
-            }
-        }
-        // Form normal şekilde gönderilsin
-        return true;
-    });
-    </script>
+    <script src="../../assets/js/property-form.js"></script>
 </body>
 </html>
