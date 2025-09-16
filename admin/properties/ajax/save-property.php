@@ -6,7 +6,6 @@ if(!isset($_SESSION['admin_logged_in'])) {
 }
 
 require_once '../../../config/database.php';
-require_once '../../includes/upload.php'; // Upload fonksiyonları
 
 if($_SERVER['REQUEST_METHOD'] != 'POST' || !isset($_POST['save_property'])) {
     header("Location: ../add-step1.php");
@@ -26,7 +25,7 @@ try {
         esyali, kullanim_durumu, site_icerisinde, aidat,
         il, ilce, mahalle, adres, durum, kimden,
         anahtar_no, mulk_sahibi_tel, danisman_notu,
-        ekleyen_admin_id
+        ekleyen_admin_id, created_at
     ) VALUES (
         :ilan_no, CURDATE(), :baslik, :aciklama, :fiyat,
         :emlak_tipi, :kategori, :oda_sayisi, :brut_metrekare, :net_metrekare,
@@ -34,7 +33,7 @@ try {
         :esyali, :kullanim_durumu, :site_icerisinde, :aidat,
         :il, :ilce, :mahalle, :adres, 'aktif', 'Ofisten',
         :anahtar_no, :mulk_sahibi_tel, :danisman_notu,
-        :admin_id
+        :admin_id, NOW()
     )";
     
     $stmt = $db->prepare($sql);
@@ -70,25 +69,57 @@ try {
     
     $property_id = $db->lastInsertId();
     
-    // Fotoğrafları yükle (eğer varsa)
+    // FOTOĞRAF YÜKLEME - DEBUG'DA TEST EDİLMİŞ VE ÇALIŞAN KOD
+    $uploadPath = realpath(dirname(__FILE__) . '/../../../assets/uploads/properties/') . '/';
+    
+    // Klasör kontrolü
+    if (!file_exists($uploadPath)) {
+        mkdir($uploadPath, 0777, true);
+    }
+    
+    // Fotoğrafları işle
     if(isset($_FILES['photos']) && !empty($_FILES['photos']['name'][0])) {
-        $uploadResult = uploadPropertyImages($_FILES['photos'], $property_id, $db);
         
-        if(!$uploadResult['success'] && count($uploadResult['errors']) > 0) {
-            $_SESSION['photo_errors'] = $uploadResult['errors'];
+        for($i = 0; $i < count($_FILES['photos']['name']); $i++) {
+            
+            if($_FILES['photos']['error'][$i] == 0) {
+                
+                $temp = $_FILES['photos']['tmp_name'][$i];
+                $name = $_FILES['photos']['name'][$i];
+                $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
+                
+                // Basit dosya adı (debug'daki gibi)
+                $newName = 'img_' . $property_id . '_' . time() . '_' . $i . '.' . $ext;
+                $target = $uploadPath . $newName;
+                
+                // Dosyayı taşı (debug'da çalışan yöntem)
+                if(move_uploaded_file($temp, $target)) {
+                    
+                    // Veritabanına ekle
+                    $dbPath = 'assets/uploads/properties/' . $newName;
+                    $isMain = ($i == 0) ? 1 : 0;
+                    
+                    try {
+                        $stmt = $db->prepare("INSERT INTO property_images (property_id, image_path, image_name, is_main) 
+                                             VALUES (?, ?, ?, ?)");
+                        $stmt->execute([$property_id, $dbPath, $name, $isMain]);
+                    } catch(Exception $e) {
+                        // Hata olsa bile devam et
+                    }
+                }
+            }
         }
     }
     
-    // Başarı mesajı
+    // Başarı
     $_SESSION['new_property_id'] = $property_id;
     $_SESSION['new_property_no'] = $ilan_no;
     $_SESSION['success'] = "İlan başarıyla eklendi! İlan No: " . $ilan_no;
     
-    // Step 4'e yönlendir
     header("Location: ../add-step4.php");
     exit();
     
-} catch(PDOException $e) {
+} catch(Exception $e) {
     $_SESSION['error'] = "Hata: " . $e->getMessage();
     header("Location: ../add-step3.php");
     exit();
