@@ -69,46 +69,58 @@ try {
     
     $property_id = $db->lastInsertId();
     
-    // FOTOĞRAF YÜKLEME - DEBUG'DA TEST EDİLMİŞ VE ÇALIŞAN KOD
-    $uploadPath = realpath(dirname(__FILE__) . '/../../../assets/uploads/properties/') . '/';
+    // FOTOĞRAF YÜKLEME - DÜZELTİLMİŞ VERSİYON
+    $uploadPath = dirname(__FILE__) . '/../../../assets/uploads/properties/';
+    $uploadPath = realpath($uploadPath) . '/';
     
     // Klasör kontrolü
     if (!file_exists($uploadPath)) {
         mkdir($uploadPath, 0777, true);
     }
     
-    // Fotoğrafları işle
-    if(isset($_FILES['photos']) && !empty($_FILES['photos']['name'][0])) {
+    // Session'dan gelen dosyaları işle
+    if(isset($_SESSION['property_files']['photos'])) {
+        $files = $_SESSION['property_files']['photos'];
         
-        for($i = 0; $i < count($_FILES['photos']['name']); $i++) {
-            
-            if($_FILES['photos']['error'][$i] == 0) {
+        for($i = 0; $i < count($files['name']); $i++) {
+            if($files['error'][$i] == 0) {
                 
-                $temp = $_FILES['photos']['tmp_name'][$i];
-                $name = $_FILES['photos']['name'][$i];
+                $temp = $files['tmp_name'][$i];
+                $name = $files['name'][$i];
                 $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
                 
-                // Basit dosya adı (debug'daki gibi)
-                $newName = 'img_' . $property_id . '_' . time() . '_' . $i . '.' . $ext;
+                // Basit dosya adı
+                $newName = 'img_' . $property_id . '_' . ($i+1) . '.' . $ext;
                 $target = $uploadPath . $newName;
                 
-                // Dosyayı taşı (debug'da çalışan yöntem)
-                if(move_uploaded_file($temp, $target)) {
-                    
-                    // Veritabanına ekle
-                    $dbPath = 'assets/uploads/properties/' . $newName;
-                    $isMain = ($i == 0) ? 1 : 0;
-                    
-                    try {
+                // Geçici dosya hala var mı kontrol et
+                if(file_exists($temp)) {
+                    // copy kullanarak dosyayı kopyala
+                    if(copy($temp, $target)) {
+                        $dbPath = 'assets/uploads/properties/' . $newName;
+                        $isMain = ($i == 0) ? 1 : 0;
+                        
                         $stmt = $db->prepare("INSERT INTO property_images (property_id, image_path, image_name, is_main) 
                                              VALUES (?, ?, ?, ?)");
                         $stmt->execute([$property_id, $dbPath, $name, $isMain]);
-                    } catch(Exception $e) {
-                        // Hata olsa bile devam et
+                    }
+                } else if(isset($_FILES['photos']) && $_FILES['photos']['error'][$i] == 0) {
+                    // Eğer session'da yoksa doğrudan $_FILES'dan dene
+                    $temp = $_FILES['photos']['tmp_name'][$i];
+                    if(move_uploaded_file($temp, $target)) {
+                        $dbPath = 'assets/uploads/properties/' . $newName;
+                        $isMain = ($i == 0) ? 1 : 0;
+                        
+                        $stmt = $db->prepare("INSERT INTO property_images (property_id, image_path, image_name, is_main) 
+                                             VALUES (?, ?, ?, ?)");
+                        $stmt->execute([$property_id, $dbPath, $name, $isMain]);
                     }
                 }
             }
         }
+        
+        // Session'ı temizle
+        unset($_SESSION['property_files']);
     }
     
     // Başarı

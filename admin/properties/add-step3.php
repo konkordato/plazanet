@@ -225,7 +225,7 @@ if(empty($data)) {
                     <button type="button" class="btn btn-back" onclick="history.back()">
                         ← Geri Dön ve Düzenle
                     </button>
-                    <form method="POST" action="ajax/save-property.php" style="display: inline;">
+                    <form method="POST" action="ajax/save-property.php" enctype="multipart/form-data" style="display: inline;">
                         <?php foreach($data as $key => $value): ?>
                             <?php if(is_array($value)) continue; ?>
                             <input type="hidden" name="<?php echo $key; ?>" value="<?php echo htmlspecialchars($value ?? ''); ?>">
