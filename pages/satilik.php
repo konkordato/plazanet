@@ -1,11 +1,11 @@
 <?php
 require_once '../config/database.php';
 
-// Satılık ilanları çek
+// Satılık ilanları çek - BÜYÜK HARF İLE KONTROL
 $query = "SELECT p.*, pi.image_path 
           FROM properties p 
           LEFT JOIN property_images pi ON p.id = pi.property_id AND pi.is_main = 1
-          WHERE p.durum = 'aktif' AND p.kategori = 'satilik'
+          WHERE p.durum = 'aktif' AND (p.kategori = 'Satılık' OR p.kategori = 'satilik')
           ORDER BY p.created_at DESC";
 $stmt = $db->prepare($query);
 $stmt->execute();
@@ -27,7 +27,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="container">
                 <div class="logo-area">
                     <a href="../index.php" class="logo-link">
-                        <h1 style="color: #2c3e50; font-size: 1.8rem;">PLAZA EMLAK & YATIRIM</h1>
+                        <img src="../assets/images/plaza-logo.png" alt="Plaza Emlak & Yatırım" class="logo-img">
                     </a>
                 </div>
                 <ul class="nav-menu">

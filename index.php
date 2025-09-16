@@ -136,8 +136,8 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <section class="hero">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1 class="hero-title">PLAZA EMLAK & YATIRIM</h1>
-            <p class="hero-subtitle">Ahmet Karaman</p>
+            <h1 class="hero-title">Geleceğinize İyi Bir Yatırım</h1>
+            <p class="hero-subtitle">PLAZA EMLAK & YATIRIM</p>
             <p class="hero-description">Hayalinizdeki gayrimenkulü bulmanız için profesyonel çözümler</p>
             
             <!-- Arama Formu -->

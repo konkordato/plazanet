@@ -116,7 +116,7 @@ require_once '../config/database.php';
             <div class="container">
                 <div class="logo-area">
                     <a href="../index.php" class="logo-link">
-                        <h1 style="color: #2c3e50; font-size: 1.8rem;">PLAZA EMLAK & YATIRIM</h1>
+                        <img src="../assets/images/plaza-logo.png" alt="Plaza Emlak & Yatırım" class="logo-img">
                     </a>
                 </div>
                 <ul class="nav-menu">
