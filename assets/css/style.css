@@ -139,16 +139,18 @@ header {
 }
 
 .hero-title {
-    font-size: 3.5rem;
+    font-size: 3.8rem;
     font-weight: 800;
     margin-bottom: 1.5rem;
     background: linear-gradient(to right, white, #f0f0f0);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     animation: fadeInUp 0.8s ease;
     line-height: 1.2;
-    text-transform: uppercase;
-    letter-spacing: -1px;
+    text-transform: capitalize;
+    letter-spacing: 2px;
+    text-shadow: 0 4px 30px rgba(0,0,0,0.1);
 }
 
 .hero-subtitle {
@@ -272,6 +274,7 @@ header {
     margin-bottom: 1.5rem;
     background: linear-gradient(135deg, var(--secondary), var(--accent));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
@@ -427,6 +430,7 @@ header {
     font-weight: 700;
     background: linear-gradient(135deg, var(--primary), var(--accent));
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
