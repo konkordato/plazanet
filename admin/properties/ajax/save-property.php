@@ -1,6 +1,6 @@
 <?php
 session_start();
-if(!isset($_SESSION['admin_logged_in'])) {
+if(!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header("Location: ../../index.php");
     exit();
 }
@@ -69,58 +69,56 @@ try {
     
     $property_id = $db->lastInsertId();
     
-    // FOTOĞRAF YÜKLEME - DÜZELTİLMİŞ VERSİYON
-    $uploadPath = dirname(__FILE__) . '/../../../assets/uploads/properties/';
-    $uploadPath = realpath($uploadPath) . '/';
+    // FOTOĞRAF YÜKLEME - SESSION'DAN AL
+    $uploadPath = realpath(dirname(__FILE__) . '/../../../assets/uploads/properties/') . '/';
     
-    // Klasör kontrolü
     if (!file_exists($uploadPath)) {
         mkdir($uploadPath, 0777, true);
     }
     
-    // Session'dan gelen dosyaları işle
-    if(isset($_SESSION['property_files']['photos'])) {
-        $files = $_SESSION['property_files']['photos'];
+    // Session'daki temp fotoğrafları işle
+    if(isset($_SESSION['temp_photos']) && !empty($_SESSION['temp_photos'])) {
         
-        for($i = 0; $i < count($files['name']); $i++) {
-            if($files['error'][$i] == 0) {
-                
-                $temp = $files['tmp_name'][$i];
-                $name = $files['name'][$i];
-                $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
-                
-                // Basit dosya adı
-                $newName = 'img_' . $property_id . '_' . ($i+1) . '.' . $ext;
-                $target = $uploadPath . $newName;
-                
-                // Geçici dosya hala var mı kontrol et
-                if(file_exists($temp)) {
-                    // copy kullanarak dosyayı kopyala
-                    if(copy($temp, $target)) {
-                        $dbPath = 'assets/uploads/properties/' . $newName;
-                        $isMain = ($i == 0) ? 1 : 0;
-                        
+        foreach($_SESSION['temp_photos'] as $i => $file) {
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            $newName = 'img_' . $property_id . '_' . time() . '_' . $i . '.' . $ext;
+            $target = $uploadPath . $newName;
+            
+            // Temp dosyayı hedef klasöre kopyala
+            if(file_exists($file['path'])) {
+                if(copy($file['path'], $target)) {
+                    // Temp dosyayı sil
+                    @unlink($file['path']);
+                    
+                    // Veritabanına ekle
+                    $dbPath = 'assets/uploads/properties/' . $newName;
+                    $isMain = ($i == 0) ? 1 : 0;
+                    
+                    try {
                         $stmt = $db->prepare("INSERT INTO property_images (property_id, image_path, image_name, is_main) 
                                              VALUES (?, ?, ?, ?)");
-                        $stmt->execute([$property_id, $dbPath, $name, $isMain]);
+                        $stmt->execute([$property_id, $dbPath, $file['name'], $isMain]);
+                    } catch(Exception $e) {
+                        // Hata olsa bile devam et
+                        error_log("Resim veritabanı hatası: " . $e->getMessage());
                     }
-                } else if(isset($_FILES['photos']) && $_FILES['photos']['error'][$i] == 0) {
-                    // Eğer session'da yoksa doğrudan $_FILES'dan dene
-                    $temp = $_FILES['photos']['tmp_name'][$i];
-                    if(move_uploaded_file($temp, $target)) {
-                        $dbPath = 'assets/uploads/properties/' . $newName;
-                        $isMain = ($i == 0) ? 1 : 0;
-                        
-                        $stmt = $db->prepare("INSERT INTO property_images (property_id, image_path, image_name, is_main) 
-                                             VALUES (?, ?, ?, ?)");
-                        $stmt->execute([$property_id, $dbPath, $name, $isMain]);
-                    }
+                } else {
+                    error_log("Dosya kopyalanamadı: " . $file['path'] . " -> " . $target);
                 }
+            } else {
+                error_log("Temp dosya bulunamadı: " . $file['path']);
             }
         }
         
-        // Session'ı temizle
-        unset($_SESSION['property_files']);
+        // Temp klasörü temizle
+        $tempDir = sys_get_temp_dir() . '/plaza_temp_' . session_id() . '/';
+        if(is_dir($tempDir)) {
+            array_map('unlink', glob("$tempDir/*"));
+            @rmdir($tempDir);
+        }
+        
+        // Session'dan temp fotoğrafları temizle
+        unset($_SESSION['temp_photos']);
     }
     
     // Başarı
@@ -128,11 +126,18 @@ try {
     $_SESSION['new_property_no'] = $ilan_no;
     $_SESSION['success'] = "İlan başarıyla eklendi! İlan No: " . $ilan_no;
     
+    // Session'daki property_data'yı da temizle
+    unset($_SESSION['property_data']);
+    unset($_SESSION['emlak_tipi']);
+    unset($_SESSION['kategori']);
+    unset($_SESSION['alt_kategori']);
+    
     header("Location: ../add-step4.php");
     exit();
     
 } catch(Exception $e) {
     $_SESSION['error'] = "Hata: " . $e->getMessage();
+    error_log("Property save error: " . $e->getMessage());
     header("Location: ../add-step3.php");
     exit();
 }

@@ -10,7 +10,33 @@ require_once '../../config/database.php';
 // Form verilerini al ve session'a kaydet
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
     $_SESSION['property_data'] = $_POST;
-    $_SESSION['property_files'] = $_FILES;
+    
+    // FOTOĞRAFLARI TEMP KLASÖRE KAYDET
+    if(isset($_FILES['photos']) && !empty($_FILES['photos']['name'][0])) {
+        $tempFiles = [];
+        $tempDir = sys_get_temp_dir() . '/plaza_temp_' . session_id() . '/';
+        
+        if(!is_dir($tempDir)) {
+            mkdir($tempDir, 0777, true);
+        }
+        
+        for($i = 0; $i < count($_FILES['photos']['name']); $i++) {
+            if($_FILES['photos']['error'][$i] == 0) {
+                $tempName = 'temp_' . time() . '_' . $i . '_' . $_FILES['photos']['name'][$i];
+                $tempPath = $tempDir . $tempName;
+                
+                if(move_uploaded_file($_FILES['photos']['tmp_name'][$i], $tempPath)) {
+                    $tempFiles[] = [
+                        'path' => $tempPath,
+                        'name' => $_FILES['photos']['name'][$i],
+                        'type' => $_FILES['photos']['type'][$i],
+                        'size' => $_FILES['photos']['size'][$i]
+                    ];
+                }
+            }
+        }
+        $_SESSION['temp_photos'] = $tempFiles;
+    }
 }
 
 // Session'dan verileri al
@@ -82,6 +108,18 @@ if(empty($data)) {
         }
         .edit-btn:hover {
             background: #7f8c8d;
+        }
+        .photo-preview-section {
+            background: #e8f5e9;
+            border-left-color: #4caf50;
+        }
+        .photo-count {
+            background: #4caf50;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -199,6 +237,17 @@ if(empty($data)) {
                     </div>
                 </div>
 
+                <!-- Fotoğraflar Önizleme -->
+                <?php if(isset($_SESSION['temp_photos']) && !empty($_SESSION['temp_photos'])): ?>
+                <div class="preview-section photo-preview-section">
+                    <div class="preview-title">📷 Yüklenen Fotoğraflar</div>
+                    <div style="padding: 10px;">
+                        <p>Toplam <strong><?php echo count($_SESSION['temp_photos']); ?></strong> adet fotoğraf yüklendi.</p>
+                        <div class="photo-count">✓ Fotoğraflar hazır</div>
+                    </div>
+                </div>
+                <?php endif; ?>
+
                 <!-- Danışman Bilgileri (Sadece Admin Görür) -->
                 <div class="preview-section admin-only">
                     <div class="preview-title">🔒 Danışman Bilgileri (Sadece Siz Görürsünüz)</div>
@@ -225,7 +274,7 @@ if(empty($data)) {
                     <button type="button" class="btn btn-back" onclick="history.back()">
                         ← Geri Dön ve Düzenle
                     </button>
-                    <form method="POST" action="ajax/save-property.php" enctype="multipart/form-data" style="display: inline;">
+                    <form method="POST" action="ajax/save-property.php" style="display: inline;">
                         <?php foreach($data as $key => $value): ?>
                             <?php if(is_array($value)) continue; ?>
                             <input type="hidden" name="<?php echo $key; ?>" value="<?php echo htmlspecialchars($value ?? ''); ?>">

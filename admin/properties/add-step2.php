@@ -541,13 +541,17 @@ $ilceler = $db->query("SELECT * FROM ilceler WHERE il_id = 1 ORDER BY ilce_adi")
         }
     }
     
-    // Form gönderilmeden önce
+    // Form gönderilmeden önce - DÜZELTİLMİŞ KOD
     document.getElementById('detailForm').addEventListener('submit', function(e) {
+        // Sadece uyarı ver, engelleme sadece iptal edilirse
         if(selectedFiles.length === 0) {
             if(!confirm('Fotoğraf eklemeden devam etmek istiyor musunuz?')) {
                 e.preventDefault();
+                return false;
             }
         }
+        // Form normal şekilde gönderilsin
+        return true;
     });
     </script>
 </body>
