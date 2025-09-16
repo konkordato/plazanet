@@ -1,7 +1,7 @@
 <?php
 require_once 'config/database.php';
 
-// İlanları çek - DÜZELTME: status yerine durum kullan
+// İlanları çek
 $query = "SELECT p.*, pi.image_path 
           FROM properties p 
           LEFT JOIN property_images pi ON p.id = pi.property_id AND pi.is_main = 1
@@ -17,11 +17,93 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plaza Emlak & Yatırım - Geleceğinize İyi Bir Yatırım</title>
+    <title>Plaza Emlak & Yatırım - Ahmet Karaman</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Ana Sayfa Özel Stilleri */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.95;
+        }
+        
+        .features {
+            background: #fff;
+            padding: 4rem 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .feature-card {
+            text-align: center;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .property-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+        
+        .property-view {
+            color: #3498db;
+            font-weight: 500;
+        }
+        
+        .no-image {
+            height: 200px;
+            background: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+        }
+        
+        .no-image span {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
 </head>
 <body>
     <!-- Üst Menü -->
@@ -35,10 +117,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <ul class="nav-menu">
                     <li><a href="index.php" class="active">Ana Sayfa</a></li>
-                    <li><a href="#satilik">Satılık</a></li>
-                    <li><a href="#kiralik">Kiralık</a></li>
-                    <li><a href="#hakkimizda">Hakkımızda</a></li>
-                    <li><a href="#iletisim">İletişim</a></li>
+                    <li><a href="pages/satilik.php">Satılık</a></li>
+                    <li><a href="pages/kiralik.php">Kiralık</a></li>
+                    <li><a href="pages/hakkimizda.php">Hakkımızda</a></li>
+                    <li><a href="pages/iletisim.php">İletişim</a></li>
                     <li><a href="admin/" class="admin-btn">Yönetim</a></li>
                 </ul>
                 <div class="mobile-menu-toggle">
@@ -54,8 +136,9 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <section class="hero">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1 class="hero-title">Geleceğinize İyi Bir Yatırım</h1>
-            <p class="hero-subtitle">PLAZA EMLAK & YATIRIM</p>
+            <h1 class="hero-title">PLAZA EMLAK & YATIRIM</h1>
+            <p class="hero-subtitle">Ahmet Karaman</p>
+            <p class="hero-description">Hayalinizdeki gayrimenkulü bulmanız için profesyonel çözümler</p>
             
             <!-- Arama Formu -->
             <div class="search-box">
@@ -180,34 +263,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </section>
 
     <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <img src="assets/images/plaza-logo.png" alt="Plaza Emlak" class="footer-logo">
-                    <p class="footer-desc">Plaza Emlak & Yatırım olarak 20 yıldır güvenilir gayrimenkul hizmetleri sunuyoruz.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Hızlı Linkler</h4>
-                    <ul>
-                        <li><a href="#satilik">Satılık İlanlar</a></li>
-                        <li><a href="#kiralik">Kiralık İlanlar</a></li>
-                        <li><a href="#hakkimizda">Hakkımızda</a></li>
-                        <li><a href="#iletisim">İletişim</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>İletişim</h4>
-                    <p>📞 0272 213 11 10</p>
-                    <p>📱 0532 XXX XX XX</p>
-                    <p>✉️ info@plazaemlak.com</p>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2024 Plaza Emlak & Yatırım. Tüm hakları saklıdır.</p>
-            </div>
-        </div>
-    </footer>
+    <?php include 'includes/footer.php'; ?>
 
     <script src="assets/js/main.js"></script>
 </body>
