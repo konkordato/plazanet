@@ -277,15 +277,23 @@ if(empty($data)) {
                     <form method="POST" action="ajax/save-property.php" style="display: inline;">
                         <?php foreach($data as $key => $value): ?>
                             <?php if(is_array($value)) continue; ?>
-                            <input type="hidden" name="<?php echo $key; ?>" value="<?php echo htmlspecialchars($value ?? ''); ?>">
+                            <input type="hidden" name="<?php echo htmlspecialchars($key); ?>" value="<?php echo htmlspecialchars($value ?? ''); ?>">
                         <?php endforeach; ?>
-                        <button type="submit" class="btn btn-save" name="save_property">
-                        ✓ Onayla ve Kaydet
+                        <input type="hidden" name="save_property" value="1">
+                        <button type="submit" class="btn btn-save">
+                            ✓ Onayla ve Kaydet
                         </button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Debug için JavaScript -->
+    <script>
+    document.querySelector('.btn-save').addEventListener('click', function(e) {
+        console.log('Kaydet butonu tıklandı');
+    });
+    </script>
 </body>
 </html>
