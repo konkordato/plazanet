@@ -17,11 +17,11 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plaza Emlak & Yatırım - Ahmet Karaman</title>
+    <title>Plaza Emlak & Yatırım - Geleceğinize İyi Bir Yatırım</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Üst Menü -->
@@ -54,9 +54,8 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <section class="hero">
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1 class="hero-title">PLAZA EMLAK & YATIRIM</h1>
-            <p class="hero-subtitle">Ahmet Karaman</p>
-            <p class="hero-description">Hayalinizdeki gayrimenkulü bulmanız için profesyonel çözümler</p>
+            <h1 class="hero-title">Geleceğinize İyi Bir Yatırım</h1>
+            <p class="hero-subtitle">PLAZA EMLAK & YATIRIM</p>
             
             <!-- Arama Formu -->
             <div class="search-box">
@@ -199,13 +198,13 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 </div>
                 <div class="footer-section">
                     <h4>İletişim</h4>
-                    <p>📞 0212 XXX XX XX</p>
+                    <p>📞 0272 213 11 10</p>
                     <p>📱 0532 XXX XX XX</p>
                     <p>✉️ info@plazaemlak.com</p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2024 Plaza Emlak & Yatırım - Ahmet Karaman. Tüm hakları saklıdır.</p>
+                <p>&copy; 2024 Plaza Emlak & Yatırım. Tüm hakları saklıdır.</p>
             </div>
         </div>
     </footer>
