@@ -385,51 +385,163 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
             <div class="property-details">
                 <h2>İlan Detayları</h2>
                 <div class="info-grid">
-                    <div class="info-item">
-                        <div class="info-label">İlan No</div>
-                        <div class="info-value"><?php echo $property['ilan_no']; ?></div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">İlan Tarihi</div>
-                        <div class="info-value"><?php echo date('d.m.Y', strtotime($property['ilan_tarihi'])); ?></div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Emlak Tipi</div>
-                        <div class="info-value"><?php echo $property['emlak_tipi']; ?></div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Kategori</div>
-                        <div class="info-value"><?php echo $property['kategori']; ?></div>
-                    </div>
-                    <?php if($property['oda_sayisi']): ?>
-                    <div class="info-item">
-                        <div class="info-label">Oda Sayısı</div>
-                        <div class="info-value"><?php echo $property['oda_sayisi']; ?></div>
-                    </div>
-                    <?php endif; ?>
-                    <div class="info-item">
-                        <div class="info-label">Metrekare</div>
-                        <div class="info-value"><?php echo $property['brut_metrekare']; ?> m²</div>
-                    </div>
-                    <?php if($property['bina_yasi']): ?>
-                    <div class="info-item">
-                        <div class="info-label">Bina Yaşı</div>
-                        <div class="info-value"><?php echo $property['bina_yasi']; ?></div>
-                    </div>
-                    <?php endif; ?>
-                    <?php if($property['bulundugu_kat']): ?>
-                    <div class="info-item">
-                        <div class="info-label">Bulunduğu Kat</div>
-                        <div class="info-value"><?php echo $property['bulundugu_kat']; ?></div>
-                    </div>
-                    <?php endif; ?>
-                    <?php if($property['isitma']): ?>
-                    <div class="info-item">
-                        <div class="info-label">Isıtma</div>
-                        <div class="info-value"><?php echo $property['isitma']; ?></div>
-                    </div>
-                    <?php endif; ?>
-                </div>
+    <div class="info-item">
+        <div class="info-label">İlan No</div>
+        <div class="info-value"><?php echo $property['ilan_no']; ?></div>
+    </div>
+    <div class="info-item">
+        <div class="info-label">İlan Tarihi</div>
+        <div class="info-value"><?php echo date('d.m.Y', strtotime($property['ilan_tarihi'])); ?></div>
+    </div>
+    <div class="info-item">
+        <div class="info-label">Emlak Tipi</div>
+        <div class="info-value"><?php echo $property['emlak_tipi']; ?></div>
+    </div>
+    <div class="info-item">
+        <div class="info-label">Kategori</div>
+        <div class="info-value"><?php echo $property['kategori']; ?></div>
+    </div>
+    
+    <?php if($property['emlak_tipi'] == 'arsa'): ?>
+        <!-- ARSA BİLGİLERİ -->
+        <div class="info-item">
+            <div class="info-label">Metrekare</div>
+            <div class="info-value"><?php echo $property['brut_metrekare']; ?> m²</div>
+        </div>
+        <?php if($property['metrekare_fiyat']): ?>
+        <div class="info-item">
+            <div class="info-label">m² Fiyatı</div>
+            <div class="info-value"><?php echo number_format($property['metrekare_fiyat'], 0, ',', '.'); ?> ₺</div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['imar_durumu']): ?>
+        <div class="info-item">
+            <div class="info-label">İmar Durumu</div>
+            <div class="info-value"><?php echo $property['imar_durumu']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['ada_no']): ?>
+        <div class="info-item">
+            <div class="info-label">Ada No</div>
+            <div class="info-value"><?php echo $property['ada_no']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['parsel_no']): ?>
+        <div class="info-item">
+            <div class="info-label">Parsel No</div>
+            <div class="info-value"><?php echo $property['parsel_no']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['pafta_no']): ?>
+        <div class="info-item">
+            <div class="info-label">Pafta No</div>
+            <div class="info-value"><?php echo $property['pafta_no']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['kaks_emsal']): ?>
+        <div class="info-item">
+            <div class="info-label">Kaks (Emsal)</div>
+            <div class="info-value"><?php echo $property['kaks_emsal']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['gabari']): ?>
+        <div class="info-item">
+            <div class="info-label">Gabari</div>
+            <div class="info-value"><?php echo $property['gabari']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['tapu_durumu']): ?>
+        <div class="info-item">
+            <div class="info-label">Tapu Durumu</div>
+            <div class="info-value"><?php echo $property['tapu_durumu']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['krediye_uygun']): ?>
+        <div class="info-item">
+            <div class="info-label">Krediye Uygunluk</div>
+            <div class="info-value"><?php echo $property['krediye_uygun']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['takas']): ?>
+        <div class="info-item">
+            <div class="info-label">Takas</div>
+            <div class="info-value"><?php echo $property['takas']; ?></div>
+        </div>
+        <?php endif; ?>
+    <?php else: ?>
+        <!-- KONUT/İŞYERİ BİLGİLERİ -->
+        <?php if($property['oda_sayisi']): ?>
+        <div class="info-item">
+            <div class="info-label">Oda Sayısı</div>
+            <div class="info-value"><?php echo $property['oda_sayisi']; ?></div>
+        </div>
+        <?php endif; ?>
+        <div class="info-item">
+            <div class="info-label">Brüt m²</div>
+            <div class="info-value"><?php echo $property['brut_metrekare']; ?></div>
+        </div>
+        <?php if($property['net_metrekare']): ?>
+        <div class="info-item">
+            <div class="info-label">Net m²</div>
+            <div class="info-value"><?php echo $property['net_metrekare']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['bina_yasi']): ?>
+        <div class="info-item">
+            <div class="info-label">Bina Yaşı</div>
+            <div class="info-value"><?php echo $property['bina_yasi']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['bulundugu_kat']): ?>
+        <div class="info-item">
+            <div class="info-label">Bulunduğu Kat</div>
+            <div class="info-value"><?php echo $property['bulundugu_kat']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['kat_sayisi']): ?>
+        <div class="info-item">
+            <div class="info-label">Kat Sayısı</div>
+            <div class="info-value"><?php echo $property['kat_sayisi']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['isitma']): ?>
+        <div class="info-item">
+            <div class="info-label">Isıtma</div>
+            <div class="info-value"><?php echo $property['isitma']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['banyo_sayisi']): ?>
+        <div class="info-item">
+            <div class="info-label">Banyo Sayısı</div>
+            <div class="info-value"><?php echo $property['banyo_sayisi']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['balkon']): ?>
+        <div class="info-item">
+            <div class="info-label">Balkon</div>
+            <div class="info-value"><?php echo $property['balkon']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['esyali']): ?>
+        <div class="info-item">
+            <div class="info-label">Eşyalı</div>
+            <div class="info-value"><?php echo $property['esyali']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['kullanim_durumu']): ?>
+        <div class="info-item">
+            <div class="info-label">Kullanım Durumu</div>
+            <div class="info-value"><?php echo $property['kullanim_durumu']; ?></div>
+        </div>
+        <?php endif; ?>
+        <?php if($property['site_icerisinde']): ?>
+        <div class="info-item">
+            <div class="info-label">Site İçerisinde</div>
+            <div class="info-value"><?php echo $property['site_icerisinde']; ?></div>
+        </div>
+        <?php endif; ?>
+    <?php endif; ?>
+</div>
 
                 <h3 style="margin: 30px 0 15px;">Açıklama</h3>
                 <p style="line-height: 1.6; color: #555;">
