@@ -294,8 +294,8 @@ require_once '../../config/database.php';
                 <div class="category-box" data-category="konut">
                     <h3 class="category-title">🏠 Konut</h3>
                     <ul class="category-list">
-                        <li data-type="satilik">Satılık</li>
-                        <li data-type="kiralik">Kiralık</li>
+                        <li data-type="Satılık">Satılık</li>
+                        <li data-type="Kiralık">Kiralık</li>
                         <li data-type="devren">Devren Satılık Konut</li>
                     </ul>
                 </div>
@@ -303,8 +303,8 @@ require_once '../../config/database.php';
                 <div class="category-box" data-category="isyeri">
                     <h3 class="category-title">🏢 İş Yeri</h3>
                     <ul class="category-list">
-                        <li data-type="satilik">Satılık</li>
-                        <li data-type="kiralik">Kiralık</li>
+                        <li data-type="Satılık">Satılık</li>
+                        <li data-type="Kiralık">Kiralık</li>
                         <li data-type="devren">Devren</li>
                     </ul>
                 </div>
@@ -312,8 +312,8 @@ require_once '../../config/database.php';
                 <div class="category-box" data-category="arsa">
                     <h3 class="category-title">🌍 Arsa</h3>
                     <ul class="category-list">
-                        <li data-type="satilik">Satılık</li>
-                        <li data-type="kiralik">Kiralık</li>
+                        <li data-type="Satılık">Satılık</li>
+                        <li data-type="Kiralık">Kiralık</li>
                     </ul>
                 </div>
             </div>

@@ -1,6 +1,7 @@
 <?php
 require_once 'config/database.php';
-
+// Türkçe karakter düzeltmesi
+header('Content-Type: text/html; charset=utf-8');
 // İlanları çek
 $query = "SELECT p.*, pi.image_path 
           FROM properties p 
