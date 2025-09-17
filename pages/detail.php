@@ -102,30 +102,39 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                     <tr><td>Emlak Tipi</td><td><?php echo $property['emlak_tipi']; ?></td></tr>
                     <tr><td>Kategori</td><td><?php echo $property['kategori']; ?></td></tr>
                     
-                    <?php if($property['emlak_tipi'] == 'arsa' || $property['emlak_tipi'] == 'Arsa'): ?>
-                        <!-- ARSA BİLGİLERİ -->
-                        <?php if($property['imar_durumu']): ?>
-                        <tr><td>İmar Durumu</td><td><?php echo $property['imar_durumu']; ?></td></tr>
-                        <?php endif; ?>
-                        <?php if($property['ada_no']): ?>
-                        <tr><td>Ada No</td><td><?php echo $property['ada_no']; ?></td></tr>
-                        <?php endif; ?>
-                        <?php if($property['parsel_no']): ?>
-                        <tr><td>Parsel No</td><td><?php echo $property['parsel_no']; ?></td></tr>
-                        <?php endif; ?>
-                        <?php if($property['pafta_no']): ?>
-                        <tr><td>Pafta No</td><td><?php echo $property['pafta_no']; ?></td></tr>
-                        <?php endif; ?>
-                        <?php if($property['kaks']): ?>
-                        <tr><td>Kaks (Emsal)</td><td><?php echo $property['kaks']; ?></td></tr>
-                        <?php endif; ?>
-                        <?php if($property['gabari']): ?>
-                        <tr><td>Gabari</td><td><?php echo $property['gabari']; ?></td></tr>
-                        <?php endif; ?>
-                        <?php if($property['tapu_durumu']): ?>
-                        <tr><td>Tapu Durumu</td><td><?php echo $property['tapu_durumu']; ?></td></tr>
-                        <?php endif; ?>
-                    <?php else: ?>
+                    <!-- ARSA BİLGİLERİ -->
+<!-- Bu kodu detail.php dosyasında 108. satır civarındaki ARSA BİLGİLERİ bölümüyle değiştirin -->
+
+<?php if($property['emlak_tipi'] == 'arsa' || $property['emlak_tipi'] == 'Arsa'): ?>
+    <!-- ARSA BİLGİLERİ -->
+    <?php if(isset($property['imar_durumu']) && $property['imar_durumu']): ?>
+    <tr><td>İmar Durumu</td><td><?php echo $property['imar_durumu']; ?></td></tr>
+    <?php endif; ?>
+    
+    <?php if(isset($property['ada_no']) && $property['ada_no']): ?>
+    <tr><td>Ada No</td><td><?php echo $property['ada_no']; ?></td></tr>
+    <?php endif; ?>
+    
+    <?php if(isset($property['parsel_no']) && $property['parsel_no']): ?>
+    <tr><td>Parsel No</td><td><?php echo $property['parsel_no']; ?></td></tr>
+    <?php endif; ?>
+    
+    <?php if(isset($property['pafta_no']) && $property['pafta_no']): ?>
+    <tr><td>Pafta No</td><td><?php echo $property['pafta_no']; ?></td></tr>
+    <?php endif; ?>
+    
+    <?php if(isset($property['kaks']) && $property['kaks']): ?>
+    <tr><td>Kaks (Emsal)</td><td><?php echo $property['kaks']; ?></td></tr>
+    <?php endif; ?>
+    
+    <?php if(isset($property['gabari']) && $property['gabari']): ?>
+    <tr><td>Gabari</td><td><?php echo $property['gabari']; ?></td></tr>
+    <?php endif; ?>
+    
+    <?php if(isset($property['tapu_durumu']) && $property['tapu_durumu']): ?>
+    <tr><td>Tapu Durumu</td><td><?php echo $property['tapu_durumu']; ?></td></tr>
+    <?php endif; ?>
+<?php else: ?>
                         <!-- KONUT/İŞYERİ BİLGİLERİ -->
                         <?php if($property['oda_sayisi']): ?>
                         <tr><td>Oda Sayısı</td><td><?php echo $property['oda_sayisi']; ?></td></tr>
