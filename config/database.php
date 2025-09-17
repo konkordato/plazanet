@@ -19,6 +19,8 @@ class Database {
             );
             // Türkçe karakterler için UTF-8 ayarı
             $this->conn->exec("set names utf8mb4");
+            $this->conn->exec("SET CHARACTER SET utf8mb4");
+            $this->conn->exec("SET COLLATION_CONNECTION = 'utf8mb4_unicode_ci'");
             // Hata ayıklama modu
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch(PDOException $exception) {
