@@ -54,8 +54,78 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($property['baslik']); ?> - Plaza Emlak</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+<style>
+/* SADECE BU SAYFAYA ÖZEL - DİĞER SAYFALARLA ÇAKIŞMAZ */
+.detail-page-custom .detail-container { 
+    max-width: 1400px !important; /* Sadece bu sayfada genişlet */
+}
+
+.detail-page-custom .detail-grid {
+    display: grid !important;
+    grid-template-columns: 48% 30% 20% !important; /* Güvenli oranlar */
+    gap: 1% !important;
+}
+
+/* Sadece bu sayfadaki galeriye özel */
+.detail-page-custom .detail-gallery {
+    position: relative;
+}
+
+.detail-page-custom .detail-gallery img.gallery-main {
+    width: 100% !important;
+    height: 480px !important; /* Resim yüksekliği */
+    object-fit: cover !important;
+    border-radius: 8px !important;
+}
+
+.detail-page-custom .gallery-thumbs {
+    display: flex !important;
+    gap: 8px !important;
+    margin-top: 12px !important;
+    overflow-x: auto !important;
+}
+
+.detail-page-custom .gallery-thumb {
+    min-width: 85px !important;
+    width: 85px !important;
+    height: 65px !important;
+    object-fit: cover !important;
+    cursor: pointer !important;
+}
+
+/* Orta sütun ayarları */
+.detail-page-custom .detail-info .detail-table {
+    width: 100% !important;
+}
+
+.detail-page-custom .detail-table td {
+    padding: 7px 8px !important; /* Tabloda boşlukları azalt */
+    font-size: 13px !important;
+}
+
+/* Sağ sütun (danışman) ayarları */
+.detail-page-custom .detail-agent {
+    padding: 15px !important;
+}
+
+.detail-page-custom .agent-phone {
+    font-size: 14px !important;
+    padding: 10px 12px !important;
+}
+
+/* Mobil görünüm koruması */
+@media (max-width: 768px) {
+    .detail-page-custom .detail-grid {
+        grid-template-columns: 1fr !important; /* Mobilde alt alta */
+    }
+    
+    .detail-page-custom .detail-gallery img.gallery-main {
+        height: 300px !important; /* Mobilde daha kısa */
+    }
+}
+</style>
 </head>
-<body style="background: #f4f4f4;">
+<body class="detail-page-custom" style="background: #f4f4f4;">
     <!-- Üst Bar -->
     <div class="detail-nav">
         <a href="../index.php">← Ana Sayfa</a> / 

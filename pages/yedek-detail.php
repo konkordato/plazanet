@@ -181,9 +181,9 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                         📍 <?php echo $property['mahalle'] ? $property['mahalle'].', ' : ''; ?>
                         <?php echo $property['ilce']; ?> / <?php echo $property['il']; ?>
                     </p>
-                    <a href="../index.php" style="color:#489ae9;text-decoration:none;font-size:14px;">
-                        Bu danışmanın diğer <?php echo $digerIlanSayisi; ?> ilanını gör →
-                    </a>
+                    <a href="danisman-ilanlari.php" style="color:#489ae9;text-decoration:none;font-size:14px;">
+                        Bu danışmanın diğer <?php echo $digerIlanSayisi; ?> ilanlarını gör →
+                     </a>
                 </div>
             </div>
         </div>
