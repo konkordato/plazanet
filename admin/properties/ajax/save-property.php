@@ -1,6 +1,6 @@
 <?php
 session_start();
-if(!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+if(!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true) {
     header("Location: ../../index.php");
     exit();
 }
@@ -78,9 +78,15 @@ try {
         ':anahtar_no' => $data['anahtar_no'] ?? null,
         ':mulk_sahibi_tel' => $data['mulk_sahibi_tel'] ?? null,
         ':danisman_notu' => $data['danisman_notu'] ?? null,
-        ':admin_id' => $_SESSION['admin_id'] ?? 1
+        ':admin_id' => $_SESSION['user_id'] ?? $_SESSION['admin_id'] ?? 1
     ]);
-    
+    if(isset($_SESSION['user_id'])) {
+    $updateUser = $db->prepare("UPDATE properties SET user_id = :user_id WHERE id = :id");
+    $updateUser->execute([
+        ':user_id' => $_SESSION['user_id'],
+        ':id' => $property_id
+    ]);
+   }
     $property_id = $db->lastInsertId();
     
     // FOTOĞRAF YÜKLEME - BASİT ÇÖZÜM
