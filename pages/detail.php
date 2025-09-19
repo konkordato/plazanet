@@ -22,6 +22,25 @@ $stmt = $db->prepare("SELECT * FROM property_images WHERE property_id = :id ORDE
 $stmt->execute([':id' => $id]);
 $images = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// İlanı ekleyen admin bilgilerini çek
+$adminInfo = null;
+if($property['ekleyen_admin_id']) {
+    $stmt = $db->prepare("SELECT * FROM admins WHERE id = :admin_id");
+    $stmt->execute([':admin_id' => $property['ekleyen_admin_id']]);
+    $adminInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// Eğer admin bilgisi yoksa varsayılan değerler kullan
+if(!$adminInfo) {
+    $adminInfo = [
+        'username' => 'Plaza Emlak',
+        'phone' => '0272 222 00 03',
+        'mobile' => '0552 653 03 03',
+        'company' => 'Plaza Emlak & Yatırım',
+        'title' => 'Gayrimenkul Danışmanı'
+    ];
+}
+
 // m² fiyatı hesapla
 $m2_fiyat = $property['brut_metrekare'] > 0 ? round($property['fiyat'] / $property['brut_metrekare']) : 0;
 
@@ -43,8 +62,8 @@ $stmt->execute([':id' => $id]);
 $popularProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Bu danışmanın toplam ilan sayısı
-$stmt = $db->prepare("SELECT COUNT(*) as toplam FROM properties WHERE durum = 'aktif' AND id != :id");
-$stmt->execute([':id' => $id]);
+$stmt = $db->prepare("SELECT COUNT(*) as toplam FROM properties WHERE durum = 'aktif' AND ekleyen_admin_id = :admin_id AND id != :id");
+$stmt->execute([':admin_id' => $property['ekleyen_admin_id'], ':id' => $id]);
 $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
 ?>
 <!DOCTYPE html>
@@ -172,39 +191,36 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                     <tr><td>Emlak Tipi</td><td><?php echo $property['emlak_tipi']; ?></td></tr>
                     <tr><td>Kategori</td><td><?php echo $property['kategori']; ?></td></tr>
                     
-                    <!-- ARSA BİLGİLERİ -->
-<!-- Bu kodu detail.php dosyasında 108. satır civarındaki ARSA BİLGİLERİ bölümüyle değiştirin -->
-
-<?php if($property['emlak_tipi'] == 'arsa' || $property['emlak_tipi'] == 'Arsa'): ?>
-    <!-- ARSA BİLGİLERİ -->
-    <?php if(isset($property['imar_durumu']) && $property['imar_durumu']): ?>
-    <tr><td>İmar Durumu</td><td><?php echo $property['imar_durumu']; ?></td></tr>
-    <?php endif; ?>
-    
-    <?php if(isset($property['ada_no']) && $property['ada_no']): ?>
-    <tr><td>Ada No</td><td><?php echo $property['ada_no']; ?></td></tr>
-    <?php endif; ?>
-    
-    <?php if(isset($property['parsel_no']) && $property['parsel_no']): ?>
-    <tr><td>Parsel No</td><td><?php echo $property['parsel_no']; ?></td></tr>
-    <?php endif; ?>
-    
-    <?php if(isset($property['pafta_no']) && $property['pafta_no']): ?>
-    <tr><td>Pafta No</td><td><?php echo $property['pafta_no']; ?></td></tr>
-    <?php endif; ?>
-    
-    <?php if(isset($property['kaks']) && $property['kaks']): ?>
-    <tr><td>Kaks (Emsal)</td><td><?php echo $property['kaks']; ?></td></tr>
-    <?php endif; ?>
-    
-    <?php if(isset($property['gabari']) && $property['gabari']): ?>
-    <tr><td>Gabari</td><td><?php echo $property['gabari']; ?></td></tr>
-    <?php endif; ?>
-    
-    <?php if(isset($property['tapu_durumu']) && $property['tapu_durumu']): ?>
-    <tr><td>Tapu Durumu</td><td><?php echo $property['tapu_durumu']; ?></td></tr>
-    <?php endif; ?>
-<?php else: ?>
+                    <?php if($property['emlak_tipi'] == 'arsa' || $property['emlak_tipi'] == 'Arsa'): ?>
+                        <!-- ARSA BİLGİLERİ -->
+                        <?php if(isset($property['imar_durumu']) && $property['imar_durumu']): ?>
+                        <tr><td>İmar Durumu</td><td><?php echo $property['imar_durumu']; ?></td></tr>
+                        <?php endif; ?>
+                        
+                        <?php if(isset($property['ada_no']) && $property['ada_no']): ?>
+                        <tr><td>Ada No</td><td><?php echo $property['ada_no']; ?></td></tr>
+                        <?php endif; ?>
+                        
+                        <?php if(isset($property['parsel_no']) && $property['parsel_no']): ?>
+                        <tr><td>Parsel No</td><td><?php echo $property['parsel_no']; ?></td></tr>
+                        <?php endif; ?>
+                        
+                        <?php if(isset($property['pafta_no']) && $property['pafta_no']): ?>
+                        <tr><td>Pafta No</td><td><?php echo $property['pafta_no']; ?></td></tr>
+                        <?php endif; ?>
+                        
+                        <?php if(isset($property['kaks']) && $property['kaks']): ?>
+                        <tr><td>Kaks (Emsal)</td><td><?php echo $property['kaks']; ?></td></tr>
+                        <?php endif; ?>
+                        
+                        <?php if(isset($property['gabari']) && $property['gabari']): ?>
+                        <tr><td>Gabari</td><td><?php echo $property['gabari']; ?></td></tr>
+                        <?php endif; ?>
+                        
+                        <?php if(isset($property['tapu_durumu']) && $property['tapu_durumu']): ?>
+                        <tr><td>Tapu Durumu</td><td><?php echo $property['tapu_durumu']; ?></td></tr>
+                        <?php endif; ?>
+                    <?php else: ?>
                         <!-- KONUT/İŞYERİ BİLGİLERİ -->
                         <?php if($property['oda_sayisi']): ?>
                         <tr><td>Oda Sayısı</td><td><?php echo $property['oda_sayisi']; ?></td></tr>
@@ -237,23 +253,45 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
             <!-- SAĞ: Danışman -->
             <div class="detail-agent">
                 <div class="agent-header">
-                    <div class="agent-avatar">AK</div>
+                    <div class="agent-avatar">
+                        <?php 
+                        // İsmin baş harflerini al
+                        $nameParts = explode(' ', $adminInfo['username']);
+                        $initials = '';
+                        foreach($nameParts as $part) {
+                            $initials .= mb_strtoupper(mb_substr($part, 0, 1, 'UTF-8'), 'UTF-8');
+                        }
+                        echo substr($initials, 0, 2); // Maksimum 2 harf
+                        ?>
+                    </div>
                     <div class="agent-info">
-                        <h3>Ahmet Karaman</h3>
-                        <p>Plaza Emlak & Yatırım</p>
+                        <h3><?php echo htmlspecialchars($adminInfo['username']); ?></h3>
+                        <p><?php echo htmlspecialchars($adminInfo['company'] ?? 'Plaza Emlak & Yatırım'); ?></p>
                     </div>
                 </div>
-                <a href="tel:02722220003" class="agent-phone">📞 0 (272) 222 00 03</a>
-                <a href="tel:05526530303" class="agent-phone">📱 0 (552) 653 03 03</a>
+                
+                <?php if(!empty($adminInfo['phone'])): ?>
+                <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $adminInfo['phone']); ?>" class="agent-phone">
+                    📞 <?php echo htmlspecialchars($adminInfo['phone']); ?>
+                </a>
+                <?php endif; ?>
+                
+                <?php if(!empty($adminInfo['mobile'])): ?>
+                <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $adminInfo['mobile']); ?>" class="agent-phone">
+                    📱 <?php echo htmlspecialchars($adminInfo['mobile']); ?>
+                </a>
+                <?php endif; ?>
+                
                 <button class="agent-message">💬 Mesaj Gönder</button>
                 <div style="margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5;">
                     <p style="font-size:13px;color:#666;margin-bottom:10px;">
                         📍 <?php echo $property['mahalle'] ? $property['mahalle'].', ' : ''; ?>
                         <?php echo $property['ilce']; ?> / <?php echo $property['il']; ?>
                     </p>
-                    <a href="danisman-ilanlari.php" style="color:#489ae9;text-decoration:none;font-size:14px;">
+                    <a href="danisman-ilanlari.php?admin_id=<?php echo $property['ekleyen_admin_id']; ?>" 
+                       style="color:#489ae9;text-decoration:none;font-size:14px;">
                         Bu danışmanın diğer <?php echo $digerIlanSayisi; ?> ilanlarını gör →
-                     </a>
+                    </a>
                 </div>
             </div>
         </div>
@@ -264,7 +302,7 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
             <p><?php echo nl2br(htmlspecialchars($property['aciklama'])); ?></p>
         </div>
 
-        <!-- BENZEer İLANLAR -->
+        <!-- BENZER İLANLAR -->
         <?php if(count($similarProperties) > 0): ?>
         <div class="detail-description" style="margin-top:20px;">
             <h2>📍 Benzer İlanlar</h2>

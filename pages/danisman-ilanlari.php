@@ -1,14 +1,41 @@
 <?php
 require_once '../config/database.php';
 
-// Tüm aktif ilanları çek (Ahmet Karaman'ın tüm ilanları)
+// URL'den danışman ID'sini al
+$user_id = $_GET['user_id'] ?? 0;
+
+// Danışman bilgilerini çek
+$userInfo = null;
+if($user_id) {
+    $stmt = $db->prepare("SELECT * FROM users WHERE id = :id");
+    $stmt->execute([':id' => $user_id]);
+    $userInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+// Kullanıcı bulunamazsa ana sayfaya yönlendir
+if(!$userInfo) {
+    header("Location: ../index.php");
+    exit();
+}
+
+// İsmin baş harflerini al
+$nameParts = explode(' ', $userInfo['full_name']);
+$initials = '';
+foreach($nameParts as $part) {
+    if(!empty($part)) {
+        $initials .= mb_substr($part, 0, 1, 'UTF-8');
+    }
+}
+$initials = strtoupper($initials);
+
+// Bu danışmanın aktif ilanlarını çek
 $query = "SELECT p.*, pi.image_path 
           FROM properties p 
           LEFT JOIN property_images pi ON p.id = pi.property_id AND pi.is_main = 1
-          WHERE p.durum = 'aktif'
+          WHERE p.durum = 'aktif' AND p.user_id = :user_id
           ORDER BY p.created_at DESC";
 $stmt = $db->prepare($query);
-$stmt->execute();
+$stmt->execute([':user_id' => $user_id]);
 $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -16,7 +43,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ahmet Karaman - Tüm İlanlar | Plaza Emlak</title>
+    <title><?php echo htmlspecialchars($userInfo['full_name']); ?> - Tüm İlanlar | Plaza Emlak</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         body { background: #f4f4f4; }
@@ -234,9 +261,9 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <!-- Header -->
     <div class="page-header">
         <div class="agent-banner">
-            <div class="agent-avatar-large">AK</div>
+            <div class="agent-avatar-large"><?php echo $initials; ?></div>
             <div>
-                <h1 style="margin: 0; font-size: 28px;">Ahmet Karaman</h1>
+                <h1 style="margin: 0; font-size: 28px;"><?php echo htmlspecialchars($userInfo['full_name']); ?></h1>
                 <p style="margin: 5px 0; opacity: 0.9;">Plaza Emlak & Yatırım Danışmanı</p>
             </div>
         </div>
@@ -248,7 +275,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <div class="breadcrumb">
             <a href="../index.php">Ana Sayfa</a> → 
             <span>Danışman İlanları</span> → 
-            <span>Ahmet Karaman</span>
+            <span><?php echo htmlspecialchars($userInfo['full_name']); ?></span>
         </div>
         
         <!-- Sonuç Bilgisi -->
@@ -305,7 +332,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         <?php else: ?>
             <div style="background: white; padding: 60px 20px; text-align: center; border-radius: 10px;">
-                <h3 style="color: #666;">Henüz aktif ilan bulunmuyor</h3>
+                <h3 style="color: #666;">Bu danışmanın henüz aktif ilanı bulunmuyor</h3>
                 <p style="color: #999;">Lütfen daha sonra tekrar kontrol edin.</p>
             </div>
         <?php endif; ?>
@@ -315,15 +342,26 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <h3>Hemen İletişime Geçin</h3>
             <p style="color: #666; margin-bottom: 20px;">Aradığınız gayrimenkulü bulmanız için size yardımcı olmaktan mutluluk duyarım.</p>
             <div class="contact-buttons">
+                <?php if($userInfo['phone']): ?>
+                <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $userInfo['phone']); ?>" class="btn-contact btn-phone">
+                    📞 <?php echo htmlspecialchars($userInfo['phone']); ?>
+                </a>
+                <?php endif; ?>
                 <a href="tel:02722220003" class="btn-contact btn-phone">
-                    📞 (0272) 222 00 03
+                    📱 (0272) 222 00 03
                 </a>
-                <a href="tel:05526530303" class="btn-contact btn-phone">
-                    📱 (0552) 653 03 03
-                </a>
-                <a href="https://wa.me/905526530303" target="_blank" class="btn-contact btn-whatsapp">
+                <?php 
+                // WhatsApp için telefon numarasını temizle
+                $whatsapp = preg_replace('/[^0-9]/', '', $userInfo['phone'] ?? '');
+                if($whatsapp && substr($whatsapp, 0, 1) == '0') {
+                    $whatsapp = '9' . $whatsapp; // Türkiye kodu ekle
+                }
+                ?>
+                <?php if($whatsapp): ?>
+                <a href="https://wa.me/<?php echo $whatsapp; ?>" target="_blank" class="btn-contact btn-whatsapp">
                     💬 WhatsApp ile Ulaşın
                 </a>
+                <?php endif; ?>
             </div>
         </div>
     </div>

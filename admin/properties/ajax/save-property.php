@@ -17,7 +17,10 @@ try {
     $ilan_no = 'PLZ-' . date('Y') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
     $data = $_POST;
     
-    // İlanı kaydet
+    // Kullanıcı ID'sini al
+    $current_user_id = $_SESSION['user_id'] ?? $_SESSION['admin_id'] ?? 1;
+    
+    // İlanı kaydet - user_id EKLENDİ
     $sql = "INSERT INTO properties (
         ilan_no, ilan_tarihi, baslik, aciklama, fiyat, metrekare_fiyat,
         emlak_tipi, kategori, oda_sayisi, brut_metrekare, net_metrekare,
@@ -27,7 +30,7 @@ try {
         tapu_durumu, krediye_uygun, takas,
         il, ilce, mahalle, adres, durum, kimden,
         anahtar_no, mulk_sahibi_tel, danisman_notu,
-        ekleyen_admin_id, created_at
+        ekleyen_admin_id, user_id, created_at
     ) VALUES (
         :ilan_no, CURDATE(), :baslik, :aciklama, :fiyat, :metrekare_fiyat,
         :emlak_tipi, :kategori, :oda_sayisi, :brut_metrekare, :net_metrekare,
@@ -37,7 +40,7 @@ try {
         :tapu_durumu, :krediye_uygun, :takas,
         :il, :ilce, :mahalle, :adres, 'aktif', 'Ofisten',
         :anahtar_no, :mulk_sahibi_tel, :danisman_notu,
-        :admin_id, NOW()
+        :admin_id, :user_id, NOW()
     )";
     
     $stmt = $db->prepare($sql);
@@ -78,16 +81,20 @@ try {
         ':anahtar_no' => $data['anahtar_no'] ?? null,
         ':mulk_sahibi_tel' => $data['mulk_sahibi_tel'] ?? null,
         ':danisman_notu' => $data['danisman_notu'] ?? null,
-        ':admin_id' => $_SESSION['user_id'] ?? $_SESSION['admin_id'] ?? 1
+        ':admin_id' => $current_user_id,
+        ':user_id' => $current_user_id
     ]);
-    if(isset($_SESSION['user_id'])) {
-    $updateUser = $db->prepare("UPDATE properties SET user_id = :user_id WHERE id = :id");
-    $updateUser->execute([
-        ':user_id' => $_SESSION['user_id'],
-        ':id' => $property_id
-    ]);
-   }
+    
+    // Property ID'yi al
     $property_id = $db->lastInsertId();
+    
+    // ID alamazsa manuel çek
+    if(!$property_id) {
+        $stmt = $db->prepare("SELECT id FROM properties WHERE ilan_no = :ilan_no");
+        $stmt->execute([':ilan_no' => $ilan_no]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        $property_id = $row['id'];
+    }
     
     // FOTOĞRAF YÜKLEME - BASİT ÇÖZÜM
     $uploadPath = dirname(__FILE__) . '/../../../assets/uploads/properties/';
@@ -123,16 +130,21 @@ try {
                     $dbPath = 'assets/uploads/properties/' . $newName;
                     $isMain = ($i == 0) ? 1 : 0;
                     
-                    $stmt = $db->prepare("INSERT INTO property_images (property_id, image_path, image_name, is_main) 
-                                         VALUES (:pid, :path, :name, :main)");
-                    $stmt->execute([
-                        ':pid' => $property_id,
-                        ':path' => $dbPath,
-                        ':name' => $file['name'],
-                        ':main' => $isMain
-                    ]);
-                    
-                    $successCount++;
+                    try {
+                        $stmt = $db->prepare("INSERT INTO property_images (property_id, image_path, image_name, is_main) 
+                                             VALUES (:pid, :path, :name, :main)");
+                        $stmt->execute([
+                            ':pid' => $property_id,
+                            ':path' => $dbPath,
+                            ':name' => $file['name'],
+                            ':main' => $isMain
+                        ]);
+                        
+                        $successCount++;
+                    } catch(Exception $imgError) {
+                        // Fotoğraf hatası olursa devam et
+                        error_log("Fotoğraf ekleme hatası: " . $imgError->getMessage());
+                    }
                     
                     // Temp dosyayı sil
                     @unlink($tempPath);
@@ -158,7 +170,12 @@ try {
     $_SESSION['new_property_no'] = $ilan_no;
     $_SESSION['success'] = "İlan başarıyla eklendi! İlan No: " . $ilan_no;
     
-    header("Location: ../add-step4.php");
+    // Kullanıcı rolüne göre yönlendir
+    if($_SESSION['user_role'] == 'admin') {
+        header("Location: ../add-step4.php");
+    } else {
+        header("Location: ../../my-properties.php");
+    }
     exit();
     
 } catch(Exception $e) {
