@@ -22,23 +22,34 @@ $stmt = $db->prepare("SELECT * FROM property_images WHERE property_id = :id ORDE
 $stmt->execute([':id' => $id]);
 $images = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// İlanı ekleyen admin bilgilerini çek
-$adminInfo = null;
-if($property['ekleyen_admin_id']) {
-    $stmt = $db->prepare("SELECT * FROM admins WHERE id = :admin_id");
-    $stmt->execute([':admin_id' => $property['ekleyen_admin_id']]);
-    $adminInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+// İlanı ekleyen KULLANICI bilgilerini çek (users tablosundan)
+$userInfo = null;
+if($property['ekleyen_admin_id']) {  // Bu alan aslında user_id tutuyor
+    $stmt = $db->prepare("SELECT * FROM users WHERE id = :user_id");
+    $stmt->execute([':user_id' => $property['ekleyen_admin_id']]);
+    $userInfo = $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
-// Eğer admin bilgisi yoksa varsayılan değerler kullan
-if(!$adminInfo) {
-    $adminInfo = [
+// Eğer kullanıcı bilgisi yoksa varsayılan değerler kullan
+if(!$userInfo || empty($userInfo['username'])) {
+    $userInfo = [
         'username' => 'Plaza Emlak',
-        'phone' => '0272 222 00 03',
+        'full_name' => 'Plaza Emlak',
+        'phone' => '0272 222 00 03', 
         'mobile' => '0552 653 03 03',
         'company' => 'Plaza Emlak & Yatırım',
         'title' => 'Gayrimenkul Danışmanı'
     ];
+} else {
+    // full_name yoksa username'i kullan
+    if(empty($userInfo['full_name'])) {
+        $userInfo['full_name'] = $userInfo['username'];
+    }
+    // Eksik alanları doldur
+    if(empty($userInfo['phone'])) $userInfo['phone'] = '0272 222 00 03';
+    if(empty($userInfo['mobile'])) $userInfo['mobile'] = '0552 653 03 03';
+    if(empty($userInfo['company'])) $userInfo['company'] = 'Plaza Emlak & Yatırım';
+    if(empty($userInfo['title'])) $userInfo['title'] = 'Gayrimenkul Danışmanı';
 }
 
 // m² fiyatı hesapla
@@ -62,8 +73,8 @@ $stmt->execute([':id' => $id]);
 $popularProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Bu danışmanın toplam ilan sayısı
-$stmt = $db->prepare("SELECT COUNT(*) as toplam FROM properties WHERE durum = 'aktif' AND ekleyen_admin_id = :admin_id AND id != :id");
-$stmt->execute([':admin_id' => $property['ekleyen_admin_id'], ':id' => $id]);
+$stmt = $db->prepare("SELECT COUNT(*) as toplam FROM properties WHERE durum = 'aktif' AND ekleyen_admin_id = :user_id AND id != :id");
+$stmt->execute([':user_id' => $property['ekleyen_admin_id'], ':id' => $id]);
 $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
 ?>
 <!DOCTYPE html>
@@ -255,8 +266,9 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                 <div class="agent-header">
                     <div class="agent-avatar">
                         <?php 
-                        // İsmin baş harflerini al
-                        $nameParts = explode(' ', $adminInfo['username']);
+                        // full_name varsa onu, yoksa username'i kullan
+                        $displayName = $userInfo['full_name'] ?? $userInfo['username'];
+                        $nameParts = explode(' ', $displayName);
                         $initials = '';
                         foreach($nameParts as $part) {
                             $initials .= mb_strtoupper(mb_substr($part, 0, 1, 'UTF-8'), 'UTF-8');
@@ -265,20 +277,20 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                         ?>
                     </div>
                     <div class="agent-info">
-                        <h3><?php echo htmlspecialchars($adminInfo['username']); ?></h3>
-                        <p><?php echo htmlspecialchars($adminInfo['company'] ?? 'Plaza Emlak & Yatırım'); ?></p>
+                        <h3><?php echo htmlspecialchars($userInfo['full_name'] ?? $userInfo['username']); ?></h3>
+                        <p><?php echo htmlspecialchars($userInfo['company'] ?? 'Plaza Emlak & Yatırım'); ?></p>
                     </div>
                 </div>
                 
-                <?php if(!empty($adminInfo['phone'])): ?>
-                <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $adminInfo['phone']); ?>" class="agent-phone">
-                    📞 <?php echo htmlspecialchars($adminInfo['phone']); ?>
+                <?php if(!empty($userInfo['phone'])): ?>
+                <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $userInfo['phone']); ?>" class="agent-phone">
+                    📞 <?php echo htmlspecialchars($userInfo['phone']); ?>
                 </a>
                 <?php endif; ?>
                 
-                <?php if(!empty($adminInfo['mobile'])): ?>
-                <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $adminInfo['mobile']); ?>" class="agent-phone">
-                    📱 <?php echo htmlspecialchars($adminInfo['mobile']); ?>
+                <?php if(!empty($userInfo['mobile'])): ?>
+                <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $userInfo['mobile']); ?>" class="agent-phone">
+                    📱 <?php echo htmlspecialchars($userInfo['mobile']); ?>
                 </a>
                 <?php endif; ?>
                 
@@ -288,7 +300,7 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                         📍 <?php echo $property['mahalle'] ? $property['mahalle'].', ' : ''; ?>
                         <?php echo $property['ilce']; ?> / <?php echo $property['il']; ?>
                     </p>
-                    <a href="danisman-ilanlari.php?admin_id=<?php echo $property['ekleyen_admin_id']; ?>" 
+                    <a href="danisman-ilanlari.php?user_id=<?php echo $property['ekleyen_admin_id']; ?>" 
                        style="color:#489ae9;text-decoration:none;font-size:14px;">
                         Bu danışmanın diğer <?php echo $digerIlanSayisi; ?> ilanlarını gör →
                     </a>
