@@ -1,238 +1,264 @@
 <?php
 session_start();
-
-// Kullanıcı girişi kontrolü
-if(!isset($_SESSION['user_logged_in']) || $_SESSION['user_role'] !== 'user') {
-    header("Location: index.php");
+if(!isset($_SESSION['admin_logged_in'])) {
+    header("Location: ../index.php");
     exit();
 }
 
-require_once '../config/database.php';
+require_once '../../config/database.php';
 
-$user_id = $_SESSION['user_id'];
-$user_name = $_SESSION['user_fullname'];
-
-// Kullanıcının istatistikleri
-$stmt = $db->prepare("SELECT COUNT(*) as total FROM properties WHERE user_id = :user_id");
-$stmt->execute([':user_id' => $user_id]);
-$totalProperties = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-
-$stmt = $db->prepare("SELECT COUNT(*) as total FROM properties WHERE user_id = :user_id AND durum = 'aktif'");
-$stmt->execute([':user_id' => $user_id]);
-$activeProperties = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-
-$stmt = $db->prepare("SELECT COUNT(*) as total FROM properties WHERE user_id = :user_id AND kategori = 'Satılık'");
-$stmt->execute([':user_id' => $user_id]);
-$forSale = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-
-$stmt = $db->prepare("SELECT COUNT(*) as total FROM properties WHERE user_id = :user_id AND kategori = 'Kiralık'");
-$stmt->execute([':user_id' => $user_id]);
-$forRent = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-
-// Son eklenen ilanlar
-$stmt = $db->prepare("SELECT id, baslik, fiyat, kategori, created_at 
-                     FROM properties 
-                     WHERE user_id = :user_id 
-                     ORDER BY created_at DESC 
-                     LIMIT 5");
-$stmt->execute([':user_id' => $user_id]);
-$recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Kullanıcıları çek
+$stmt = $db->query("SELECT * FROM users ORDER BY id DESC");
+$users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - <?php echo htmlspecialchars($user_name); ?></title>
-    <link rel="stylesheet" href="../assets/css/admin.css">
+    <title>Kullanıcı Yönetimi</title>
     <style>
-        .user-welcome {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header {
+            background: white;
+            padding: 20px;
             margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .user-welcome h2 {
-            margin: 0 0 10px 0;
-            font-size: 28px;
+        .header h1 { color: #333; }
+        .btn-logout {
+            background: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
         }
-        .user-welcome p {
-            margin: 0;
-            opacity: 0.9;
+        .btn-add {
+            background: #27ae60;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            margin-bottom: 20px;
+            font-weight: 500;
         }
-        .quick-actions {
+        .user-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #3498db;
+        }
+        .no-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #ecf0f1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #95a5a6;
+        }
+        .user-info { flex: 1; }
+        .user-name { 
+            font-size: 18px; 
+            font-weight: 600; 
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        .user-details {
+            display: flex;
+            gap: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .user-meta {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
-            margin-top: 30px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            margin-bottom: 15px;
         }
-        .quick-action-btn {
-            background: white;
-            border: 2px solid #e0e0e0;
-            padding: 20px;
-            border-radius: 8px;
-            text-align: center;
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
             text-decoration: none;
-            color: #333;
+            font-size: 14px;
             transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
-        .quick-action-btn:hover {
-            border-color: #3498db;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        .btn-edit {
+            background: #3498db;
+            color: white;
         }
-        .quick-action-btn .icon {
-            font-size: 30px;
-            margin-bottom: 10px;
-            display: block;
+        .btn-edit:hover {
+            background: #2980b9;
+        }
+        .btn-view {
+            background: #9b59b6;
+            color: white;
+        }
+        .btn-delete {
+            background: #e74c3c;
+            color: white;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-passive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
     </style>
 </head>
 <body>
-    <div class="admin-wrapper">
-        <!-- Sidebar (Kullanıcı için özel) -->
-        <nav class="sidebar">
-            <div class="sidebar-header">
-                <h2>PLAZANET</h2>
-            </div>
-            <ul class="sidebar-menu">
-                <li>
-                    <a href="user-dashboard.php" class="active">
-                        <span class="icon">🏠</span>
-                        <span>Ana Sayfa</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="my-properties.php">
-                        <span class="icon">🏢</span>
-                        <span>İlanlarım</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="properties/add-step1.php">
-                        <span class="icon">➕</span>
-                        <span>İlan Ekle</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="my-profile.php">
-                        <span class="icon">👤</span>
-                        <span>Profilim</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Top Navbar -->
-            <div class="top-navbar">
-                <div class="navbar-left">
-                    <h3>Kullanıcı Paneli</h3>
-                </div>
-                <div class="navbar-right">
-                    <div class="admin-info">
-                        <span>👤 <?php echo htmlspecialchars($user_name); ?></span>
-                    </div>
-                    <a href="logout.php" class="btn-logout">Çıkış Yap</a>
-                </div>
-            </div>
-
-            <!-- Content -->
-            <div class="content">
-                <!-- Hoşgeldin Mesajı -->
-                <div class="user-welcome">
-                    <h2>Hoş Geldiniz, <?php echo htmlspecialchars($user_name); ?>!</h2>
-                    <p>Bugün <?php echo date('d F Y, l'); ?></p>
-                </div>
-
-                <!-- İstatistik Kartları -->
-                <div class="dashboard-cards">
-                    <div class="card">
-                        <div class="card-icon blue">🏢</div>
-                        <h4>Toplam İlanım</h4>
-                        <div class="number"><?php echo $totalProperties; ?></div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon green">✓</div>
-                        <h4>Aktif İlan</h4>
-                        <div class="number"><?php echo $activeProperties; ?></div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon orange">💰</div>
-                        <h4>Satılık</h4>
-                        <div class="number"><?php echo $forSale; ?></div>
-                    </div>
-                    <div class="card">
-                        <div class="card-icon red">🔑</div>
-                        <h4>Kiralık</h4>
-                        <div class="number"><?php echo $forRent; ?></div>
-                    </div>
-                </div>
-
-                <!-- Son İlanlar -->
-                <div class="card" style="margin-top: 30px;">
-                    <h3 style="margin-bottom: 20px;">Son Eklediğim İlanlar</h3>
-                    <?php if(count($recentProperties) > 0): ?>
-                        <table style="width: 100%; border-collapse: collapse;">
-                            <thead>
-                                <tr style="background: #f8f9fa;">
-                                    <th style="padding: 10px; text-align: left;">Başlık</th>
-                                    <th style="padding: 10px; text-align: left;">Fiyat</th>
-                                    <th style="padding: 10px; text-align: left;">Tip</th>
-                                    <th style="padding: 10px; text-align: left;">Tarih</th>
-                                    <th style="padding: 10px; text-align: center;">İşlemler</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach($recentProperties as $property): ?>
-                                <tr style="border-bottom: 1px solid #dee2e6;">
-                                    <td style="padding: 10px;"><?php echo htmlspecialchars($property['baslik']); ?></td>
-                                    <td style="padding: 10px;"><?php echo number_format($property['fiyat'], 0, ',', '.'); ?> ₺</td>
-                                    <td style="padding: 10px;">
-                                        <span style="background: <?php echo $property['kategori'] == 'Satılık' ? '#f39c12' : '#e74c3c'; ?>; 
-                                                     color: white; padding: 3px 8px; border-radius: 3px; font-size: 0.85rem;">
-                                            <?php echo $property['kategori']; ?>
-                                        </span>
-                                    </td>
-                                    <td style="padding: 10px;"><?php echo date('d.m.Y', strtotime($property['created_at'])); ?></td>
-                                    <td style="padding: 10px; text-align: center;">
-                                        <a href="my-properties-edit.php?id=<?php echo $property['id']; ?>" 
-                                           style="color: #3498db; text-decoration: none;">✏️ Düzenle</a>
-                                    </td>
-                                </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    <?php else: ?>
-                        <p style="text-align: center; color: #7f8c8d; padding: 40px;">
-                            Henüz ilan eklenmemiş.
-                        </p>
-                    <?php endif; ?>
-                </div>
-
-                <!-- Hızlı İşlemler -->
-                <div class="quick-actions">
-                    <a href="properties/add-step1.php" class="quick-action-btn">
-                        <span class="icon">➕</span>
-                        <strong>Yeni İlan Ekle</strong>
-                    </a>
-                    <a href="my-properties.php" class="quick-action-btn">
-                        <span class="icon">📋</span>
-                        <strong>İlanlarımı Gör</strong>
-                    </a>
-                    <a href="my-profile.php" class="quick-action-btn">
-                        <span class="icon">⚙️</span>
-                        <strong>Profil Ayarları</strong>
-                    </a>
-                    <a href="../index.php" target="_blank" class="quick-action-btn">
-                        <span class="icon">🌐</span>
-                        <strong>Siteyi Görüntüle</strong>
-                    </a>
-                </div>
+    <div class="container">
+        <div class="header">
+            <h1>Kullanıcı Yönetimi</h1>
+            <div>
+                <span style="margin-right: 20px;">Admin: <?php echo $_SESSION['admin_username']; ?></span>
+                <a href="../logout.php" class="btn-logout">Çıkış</a>
             </div>
         </div>
+
+        <?php if(isset($_SESSION['success'])): ?>
+            <div class="alert alert-success">
+                <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+            </div>
+        <?php endif; ?>
+
+        <a href="add.php" class="btn-add">➕ Yeni Kullanıcı Ekle</a>
+
+        <?php foreach($users as $user): ?>
+        <div class="user-card">
+            <div class="user-header">
+                <?php if($user['profile_image']): ?>
+                    <img src="../../<?php echo $user['profile_image']; ?>" alt="Profil" class="user-avatar">
+                <?php else: ?>
+                    <div class="no-avatar">👤</div>
+                <?php endif; ?>
+                
+                <div class="user-info">
+                    <div class="user-name"><?php echo htmlspecialchars($user['full_name']); ?></div>
+                    <div class="user-details">
+                        <span>👤 <?php echo htmlspecialchars($user['username']); ?></span>
+                        <span class="status-badge <?php echo $user['status'] == 'active' ? 'status-active' : 'status-passive'; ?>">
+                            <?php echo $user['status'] == 'active' ? '✓ Aktif' : '✗ Pasif'; ?>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="user-meta">
+                <div class="meta-item">
+                    <span>📧</span>
+                    <span><?php echo htmlspecialchars($user['email']); ?></span>
+                </div>
+                <div class="meta-item">
+                    <span>📱</span>
+                    <span><?php echo htmlspecialchars($user['phone'] ?: 'Belirtilmemiş'); ?></span>
+                </div>
+                <div class="meta-item">
+                    <span>🏢</span>
+                    <span>
+                        <?php 
+                        // İlan sayısını hesapla
+                        $stmt = $db->prepare("SELECT COUNT(*) as count FROM properties WHERE created_by = :user_id OR user_id = :user_id2");
+                        $stmt->execute([':user_id' => $user['id'], ':user_id2' => $user['id']]);
+                        $count = $stmt->fetch()['count'] ?? 0;
+                        echo $count . " İlan";
+                        ?>
+                    </span>
+                </div>
+                <div class="meta-item">
+                    <span>📅</span>
+                    <span>Kayıt: <?php echo date('d.m.Y', strtotime($user['created_at'])); ?></span>
+                </div>
+                <div class="meta-item">
+                    <span>🔒</span>
+                    <span>Son Giriş: <?php echo $user['last_login'] ? date('d.m.Y H:i', strtotime($user['last_login'])) : 'Hiç giriş yapmadı'; ?></span>
+                </div>
+            </div>
+
+            <div class="user-actions">
+                <a href="edit.php?id=<?php echo $user['id']; ?>" class="btn btn-edit">
+                    ✏️ Düzenle
+                </a>
+                <a href="my-properties.php?user_id=<?php echo $user['id']; ?>" class="btn btn-view">
+                    🏠 İlanları Gör
+                </a>
+                <?php if($user['username'] != 'admin'): ?>
+                <button onclick="deleteUser(<?php echo $user['id']; ?>)" class="btn btn-delete">
+                    🗑️ Sil
+                </button>
+                <?php endif; ?>
+            </div>
+        </div>
+        <?php endforeach; ?>
     </div>
+
+    <script>
+    function deleteUser(id) {
+        if(confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) {
+            window.location.href = 'my-property-delete.php?user_id=' + id;
+        }
+    }
+    </script>
 </body>
 </html>

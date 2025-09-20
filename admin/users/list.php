@@ -1,7 +1,6 @@
 <?php
 session_start();
-// Admin kontrolü
-if(!isset($_SESSION['admin_logged_in']) || $_SESSION['user_role'] !== 'admin') {
+if(!isset($_SESSION['admin_logged_in'])) {
     header("Location: ../index.php");
     exit();
 }
@@ -9,109 +8,141 @@ if(!isset($_SESSION['admin_logged_in']) || $_SESSION['user_role'] !== 'admin') {
 require_once '../../config/database.php';
 
 // Kullanıcıları çek
-$stmt = $db->prepare("
-    SELECT u.*, 
-           (SELECT COUNT(*) FROM properties WHERE user_id = u.id) as total_properties
-    FROM users u 
-    WHERE u.role = 'user'
-    ORDER BY u.created_at DESC
-");
-$stmt->execute();
+$stmt = $db->query("SELECT * FROM users ORDER BY id DESC");
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Mesajları göster
-$success = $_SESSION['success'] ?? '';
-$error = $_SESSION['error'] ?? '';
-unset($_SESSION['success'], $_SESSION['error']);
 ?>
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kullanıcı Yönetimi - Plaza Emlak</title>
+    <title>Kullanıcı Yönetimi - Admin Panel</title>
     <link rel="stylesheet" href="../../assets/css/admin.css">
     <style>
         .user-card {
             background: white;
             border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .user-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+        .user-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
         }
-        .user-info {
-            flex: 1;
+        .user-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #3498db;
         }
-        .user-name {
-            font-size: 18px;
-            font-weight: bold;
+        .no-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #999;
+            border: 3px solid #ddd;
+        }
+        .user-info h3 {
+            margin: 0 0 5px 0;
             color: #2c3e50;
-            margin-bottom: 5px;
+            font-size: 20px;
+        }
+        .user-username {
+            color: #7f8c8d;
+            font-size: 14px;
         }
         .user-details {
-            color: #666;
-            font-size: 14px;
-            line-height: 1.5;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #555;
+        }
+        .detail-icon {
+            color: #3498db;
         }
         .user-stats {
             display: flex;
             gap: 20px;
-            margin-top: 10px;
+            padding-top: 15px;
+            border-top: 1px solid #ecf0f1;
         }
         .stat-item {
-            background: #f8f9fa;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 13px;
+            flex: 1;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 12px;
         }
         .user-actions {
             display: flex;
             gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s;
         }
         .btn-edit {
             background: #3498db;
             color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 14px;
+        }
+        .btn-edit:hover {
+            background: #2980b9;
         }
         .btn-delete {
             background: #e74c3c;
             color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 14px;
         }
-        .btn-toggle {
+        .btn-delete:hover {
+            background: #c0392b;
+        }
+        .btn-status {
+            background: #27ae60;
+            color: white;
+        }
+        .btn-status.inactive {
             background: #95a5a6;
-            color: white;
-            padding: 8px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 14px;
         }
-        .btn-toggle.active {
-            background: #27ae60;
-        }
-        .add-user-btn {
+        .add-btn {
             background: #27ae60;
             color: white;
-            padding: 12px 25px;
+            padding: 12px 30px;
             border-radius: 5px;
             text-decoration: none;
             display: inline-block;
             margin-bottom: 20px;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            background: white;
-            border-radius: 10px;
         }
         .alert {
             padding: 15px;
@@ -123,11 +154,6 @@ unset($_SESSION['success'], $_SESSION['error']);
             color: #155724;
             border: 1px solid #c3e6cb;
         }
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
     </style>
 </head>
 <body>
@@ -138,24 +164,10 @@ unset($_SESSION['success'], $_SESSION['error']);
                 <h2>PLAZANET</h2>
             </div>
             <ul class="sidebar-menu">
-                <li>
-                    <a href="../dashboard.php">
-                        <span class="icon">🏠</span>
-                        <span>Ana Sayfa</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="../properties/list.php">
-                        <span class="icon">🏢</span>
-                        <span>İlanlar</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="list.php" class="active">
-                        <span class="icon">👥</span>
-                        <span>Kullanıcılar</span>
-                    </a>
-                </li>
+                <li><a href="../dashboard.php">🏠 Ana Sayfa</a></li>
+                <li><a href="../properties/list.php">🏢 İlanlar</a></li>
+                <li><a href="list.php" class="active">👥 Kullanıcılar</a></li>
+                <li><a href="../settings.php">⚙️ Ayarlar</a></li>
             </ul>
         </nav>
 
@@ -172,73 +184,99 @@ unset($_SESSION['success'], $_SESSION['error']);
             </div>
 
             <div class="content">
-                <!-- Mesajlar -->
-                <?php if($success): ?>
-                    <div class="alert alert-success"><?php echo $success; ?></div>
-                <?php endif; ?>
-                <?php if($error): ?>
-                    <div class="alert alert-error"><?php echo $error; ?></div>
-                <?php endif; ?>
-
-                <!-- Yeni Kullanıcı Butonu -->
-                <a href="add.php" class="add-user-btn">➕ Yeni Kullanıcı Ekle</a>
-
-                <!-- Kullanıcı Listesi -->
-                <?php if(count($users) > 0): ?>
-                    <?php foreach($users as $user): ?>
-                        <div class="user-card">
-                            <div class="user-info">
-                                <div class="user-name">
-                                    <?php echo htmlspecialchars($user['full_name']); ?>
-                                    <?php if($user['status'] == 'passive'): ?>
-                                        <span style="color: #e74c3c; font-size: 12px;">(Pasif)</span>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="user-details">
-                                    <div>👤 Kullanıcı Adı: <?php echo htmlspecialchars($user['username']); ?></div>
-                                    <div>📧 E-posta: <?php echo htmlspecialchars($user['email']); ?></div>
-                                    <div>📞 Telefon: <?php echo htmlspecialchars($user['phone'] ?? '-'); ?></div>
-                                </div>
-                                <div class="user-stats">
-                                    <span class="stat-item">
-                                        🏠 <?php echo $user['total_properties']; ?> İlan
-                                    </span>
-                                    <span class="stat-item">
-                                        📅 Kayıt: <?php echo date('d.m.Y', strtotime($user['created_at'])); ?>
-                                    </span>
-                                    <?php if($user['last_login']): ?>
-                                        <span class="stat-item">
-                                            🕒 Son Giriş: <?php echo date('d.m.Y H:i', strtotime($user['last_login'])); ?>
-                                        </span>
-                                    <?php endif; ?>
-                                </div>
-                            </div>
-                            <div class="user-actions">
-                                <a href="edit.php?id=<?php echo $user['id']; ?>" class="btn-edit">
-                                    ✏️ Düzenle
-                                </a>
-                                <a href="toggle-status.php?id=<?php echo $user['id']; ?>" 
-                                   class="btn-toggle <?php echo $user['status'] == 'active' ? 'active' : ''; ?>">
-                                    <?php echo $user['status'] == 'active' ? '✓ Aktif' : '✗ Pasif'; ?>
-                                </a>
-                                <?php if($user['total_properties'] == 0): ?>
-                                    <a href="delete.php?id=<?php echo $user['id']; ?>" 
-                                       class="btn-delete"
-                                       onclick="return confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')">
-                                        🗑️ Sil
-                                    </a>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="empty-state">
-                        <h3>Henüz kullanıcı eklenmemiş</h3>
-                        <p>Yeni kullanıcı eklemek için yukarıdaki butonu kullanın.</p>
+                <?php if(isset($_SESSION['success'])): ?>
+                    <div class="alert alert-success">
+                        <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
                     </div>
                 <?php endif; ?>
+
+                <a href="add.php" class="add-btn">+ Yeni Kullanıcı Ekle</a>
+
+                <?php foreach($users as $user): ?>
+                <div class="user-card">
+                    <div class="user-header">
+                        <?php if($user['profile_image']): ?>
+                            <img src="../../<?php echo $user['profile_image']; ?>" alt="Profil" class="user-avatar">
+                        <?php else: ?>
+                            <div class="no-avatar">👤</div>
+                        <?php endif; ?>
+                        
+                        <div class="user-info">
+                            <h3><?php echo htmlspecialchars($user['full_name']); ?></h3>
+                            <div class="user-username">@<?php echo htmlspecialchars($user['username']); ?></div>
+                        </div>
+                    </div>
+
+                    <div class="user-details">
+                        <div class="detail-item">
+                            <span class="detail-icon">✉️</span>
+                            <span><?php echo htmlspecialchars($user['email']); ?></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📱</span>
+                            <span><?php echo htmlspecialchars($user['phone'] ?: 'Belirtilmemiş'); ?></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">📅</span>
+                            <span>Kayıt: <?php echo date('d.m.Y', strtotime($user['created_at'] ?? 'now')); ?></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-icon">🔒</span>
+                            <span>Son Giriş: <?php echo $user['last_login'] ? date('d.m.Y H:i', strtotime($user['last_login'])) : 'Henüz giriş yapmadı'; ?></span>
+                        </div>
+                    </div>
+
+                    <div class="user-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">
+                                <?php 
+                                // İlan sayısını çek
+                                $stmt = $db->prepare("SELECT COUNT(*) as count FROM properties WHERE user_id = :user_id");
+                                $stmt->execute([':user_id' => $user['id']]);
+                                echo $stmt->fetch()['count'] ?? 0;
+                                ?>
+                            </div>
+                            <div class="stat-label">İlan</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">
+                                <?php echo date('d.m.Y', strtotime($user['created_at'] ?? 'now')); ?>
+                            </div>
+                            <div class="stat-label">Kayıt Tarihi</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">
+                                <?php echo $user['last_login'] ? date('d.m.Y', strtotime($user['last_login'])) : '-'; ?>
+                            </div>
+                            <div class="stat-label">Son Giriş</div>
+                        </div>
+                    </div>
+
+                    <div class="user-actions">
+                        <a href="edit.php?id=<?php echo $user['id']; ?>" class="btn btn-edit">
+                            ✏️ Düzenle
+                        </a>
+                        <button class="btn btn-status <?php echo $user['status'] == 'active' ? '' : 'inactive'; ?>">
+                            <?php echo $user['status'] == 'active' ? '✅ Aktif' : '⏸️ Pasif'; ?>
+                        </button>
+                        <?php if($user['username'] != 'admin'): ?>
+                        <button onclick="deleteUser(<?php echo $user['id']; ?>)" class="btn btn-delete">
+                            🗑️ Sil
+                        </button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
+
+    <script>
+    function deleteUser(id) {
+        if(confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) {
+            window.location.href = 'delete.php?id=' + id;
+        }
+    }
+    </script>
 </body>
 </html>
