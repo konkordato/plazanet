@@ -170,12 +170,8 @@ try {
     $_SESSION['new_property_no'] = $ilan_no;
     $_SESSION['success'] = "İlan başarıyla eklendi! İlan No: " . $ilan_no;
     
-    // Kullanıcı rolüne göre yönlendir
-    if($_SESSION['user_role'] == 'admin') {
-        header("Location: ../add-step4.php");
-    } else {
-        header("Location: ../../my-properties.php");
-    }
+    // Herkes için tebrikler sayfasına git
+    header("Location: ../add-step4.php");
     exit();
     
 } catch(Exception $e) {
