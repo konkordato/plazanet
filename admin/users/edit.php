@@ -68,6 +68,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         ':full_name' => $full_name,
         ':email' => $email,
         ':phone' => $phone,
+        ':mobile' => $_POST['mobile'] ?? null,
         ':profile_image' => $profile_image,
         ':status' => $status,
         ':id' => $user_id
@@ -84,6 +85,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             full_name = :full_name,
             email = :email,
             phone = :phone,
+            mobile = :mobile,
             profile_image = :profile_image,
             status = :status
             $password_sql
@@ -255,6 +257,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                         <div class="form-group">
                             <label>Telefon</label>
                             <input type="tel" name="phone" value="<?php echo htmlspecialchars($user['phone']); ?>">
+                        </div>
+                        <div class="form-group">
+                            <label>Mobil Telefon</label>
+                            <input type="tel" name="mobile" value="<?php echo htmlspecialchars($user['mobile'] ?? ''); ?>" placeholder="05XX XXX XX XX">
                         </div>
 
                         <div class="form-group">

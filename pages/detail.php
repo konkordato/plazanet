@@ -292,19 +292,24 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                     </div>
                 </div>
                 
-                <?php if(!empty($userInfo['phone'])): ?>
-                <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $userInfo['phone']); ?>" class="agent-phone">
-                    📞 <?php echo htmlspecialchars($userInfo['phone']); ?>
+            <?php if(!empty($userInfo['phone'])): ?>
+                <a href="tel:02722220003" class="agent-phone">
+                    📞 0272 222 00 03
                 </a>
                 <?php endif; ?>
                 
-                <?php if(!empty($userInfo['mobile'])): ?>
-                <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $userInfo['mobile']); ?>" class="agent-phone">
-                    📱 <?php echo htmlspecialchars($userInfo['mobile']); ?>
+                <?php 
+                // Kullanıcının kendi telefonu varsa göster, yoksa varsayılan
+                $mobileNumber = !empty($userInfo['mobile']) ? $userInfo['mobile'] : 
+                               (!empty($userInfo['phone']) ? $userInfo['phone'] : '0552 653 03 03');
+                ?>
+                <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $mobileNumber); ?>" class="agent-phone">
+                    📱 <?php echo htmlspecialchars($mobileNumber); ?>
                 </a>
-                <?php endif; ?>
                 
-                <button class="agent-message">💬 Mesaj Gönder</button>
+                <button class="agent-message" onclick="sendMessage('<?php echo $userInfo['full_name'] ?? $userInfo['username']; ?>', '<?php echo $property['ilan_no']; ?>')">
+                    💬 Mesaj Gönder
+                </button>
                 
                 <div style="margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5;">
                     <p style="font-size:13px;color:#666;margin-bottom:10px;">
@@ -391,6 +396,15 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
         document.querySelectorAll('.gallery-thumb').forEach(t => t.classList.remove('active'));
         thumb.classList.add('active');
     }
+    function sendMessage(agentName, propertyNo) {
+    var message = prompt('Mesajınızı yazın:');
+    if(message && message.trim() !== '') {
+        // WhatsApp'a yönlendir
+        var whatsappNumber = '905526530303'; // +90 olmadan
+        var whatsappMessage = 'Merhaba ' + agentName + ', ' + propertyNo + ' nolu ilan hakkında bilgi almak istiyorum. Mesajım: ' + message;
+        window.open('https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(whatsappMessage), '_blank');
+    }
+}
     </script>
 </body>
 </html>
