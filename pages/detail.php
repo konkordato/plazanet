@@ -261,69 +261,74 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                 </table>
             </div>
 
-            <!-- SAĞ: Danışman -->
-<div class="detail-agent">
-    <div class="agent-header">
-        <?php 
-        // Profil resmini kontrol et
-        if(!empty($userInfo['profile_image']) && file_exists('../' . $userInfo['profile_image'])): 
-        ?>
-            <img src="../<?php echo htmlspecialchars($userInfo['profile_image']); ?>" 
-                 alt="<?php echo htmlspecialchars($userInfo['full_name'] ?? $userInfo['username']); ?>"
-                 style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db;">
-        <?php else: ?>
-            <div class="agent-avatar">
-                <?php 
-                // full_name varsa onu, yoksa username'i kullan
-                $displayName = $userInfo['full_name'] ?? $userInfo['username'];
-                $nameParts = explode(' ', $displayName);
-                $initials = '';
-                foreach($nameParts as $part) {
-                    $initials .= mb_strtoupper(mb_substr($part, 0, 1, 'UTF-8'), 'UTF-8');
-                }
-                echo substr($initials, 0, 2); // Maksimum 2 harf
-                ?>
+ <!-- SAĞ: Danışman -->
+            <div class="detail-agent">
+                <div class="agent-header">
+                    <?php 
+                    // Profil resmini kontrol et
+                    if(!empty($userInfo['profile_image']) && file_exists('../' . $userInfo['profile_image'])): 
+                    ?>
+                        <img src="../<?php echo htmlspecialchars($userInfo['profile_image']); ?>" 
+                             alt="<?php echo htmlspecialchars($userInfo['full_name'] ?? $userInfo['username']); ?>"
+                             style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db;">
+                    <?php else: ?>
+                        <div class="agent-avatar">
+                            <?php 
+                            // full_name varsa onu, yoksa username'i kullan
+                            $displayName = $userInfo['full_name'] ?? $userInfo['username'];
+                            $nameParts = explode(' ', $displayName);
+                            $initials = '';
+                            foreach($nameParts as $part) {
+                                $initials .= mb_strtoupper(mb_substr($part, 0, 1, 'UTF-8'), 'UTF-8');
+                            }
+                            echo substr($initials, 0, 2); // Maksimum 2 harf
+                            ?>
+                        </div>
+                    <?php endif; ?>
+                    
+                    <div class="agent-info">
+                        <h3><?php echo htmlspecialchars($userInfo['full_name'] ?? $userInfo['username']); ?></h3>
+                        <p><?php echo htmlspecialchars($userInfo['company'] ?? 'Plaza Emlak & Yatırım'); ?></p>
+                    </div>
+                </div>
+                
+                <?php if(!empty($userInfo['phone'])): ?>
+                <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $userInfo['phone']); ?>" class="agent-phone">
+                    📞 <?php echo htmlspecialchars($userInfo['phone']); ?>
+                </a>
+                <?php endif; ?>
+                
+                <?php if(!empty($userInfo['mobile'])): ?>
+                <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $userInfo['mobile']); ?>" class="agent-phone">
+                    📱 <?php echo htmlspecialchars($userInfo['mobile']); ?>
+                </a>
+                <?php endif; ?>
+                
+                <button class="agent-message">💬 Mesaj Gönder</button>
+                
+                <div style="margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5;">
+                    <p style="font-size:13px;color:#666;margin-bottom:10px;">
+                        📍 <?php echo $property['mahalle'] ? $property['mahalle'].', ' : ''; ?>
+                        <?php echo $property['ilce']; ?> / <?php echo $property['il']; ?>
+                    </p>
+                    
+                    <?php if($digerIlanSayisi > 0): ?>
+                    <a href="danisman-ilanlari.php?user_id=<?php echo $property['ekleyen_admin_id']; ?>" 
+                       style="color:#489ae9;text-decoration:none;font-size:14px;">
+                        Bu danışmanın diğer <?php echo $digerIlanSayisi; ?> ilanını gör →
+                    </a>
+                    <?php else: ?>
+                    <p style="font-size:13px;color:#999;">
+                        Bu danışmanın başka ilanı bulunmuyor
+                    </p>
+                    <?php endif; ?>
+                </div>
             </div>
-        <?php endif; ?>
-        
-        <div class="agent-info">
-            <h3><?php echo htmlspecialchars($userInfo['full_name'] ?? $userInfo['username']); ?></h3>
-            <p><?php echo htmlspecialchars($userInfo['company'] ?? 'Plaza Emlak & Yatırım'); ?></p>
+            <!-- Danışman bölümü kapandı -->
+
         </div>
-    </div>
-    
-    <?php if(!empty($userInfo['phone'])): ?>
-    <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $userInfo['phone']); ?>" class="agent-phone">
-        📞 <?php echo htmlspecialchars($userInfo['phone']); ?>
-    </a>
-    <?php endif; ?>
-    
-    <?php if(!empty($userInfo['mobile'])): ?>
-    <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $userInfo['mobile']); ?>" class="agent-phone">
-        📱 <?php echo htmlspecialchars($userInfo['mobile']); ?>
-    </a>
-    <?php endif; ?>
-    
-    <button class="agent-message">💬 Mesaj Gönder</button>
-    
-    <div style="margin-top:20px;padding-top:20px;border-top:1px solid #e5e5e5;">
-        <p style="font-size:13px;color:#666;margin-bottom:10px;">
-            📍 <?php echo $property['mahalle'] ? $property['mahalle'].', ' : ''; ?>
-            <?php echo $property['ilce']; ?> / <?php echo $property['il']; ?>
-        </p>
-        
-        <?php if($digerIlanSayisi > 0): ?>
-        <a href="danisman-ilanlari.php?user_id=<?php echo $property['ekleyen_admin_id']; ?>" 
-           style="color:#489ae9;text-decoration:none;font-size:14px;">
-            Bu danışmanın diğer <?php echo $digerIlanSayisi; ?> ilanını gör →
-        </a>
-        <?php else: ?>
-        <p style="font-size:13px;color:#999;">
-            Bu danışmanın başka ilanı bulunmuyor
-        </p>
-        <?php endif; ?>
-    </div>
-</div>
+        <!-- 3 Kolonlu Grid kapandı - ÖNEMLİ! Bu satır eksikti -->
+
         <!-- AÇIKLAMA -->
         <div class="detail-description">
             <h2>Açıklama</h2>
