@@ -87,6 +87,32 @@ $recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <span>Ayarlar</span>
                     </a>
                 </li>
+                <li>
+    <a href="portfolio/closing.php">
+        <span class="icon">💰</span>
+        <span>Portföy Kapatma</span>
+    </a>
+</li>
+<li>
+    <a href="portfolio/closing-list.php">
+        <span class="icon">📋</span>
+        <span>Kapatma Listesi</span>
+    </a>
+</li>
+<li>
+    <a href="portfolio/reports.php">
+        <span class="icon">📊</span>
+        <span>Satış Raporları</span>
+    </a>
+</li>
+<?php if($_SESSION['user_role'] === 'admin'): ?>
+<li>
+    <a href="portfolio/commission-settings.php">
+        <span class="icon">⚙️</span>
+        <span>Prim Ayarları</span>
+    </a>
+</li>
+<?php endif; ?>
             </ul>
         </nav>
 

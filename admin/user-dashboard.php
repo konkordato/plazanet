@@ -322,6 +322,18 @@ unset($_SESSION['success'], $_SESSION['error']);
                         <span>Profilim</span>
                     </a>
                 </li>
+                <li>
+    <a href="portfolio/closing.php">
+        <span class="icon">💰</span>
+        <span>Portföy Kapatma</span>
+    </a>
+</li>
+<li>
+    <a href="portfolio/my-reports.php">
+        <span class="icon">📊</span>
+        <span>Satış Raporlarım</span>
+    </a>
+</li>
             </ul>
         </nav>
 
