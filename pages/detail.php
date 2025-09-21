@@ -328,8 +328,40 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                     </p>
                     <?php endif; ?>
                 </div>
+            <!-- Bütçe Arama Kutusu -->
+<div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e0e0e0;">
+    <h4 style="color: #2c3e50; margin-bottom: 12px; font-size: 16px; text-align: center; font-weight: 600;">
+        💰 Bütçenize Uygun Ara
+    </h4>
+    <form method="GET" action="../search.php" style="display: flex; flex-direction: column; gap: 10px;">
+        <input type="number" 
+               name="min_butce" 
+               placeholder="Min Bütçe (₺)" 
+               style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+        
+        <input type="number" 
+               name="max_butce" 
+               placeholder="Max Bütçe (₺)" 
+               style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px;">
+        
+        <button type="submit" 
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+                       color: white; 
+                       padding: 10px; 
+                       border: none; 
+                       border-radius: 5px; 
+                       cursor: pointer;
+                       font-size: 14px;
+                       font-weight: 600;
+                       transition: all 0.3s;">
+            🔍 Bütçeme Uygun Bul
+        </button>
+    </form>
+</div>    
             </div>
             <!-- Danışman bölümü kapandı -->
+        
+            
 
         </div>
         <!-- 3 Kolonlu Grid kapandı - ÖNEMLİ! Bu satır eksikti -->

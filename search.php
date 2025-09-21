@@ -6,6 +6,9 @@ $kategori = $_GET['kategori'] ?? '';
 $emlak_tipi = $_GET['emlak_tipi'] ?? '';
 $il = $_GET['il'] ?? '';
 $ilce = $_GET['ilce'] ?? '';
+// Bütçe parametrelerini al
+$min_butce = $_GET['min_butce'] ?? '';
+$max_butce = $_GET['max_butce'] ?? '';
 
 // SQL sorgusu oluştur
 $query = "SELECT p.*, pi.image_path 
@@ -38,7 +41,17 @@ if(!empty($ilce)) {
     $query .= " AND p.ilce LIKE :ilce";
     $params[':ilce'] = '%' . $ilce . '%';
 }
+// Min Bütçe filtresi
+if(!empty($min_butce) && is_numeric($min_butce)) {
+    $query .= " AND p.fiyat >= :min_butce";
+    $params[':min_butce'] = $min_butce;
+}
 
+// Max Bütçe filtresi  
+if(!empty($max_butce) && is_numeric($max_butce)) {
+    $query .= " AND p.fiyat <= :max_butce";
+    $params[':max_butce'] = $max_butce;
+}
 $query .= " ORDER BY p.created_at DESC";
 
 // Sorguyu çalıştır
@@ -55,6 +68,8 @@ if($kategori) $searchText[] = $kategori;
 if($emlak_tipi) $searchText[] = $emlak_tipi;
 if($il) $searchText[] = $il;
 if($ilce) $searchText[] = $ilce;
+if($min_butce) $searchText[] = "Min: " . number_format($min_butce, 0, ',', '.') . " TL";
+if($max_butce) $searchText[] = "Max: " . number_format($max_butce, 0, ',', '.') . " TL";
 $searchDescription = !empty($searchText) ? implode(', ', $searchText) : 'Tüm İlanlar';
 ?>
 <!DOCTYPE html>
@@ -115,8 +130,12 @@ $searchDescription = !empty($searchText) ? implode(', ', $searchText) : 'Tüm İ
             <div class="container">
                 <div class="logo-area">
                     <a href="index.php" class="logo-link">
-                        <img src="assets/images/plaza-logo.png" alt="Plaza Emlak" class="logo-img">
+                        <img src="assets/images/plaza-logo-buyuk.png" alt="Plaza Emlak" class="logo-img">
                     </a>
+                <!-- SLOGAN BÖLÜMÜ -->
+                    <div class="logo-slogan">
+                        <span class="slogan-text">Geleceğinize İyi Bir Yatırım</span>
+                    </div>    
                 </div>
                 <ul class="nav-menu">
                     <li><a href="index.php">Ana Sayfa</a></li>

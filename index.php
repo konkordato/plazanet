@@ -157,6 +157,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <p class="hero-description">Hayalinizdeki gayrimenkulü bulmanız için profesyonel çözümler</p>
             
             <!-- Arama Formu -->
+            <!-- Bütçe Arama Başlığı -->
+                <h2 style="color: white; margin-bottom: 20px; font-size: 24px; text-shadow: 2px 2px 4px rgba(0,0,0,0.2);">
+                 💰 Bütçenize Göre Arama Yapın
+                </h2> 
             <div class="search-box">
                 <form method="GET" action="search.php">
                     <div class="search-row">
@@ -177,6 +181,9 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </select>
                         <input type="text" name="il" placeholder="İl" class="search-input">
                         <input type="text" name="ilce" placeholder="İlçe" class="search-input">
+                        <!-- Bütçe Alanları -->
+                        <input type="number" name="min_butce" placeholder="Min Bütçe (₺)" class="search-input" style="max-width: 150px;">
+                        <input type="number" name="max_butce" placeholder="Max Bütçe (₺)" class="search-input" style="max-width: 150px;">
                         <button type="submit" class="search-btn">
                             <span>ARA</span>
                         </button>
@@ -277,7 +284,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             </div>
         </div>
     </section>
-
+    
     <!-- Footer -->
     <?php include 'includes/footer.php'; ?>
 
