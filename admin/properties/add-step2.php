@@ -16,7 +16,10 @@ $alt_kategori = $_POST['alt_kategori'] ?? $_SESSION['alt_kategori'] ?? '';
 $_SESSION['emlak_tipi'] = $emlak_tipi;
 $_SESSION['kategori'] = $kategori;
 $_SESSION['alt_kategori'] = $alt_kategori;
-
+// Lokasyon önerilerini çek
+$il_onerileri = $db->query("SELECT DISTINCT il FROM lokasyon_onerileri ORDER BY kullanim_sayisi DESC, il ASC")->fetchAll(PDO::FETCH_COLUMN);
+$ilce_onerileri = $db->query("SELECT DISTINCT ilce FROM lokasyon_onerileri ORDER BY kullanim_sayisi DESC, ilce ASC")->fetchAll(PDO::FETCH_COLUMN);
+$mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri WHERE mahalle IS NOT NULL ORDER BY kullanim_sayisi DESC, mahalle ASC")->fetchAll(PDO::FETCH_COLUMN);
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -376,22 +379,43 @@ $_SESSION['alt_kategori'] = $alt_kategori;
        <h2 class="section-title">Adres Bilgileri</h2>
        
        <div class="form-row">
-           <div class="form-group">
-               <label class="required">İl</label>
-               <input type="text" name="il" value="Afyonkarahisar" required 
-                      placeholder="İl adını yazın">
-           </div>
-           <div class="form-group">
-               <label class="required">İlçe</label>
-               <input type="text" name="ilce" required 
-                      placeholder="İlçe adını yazın (Örn: Merkez, Sandıklı, Dinar)">
-           </div>
-           <div class="form-group">
-               <label>Mahalle</label>
-               <input type="text" name="mahalle" 
-                      placeholder="Mahalle adını yazın">
-           </div>
-       </div>
+    <div class="form-group">
+        <label class="required">İl</label>
+        <input type="text" name="il" id="il" value="Afyonkarahisar" required 
+               placeholder="İl adını yazın" list="il-listesi"
+               style="text-transform: capitalize;">
+        <datalist id="il-listesi">
+            <?php foreach($il_onerileri as $il): ?>
+                <option value="<?php echo htmlspecialchars($il); ?>">
+            <?php endforeach; ?>
+        </datalist>
+        <small>İlk harf büyük, diğerleri küçük yazın</small>
+    </div>
+    <div class="form-group">
+        <label class="required">İlçe</label>
+        <input type="text" name="ilce" id="ilce" required 
+               placeholder="İlçe adını yazın" list="ilce-listesi"
+               style="text-transform: capitalize;">
+        <datalist id="ilce-listesi">
+            <?php foreach($ilce_onerileri as $ilce): ?>
+                <option value="<?php echo htmlspecialchars($ilce); ?>">
+            <?php endforeach; ?>
+        </datalist>
+        <small>İlk harf büyük yazın</small>
+    </div>
+    <div class="form-group">
+        <label>Mahalle/Köy</label>
+        <input type="text" name="mahalle" id="mahalle"
+               placeholder="Mahalle veya köy adını yazın" list="mahalle-listesi"
+               style="text-transform: capitalize;">
+        <datalist id="mahalle-listesi">
+            <?php foreach($mahalle_onerileri as $mahalle): ?>
+                <option value="<?php echo htmlspecialchars($mahalle); ?>">
+            <?php endforeach; ?>
+        </datalist>
+        <small>İlk harf büyük yazın</small>
+    </div>
+</div>
 
        <div class="form-group">
            <label>Açık Adres</label>
@@ -455,5 +479,28 @@ $_SESSION['alt_kategori'] = $alt_kategori;
     </div>
 
     <script src="../../assets/js/property-form.js"></script>
+<script>
+// İl, ilçe, mahalle format kontrolü
+function formatText(text) {
+    if(!text) return '';
+    // Her kelimenin ilk harfi büyük, diğerleri küçük
+    return text.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+}
+
+document.getElementById('il').addEventListener('blur', function() {
+    this.value = formatText(this.value);
+});
+
+document.getElementById('ilce').addEventListener('blur', function() {
+    this.value = formatText(this.value);
+});
+
+var mahalleInput = document.getElementById('mahalle');
+if(mahalleInput) {
+    mahalleInput.addEventListener('blur', function() {
+        this.value = formatText(this.value);
+    });
+}
+</script>
 </body>
 </html>

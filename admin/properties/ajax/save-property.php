@@ -157,7 +157,31 @@ try {
             error_log("Upload başarılı: " . $successCount . " fotoğraf yüklendi.");
         }
     }
-    
+    // Lokasyon önerilerine ekle/güncelle
+    if(!empty($data['il']) && !empty($data['ilce'])) {
+        $il_formatted = ucwords(strtolower(trim($data['il'])));
+        $ilce_formatted = ucwords(strtolower(trim($data['ilce'])));
+        $mahalle_formatted = !empty($data['mahalle']) ? ucwords(strtolower(trim($data['mahalle']))) : null;
+        
+        try {
+            $check = $db->prepare("SELECT id FROM lokasyon_onerileri WHERE il = :il AND ilce = :ilce AND (mahalle = :mahalle OR (:mahalle IS NULL AND mahalle IS NULL))");
+            $check->execute([':il' => $il_formatted, ':ilce' => $ilce_formatted, ':mahalle' => $mahalle_formatted]);
+            
+            if($check->rowCount() > 0) {
+                // Varsa kullanım sayısını artır
+                $update = $db->prepare("UPDATE lokasyon_onerileri SET kullanim_sayisi = kullanim_sayisi + 1 
+                                       WHERE il = :il AND ilce = :ilce AND (mahalle = :mahalle OR (:mahalle IS NULL AND mahalle IS NULL))");
+                $update->execute([':il' => $il_formatted, ':ilce' => $ilce_formatted, ':mahalle' => $mahalle_formatted]);
+            } else {
+                // Yoksa yeni ekle
+                $insert = $db->prepare("INSERT INTO lokasyon_onerileri (il, ilce, mahalle) VALUES (:il, :ilce, :mahalle)");
+                $insert->execute([':il' => $il_formatted, ':ilce' => $ilce_formatted, ':mahalle' => $mahalle_formatted]);
+            }
+        } catch(Exception $e) {
+            // Hata olsa bile devam et
+            error_log("Lokasyon kayıt hatası: " . $e->getMessage());
+        }
+    }
     // Session temizle
     unset($_SESSION['temp_photos']);
     unset($_SESSION['property_data']);
