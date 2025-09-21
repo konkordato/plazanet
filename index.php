@@ -20,10 +20,20 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plaza Emlak & Yatırım - Ahmet Karaman</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/override.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* MENÜ DÜZELTMELERİ - YENİ EKLENEN */
+        .nav-menu a {
+            font-size: 16px !important;
+            font-weight: 500 !important;
+        }
+        
+        .admin-btn {
+            font-size: 16px !important;
+        }
         /* Ana Sayfa Özel Stilleri */
         .hero {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -105,6 +115,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             margin-bottom: 0.5rem;
         }
     </style>
+
 </head>
 <body>
     <!-- Üst Menü -->

@@ -1,0 +1,30 @@
+/* Menü Düzeltme Dosyası */
+header .nav-menu {
+    display: flex !important;
+    list-style: none !important;
+    gap: 2rem !important;
+    align-items: center !important;
+}
+
+header .nav-menu a {
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    color: #2c3e50 !important;
+    text-decoration: none !important;
+    display: inline-block !important;
+    padding: 5px 10px !important;
+}
+
+header .nav-menu a:hover,
+header .nav-menu a.active {
+    color: #3498db !important;
+}
+
+header .nav-menu .admin-btn {
+    background: #ff6b35 !important;
+    color: white !important;
+    padding: 8px 16px !important;
+    border-radius: 25px !important;
+    font-weight: 600 !important;
+    font-size: 16px !important;
+}

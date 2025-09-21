@@ -260,7 +260,9 @@ header {
     color: var(--text-dark);
     font-weight: 500;
     transition: color 0.3s;
-    font-size: 1rem;
+    font-size: 1rem !important;
+    display: inline-block;
+    padding: 5px 10px;
 }
 
 .nav-menu a:hover,
@@ -274,7 +276,9 @@ header {
     padding: 0.6rem 1.2rem !important;
     border-radius: 25px !important;
     font-weight: 600 !important;
+    font-size: 1rem !important;
     transition: all 0.3s !important;
+    display: inline-block !important;
 }
 
 .admin-btn:hover {

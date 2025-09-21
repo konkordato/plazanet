@@ -107,22 +107,6 @@ $consultants = $stmt->fetchAll(PDO::FETCH_ASSOC);
             margin: 1rem 0;
             line-height: 1.6;
         }
-        
-        /* MENÜ FONT BOYUTU KESİN ÇÖZÜM */
-        .nav-menu a,
-        .nav-menu li a,
-        .navbar .nav-menu a,
-        header .nav-menu a {
-            font-size: 16px !important;
-            font-weight: 500 !important;
-        }
-        
-        .admin-btn,
-        .nav-menu .admin-btn,
-        a.admin-btn {
-            font-size: 16px !important;
-            padding: 0.6rem 1.2rem !important;
-        }
     </style>
 </head>
 <body>

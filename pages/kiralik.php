@@ -19,23 +19,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Kiralık İlanlar - Plaza Emlak & Yatırım</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/pages.css">
-    <style>
-    /* MENÜ FONT BOYUTU KESİN ÇÖZÜM */
-    .nav-menu a,
-    .nav-menu li a,
-    .navbar .nav-menu a,
-    header .nav-menu a {
-        font-size: 16px !important;
-        font-weight: 500 !important;
-    }
-    
-    .admin-btn,
-    .nav-menu .admin-btn,
-    a.admin-btn {
-        font-size: 16px !important;
-        padding: 0.6rem 1.2rem !important;
-    }
-    </style>
+    <link rel="stylesheet" href="../assets/css/override.css">
 </head>
 <body>
     <!-- Header -->
