@@ -207,27 +207,31 @@ if(empty($data)) {
                 </div>
 
                 <!-- Adres Bilgileri -->
-                <div class="preview-section">
-                    <div class="preview-title">Adres Bilgileri</div>
-                    <div class="preview-grid">
-                        <div class="preview-item">
-                            <div class="preview-label">İl</div>
-                            <div class="preview-value"><?php echo $data['il'] ?? '-'; ?></div>
-                        </div>
-                        <div class="preview-item">
-                            <div class="preview-label">İlçe</div>
-                            <div class="preview-value"><?php echo $data['ilce'] ?? '-'; ?></div>
-                        </div>
-                        <div class="preview-item">
-                            <div class="preview-label">Mahalle</div>
-                            <div class="preview-value"><?php echo $data['mahalle'] ?? '-'; ?></div>
-                        </div>
-                        <div class="preview-item">
-                            <div class="preview-label">Açık Adres</div>
-                            <div class="preview-value"><?php echo $data['adres'] ?? '-'; ?></div>
-                        </div>
-                    </div>
-                </div>
+   <div class="preview-section">
+       <div class="preview-title">Adres Bilgileri</div>
+       <div class="preview-grid">
+           <div class="preview-item">
+               <div class="preview-label">İl</div>
+               <div class="preview-value"><?php echo htmlspecialchars($data['il'] ?? 'Afyonkarahisar'); ?></div>
+           </div>
+           <div class="preview-item">
+               <div class="preview-label">İlçe</div>
+               <div class="preview-value"><?php echo htmlspecialchars($data['ilce'] ?? '-'); ?></div>
+           </div>
+           <?php if(!empty($data['mahalle'])): ?>
+           <div class="preview-item">
+               <div class="preview-label">Mahalle</div>
+               <div class="preview-value"><?php echo htmlspecialchars($data['mahalle']); ?></div>
+           </div>
+           <?php endif; ?>
+           <?php if(!empty($data['adres'])): ?>
+           <div class="preview-item">
+               <div class="preview-label">Açık Adres</div>
+               <div class="preview-value"><?php echo htmlspecialchars($data['adres']); ?></div>
+           </div>
+           <?php endif; ?>
+       </div>
+   </div>
 
                 <!-- Açıklama -->
                 <div class="preview-section">

@@ -17,9 +17,6 @@ $_SESSION['emlak_tipi'] = $emlak_tipi;
 $_SESSION['kategori'] = $kategori;
 $_SESSION['alt_kategori'] = $alt_kategori;
 
-// İller ve ilçeleri çek
-$iller = $db->query("SELECT * FROM iller ORDER BY il_adi")->fetchAll(PDO::FETCH_ASSOC);
-$ilceler = $db->query("SELECT * FROM ilceler WHERE il_id = 1 ORDER BY ilce_adi")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -375,41 +372,32 @@ $ilceler = $db->query("SELECT * FROM ilceler WHERE il_id = 1 ORDER BY ilce_adi")
                 </div>
 
                 <!-- ADRES BİLGİLERİ -->
-                <div class="form-section">
-                    <h2 class="section-title">Adres Bilgileri</h2>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="required">İl</label>
-                            <select name="il" id="il" required>
-                                <option value="Afyonkarahisar">Afyonkarahisar</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="required">İlçe</label>
-                            <select name="ilce" id="ilce" required>
-                                <option value="">Seçiniz</option>
-                                <?php foreach($ilceler as $ilce): ?>
-                                    <option value="<?php echo $ilce['ilce_adi']; ?>">
-                                        <?php echo $ilce['ilce_adi']; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Mahalle</label>
-                            <select name="mahalle" id="mahalle">
-                                <option value="">Önce ilçe seçin</option>
-                            </select>
-                        </div>
-                    </div>
+   <div class="form-section">
+       <h2 class="section-title">Adres Bilgileri</h2>
+       
+       <div class="form-row">
+           <div class="form-group">
+               <label class="required">İl</label>
+               <input type="text" name="il" value="Afyonkarahisar" required 
+                      placeholder="İl adını yazın">
+           </div>
+           <div class="form-group">
+               <label class="required">İlçe</label>
+               <input type="text" name="ilce" required 
+                      placeholder="İlçe adını yazın (Örn: Merkez, Sandıklı, Dinar)">
+           </div>
+           <div class="form-group">
+               <label>Mahalle</label>
+               <input type="text" name="mahalle" 
+                      placeholder="Mahalle adını yazın">
+           </div>
+       </div>
 
-                    <div class="form-group">
-                        <label>Açık Adres</label>
-                        <textarea name="adres" rows="3" placeholder="Cadde, sokak, bina no vb."></textarea>
-                    </div>
-                </div>
-
+       <div class="form-group">
+           <label>Açık Adres</label>
+           <textarea name="adres" rows="3" placeholder="Cadde, sokak, bina no vb."></textarea>
+       </div>
+   </div>
                 <!-- DANIŞMAN ÖZEL ALANLARI -->
                 <div class="form-section special">
                     <h2 class="section-title">🔒 Danışman Bilgileri (Sadece Siz Görebilirsiniz)</h2>

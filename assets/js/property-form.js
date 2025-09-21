@@ -1,26 +1,29 @@
 // İlan Formu JavaScript İşlemleri
 
-// İlçe değiştiğinde mahalle getir
-document.getElementById('ilce').addEventListener('change', function() {
-    const ilce = this.value;
-    const mahalleSelect = document.getElementById('mahalle');
-    
-    if(!ilce) {
-        mahalleSelect.innerHTML = '<option value="">Önce ilçe seçin</option>';
-        return;
-    }
-    
-    // AJAX ile mahalleleri getir
-    fetch('ajax/get-neighborhoods.php?ilce=' + encodeURIComponent(ilce))
-        .then(response => response.text())
-        .then(data => {
-            mahalleSelect.innerHTML = data;
-        })
-        .catch(error => {
-            console.error('Hata:', error);
-            mahalleSelect.innerHTML = '<option value="">Mahalle yüklenemedi</option>';
-        });
-});
+// İlçe elementi varsa event ekle (artık text input olduğu için bu kod çalışmayacak)
+var ilceElement = document.getElementById('ilce');
+if(ilceElement && ilceElement.tagName === 'SELECT') {
+    ilceElement.addEventListener('change', function() {
+        const ilce = this.value;
+        const mahalleSelect = document.getElementById('mahalle');
+        
+        if(!ilce) {
+            mahalleSelect.innerHTML = '<option value="">Önce ilçe seçin</option>';
+            return;
+        }
+        
+        // AJAX ile mahalleleri getir
+        fetch('ajax/get-neighborhoods.php?ilce=' + encodeURIComponent(ilce))
+            .then(response => response.text())
+            .then(data => {
+                mahalleSelect.innerHTML = data;
+            })
+            .catch(error => {
+                console.error('Hata:', error);
+                mahalleSelect.innerHTML = '<option value="">Mahalle yüklenemedi</option>';
+            });
+    });
+}
 
 // Çoklu resim yükleme ve önizleme
 const photoInput = document.getElementById('photos');

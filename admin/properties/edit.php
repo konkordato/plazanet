@@ -31,9 +31,6 @@ $stmt = $db->prepare("SELECT * FROM property_images WHERE property_id = :id ORDE
 $stmt->execute([':id' => $id]);
 $images = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// İlçeleri çek
-$ilceler = $db->query("SELECT * FROM ilceler WHERE il_id = 1 ORDER BY ilce_adi")->fetchAll(PDO::FETCH_ASSOC);
-
 // Form gönderilmişse güncelle
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
@@ -486,34 +483,31 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     <!-- Adres Bilgileri -->
                     <div class="form-section">
-                        <h2 class="section-title">Adres Bilgileri</h2>
-                        
+                    <h2 class="section-title">Adres Bilgileri</h2>
+       
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="required">İl</label>
-                                <input type="text" name="il" value="<?php echo htmlspecialchars($property['il']); ?>" required>
+                                <input type="text" name="il" value="<?php echo htmlspecialchars($property['il']); ?>" required 
+                                    placeholder="İl adını yazın">
                             </div>
-                            <div class="form-group">
-                                <label class="required">İlçe</label>
-                                <select name="ilce" required>
-                                    <?php foreach($ilceler as $ilce): ?>
-                                        <option value="<?php echo $ilce['ilce_adi']; ?>" <?php echo $property['ilce'] == $ilce['ilce_adi'] ? 'selected' : ''; ?>>
-                                            <?php echo $ilce['ilce_adi']; ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Mahalle</label>
-                                <input type="text" name="mahalle" value="<?php echo htmlspecialchars($property['mahalle']); ?>">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Açık Adres</label>
-                            <textarea name="adres" rows="3"><?php echo htmlspecialchars($property['adres']); ?></textarea>
-                        </div>
+                    <div class="form-group">
+                        <label class="required">İlçe</label>
+                            <input type="text" name="ilce" value="<?php echo htmlspecialchars($property['ilce']); ?>" required 
+                            placeholder="İlçe adını yazın">
                     </div>
+           <div class="form-group">
+               <label>Mahalle</label>
+               <input type="text" name="mahalle" value="<?php echo htmlspecialchars($property['mahalle'] ?? ''); ?>" 
+                      placeholder="Mahalle adını yazın">
+           </div>
+       </div>
+
+       <div class="form-group">
+           <label>Açık Adres</label>
+           <textarea name="adres" rows="3"><?php echo htmlspecialchars($property['adres']); ?></textarea>
+       </div>
+   </div>
 
                     <!-- Butonlar -->
                     <div class="buttons">
