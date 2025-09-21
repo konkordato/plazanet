@@ -331,7 +331,7 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
             <!-- Bütçe Arama Kutusu -->
 <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e0e0e0;">
     <h4 style="color: #2c3e50; margin-bottom: 12px; font-size: 16px; text-align: center; font-weight: 600;">
-        💰 Bütçenize Uygun Ara
+        💰 Bütçeye Göre Arama
     </h4>
     <form method="GET" action="../search.php" style="display: flex; flex-direction: column; gap: 10px;">
         <input type="number" 
