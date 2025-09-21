@@ -159,7 +159,7 @@ header {
     color: #2c3e50;
     font-weight: 500;
     transition: color 0.3s;
-    font-size: 0.95rem; /* Font biraz küçültüldü */
+    font-size: 1rem !important;
     white-space: nowrap;
 }
 
@@ -244,7 +244,7 @@ header {
     font-weight: 600 !important;
     transition: all 0.3s !important;
     white-space: nowrap;
-    font-size: 0.9rem !important;
+    font-size: 1rem !important;
 }
 
 /* Menü */
@@ -1266,4 +1266,50 @@ body {
 img {
     max-width: 100%;
     height: auto;
+}
+/* ========== LOGO SLOGAN STİLLERİ ========== */
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.logo-slogan {
+    position: relative;
+    display: inline-block;
+    background: #DC2626;
+    padding: 8px 20px;
+    transform: skewX(-10deg);
+    box-shadow: 0 3px 10px rgba(220, 38, 38, 0.3);
+    transition: all 0.3s ease;
+}
+
+.logo-slogan::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -10px;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 10px 40px 0;
+    border-color: transparent #DC2626 transparent transparent;
+}
+
+.slogan-text {
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    font-style: italic;
+    letter-spacing: 0.5px;
+    display: inline-block;
+    transform: skewX(10deg);
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    font-family: 'Arial', sans-serif;
+}
+
+.logo-area:hover .logo-slogan {
+    background: #B91C1C;
+    transform: skewX(-10deg) translateY(-2px);
+    box-shadow: 0 5px 15px rgba(220, 38, 38, 0.4);
 }

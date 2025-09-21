@@ -112,10 +112,14 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <nav class="navbar">
             <div class="container">
                 <div class="logo-area">
-                    <a href="index.php" class="logo-link">
-                        <img src="assets/images/plaza-logo-buyuk.png" alt="Plaza Emlak & Yatırım" class="logo-img">
-                    </a>
-                </div>
+    <a href="index.php" class="logo-link">
+        <img src="assets/images/plaza-logo-buyuk.png" alt="Plaza Emlak & Yatırım" class="logo-img">
+    </a>
+    <!-- SLOGAN BÖLÜMÜ -->
+    <div class="logo-slogan">
+        <span class="slogan-text">Geleceğinize İyi Bir Yatırım</span>
+    </div>
+</div>
                 <ul class="nav-menu">
                     <li><a href="index.php" class="active">Ana Sayfa</a></li>
                     <li><a href="pages/satilik.php">Satılık</a></li>

@@ -19,6 +19,23 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Satılık İlanlar - Plaza Emlak & Yatırım</title>
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/pages.css">
+    <style>
+    /* MENÜ FONT BOYUTU KESİN ÇÖZÜM */
+    .nav-menu a,
+    .nav-menu li a,
+    .navbar .nav-menu a,
+    header .nav-menu a {
+        font-size: 16px !important;
+        font-weight: 500 !important;
+    }
+    
+    .admin-btn,
+    .nav-menu .admin-btn,
+    a.admin-btn {
+        font-size: 16px !important;
+        padding: 0.6rem 1.2rem !important;
+    }
+    </style>
 </head>
 <body>
     <!-- Header -->
@@ -29,6 +46,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <a href="../index.php" class="logo-link">
                         <img src="../assets/images/plaza-logo-buyuk.png" alt="Plaza Emlak & Yatırım" class="logo-img">
                     </a>
+                    <!-- SLOGAN BÖLÜMÜ -->
+                    <div class="logo-slogan">
+                        <span class="slogan-text">Geleceğinize İyi Bir Yatırım</span>
+                    </div>
                 </div>
                 <ul class="nav-menu">
                     <li><a href="../index.php">Ana Sayfa</a></li>
