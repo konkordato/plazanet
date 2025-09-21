@@ -27,7 +27,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="container">
                 <div class="logo-area">
                     <a href="../index.php" class="logo-link">
-                        <img src="../assets/images/plaza-logo.png" alt="Plaza Emlak & Yatırım" class="logo-img">
+                        <img src="../assets/images/plaza-logo-buyuk.png" alt="Plaza Emlak & Yatırım" class="logo-img">
                     </a>
                 </div>
                 <ul class="nav-menu">

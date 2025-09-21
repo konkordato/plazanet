@@ -1,8 +1,9 @@
 <?php
 require_once '../config/database.php';
 
-// Danışmanları çek (varsa)
-$stmt = $db->query("SELECT * FROM consultants WHERE status = 'active' ORDER BY display_order ASC");
+// DANIŞMANLARI USERS TABLOSUNDAN ÇEK
+// Aktif durumda olan ve danışman olan kullanıcıları getir
+$stmt = $db->query("SELECT * FROM users WHERE status = 'active' ORDER BY id ASC");
 $consultants = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -50,22 +51,38 @@ $consultants = $stmt->fetchAll(PDO::FETCH_ASSOC);
             padding: 1.5rem;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             transition: transform 0.3s;
+            text-align: center;
         }
         .consultant-card:hover {
             transform: translateY(-5px);
         }
         .consultant-image {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
             margin: 0 auto 1rem;
             display: block;
             object-fit: cover;
+            border: 3px solid #3498db;
+        }
+        .consultant-avatar {
+            width: 120px;
+            height: 120px;
+            background: #3498db;
+            color: white;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
         }
         .consultant-name {
             color: #2c3e50;
             text-align: center;
             margin-bottom: 0.5rem;
+            font-size: 1.2rem;
         }
         .consultant-title {
             color: #7f8c8d;
@@ -83,6 +100,13 @@ $consultants = $stmt->fetchAll(PDO::FETCH_ASSOC);
             color: #555;
             margin: 0.5rem 0;
         }
+        .consultant-bio {
+            text-align: center;
+            color: #666;
+            font-size: 0.9rem;
+            margin: 1rem 0;
+            line-height: 1.6;
+        }
     </style>
 </head>
 <body>
@@ -92,7 +116,7 @@ $consultants = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <div class="container">
                 <div class="logo-area">
                     <a href="../index.php" class="logo-link">
-                        <img src="../assets/images/plaza-logo.png" alt="Plaza Emlak & Yatırım" class="logo-img">
+                        <img src="../assets/images/plaza-logo-buyuk.png" alt="Plaza Emlak & Yatırım" class="logo-img">
                     </a>
                 </div>
                 <ul class="nav-menu">
@@ -132,7 +156,7 @@ $consultants = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <p><strong>Yerel Müşterilerimize Global Standartlarda Hizmet sağlayan Plaza Emlak Yatırım olarak Kurumsal ve İnovatif Emlak Hizmetleri için bizi arayın.</strong></p>
             </div>
 
-            <!-- Danışmanlar Bölümü -->
+            <!-- DANIŞMANLAR BÖLÜMÜ - USERS TABLOSUNDAN VERİ ÇEKİYOR -->
             <div class="consultants-section">
                 <div class="about-content">
                     <h2>DANIŞMANLARIMIZ</h2>
@@ -140,31 +164,60 @@ $consultants = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php if(count($consultants) > 0): ?>
                         <div class="consultants-grid">
                             <?php foreach($consultants as $consultant): ?>
+                                <?php
+                                // İsmin baş harflerini al (avatar için)
+                                $nameParts = explode(' ', $consultant['full_name']);
+                                $initials = '';
+                                foreach($nameParts as $part) {
+                                    if(!empty($part)) {
+                                        $initials .= mb_substr($part, 0, 1, 'UTF-8');
+                                    }
+                                }
+                                $initials = strtoupper($initials);
+                                ?>
                                 <div class="consultant-card">
-                                    <?php if($consultant['photo']): ?>
-                                        <img src="../<?php echo $consultant['photo']; ?>" alt="<?php echo $consultant['name']; ?>" class="consultant-image">
+                                    <?php if(!empty($consultant['profile_image'])): ?>
+                                        <img src="../<?php echo $consultant['profile_image']; ?>" 
+                                             alt="<?php echo htmlspecialchars($consultant['full_name']); ?>" 
+                                             class="consultant-image">
                                     <?php else: ?>
-                                        <div style="width: 100px; height: 100px; background: #f0f0f0; border-radius: 50%; margin: 0 auto 1rem; display: flex; align-items: center; justify-content: center;">
-                                            <span style="font-size: 2rem;">👤</span>
+                                        <div class="consultant-avatar">
+                                            <?php echo $initials; ?>
                                         </div>
                                     <?php endif; ?>
                                     
-                                    <h3 class="consultant-name"><?php echo htmlspecialchars($consultant['name']); ?></h3>
-                                    <p class="consultant-title"><?php echo htmlspecialchars($consultant['title']); ?></p>
+                                    <h3 class="consultant-name"><?php echo htmlspecialchars($consultant['full_name']); ?></h3>
                                     
-                                    <p style="text-align: center; color: #666; font-size: 0.9rem;">
-                                        <?php echo nl2br(htmlspecialchars($consultant['bio'])); ?>
-                                    </p>
+                                    <?php if(!empty($consultant['title'])): ?>
+                                        <p class="consultant-title"><?php echo htmlspecialchars($consultant['title']); ?></p>
+                                    <?php else: ?>
+                                        <p class="consultant-title">Gayrimenkul Danışmanı</p>
+                                    <?php endif; ?>
+                                    
+                                    <?php if(!empty($consultant['bio'])): ?>
+                                        <p class="consultant-bio"><?php echo nl2br(htmlspecialchars($consultant['bio'])); ?></p>
+                                    <?php endif; ?>
                                     
                                     <div class="consultant-contact">
-                                        <p>📞 <?php echo htmlspecialchars($consultant['phone']); ?></p>
-                                        <p>✉️ <?php echo htmlspecialchars($consultant['email']); ?></p>
+                                        <?php if(!empty($consultant['phone'])): ?>
+                                            <p>📞 <?php echo htmlspecialchars($consultant['phone']); ?></p>
+                                        <?php endif; ?>
+                                        
+                                        <?php if(!empty($consultant['mobile'])): ?>
+                                            <p>📱 <?php echo htmlspecialchars($consultant['mobile']); ?></p>
+                                        <?php endif; ?>
+                                        
+                                        <?php if(!empty($consultant['email'])): ?>
+                                            <p>✉️ <?php echo htmlspecialchars($consultant['email']); ?></p>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
                     <?php else: ?>
-                        <p style="text-align: center; color: #999;">Danışman bilgileri yakında eklenecektir.</p>
+                        <p style="text-align: center; color: #999; margin: 2rem 0;">
+                            Danışman bilgileri yakında eklenecektir.
+                        </p>
                     <?php endif; ?>
                 </div>
             </div>
