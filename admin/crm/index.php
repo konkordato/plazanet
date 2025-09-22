@@ -264,6 +264,7 @@ $son_musteriler = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <a href="alici-liste.php" class="action-btn">📋 Alıcı Listesi</a>
                     <a href="satici-liste.php" class="action-btn">📋 Satıcı Listesi</a>
                     <a href="raporlar.php" class="action-btn">📊 Raporlar</a>
+                    <a href="takvim.php" class="action-btn">📅 Takvim</a>
                 </div>
                 
                 <!-- Son Eklenen Müşteriler -->
