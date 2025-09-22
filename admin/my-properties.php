@@ -2,7 +2,7 @@
 session_start();
 
 // Kullanıcı girişi kontrolü
-if(!isset($_SESSION['user_logged_in']) || $_SESSION['user_role'] !== 'user') {
+if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_role'] !== 'user') {
     header("Location: index.php");
     exit();
 }
@@ -29,6 +29,7 @@ unset($_SESSION['success'], $_SESSION['error']);
 ?>
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -40,11 +41,13 @@ unset($_SESSION['success'], $_SESSION['error']);
             background: white;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
         }
+
         .properties-table thead {
             background: #f8f9fa;
         }
+
         .properties-table th {
             padding: 15px;
             text-align: left;
@@ -52,16 +55,19 @@ unset($_SESSION['success'], $_SESSION['error']);
             color: #495057;
             border-bottom: 2px solid #dee2e6;
         }
+
         .properties-table td {
             padding: 12px 15px;
             border-bottom: 1px solid #dee2e6;
         }
+
         .property-thumb {
             width: 60px;
             height: 45px;
             object-fit: cover;
             border-radius: 4px;
         }
+
         .no-image {
             width: 60px;
             height: 45px;
@@ -72,24 +78,29 @@ unset($_SESSION['success'], $_SESSION['error']);
             justify-content: center;
             color: #adb5bd;
         }
+
         .status-badge {
             padding: 4px 10px;
             border-radius: 4px;
             font-size: 0.85rem;
             font-weight: 500;
         }
+
         .status-active {
             background: #d4edda;
             color: #155724;
         }
+
         .status-passive {
             background: #f8d7da;
             color: #721c24;
         }
+
         .action-buttons {
             display: flex;
             gap: 8px;
         }
+
         .btn-small {
             padding: 6px 12px;
             font-size: 0.9rem;
@@ -99,18 +110,22 @@ unset($_SESSION['success'], $_SESSION['error']);
             border: none;
             cursor: pointer;
         }
+
         .btn-edit {
             background: #ffc107;
             color: #212529;
         }
+
         .btn-view {
             background: #17a2b8;
             color: white;
         }
+
         .btn-delete {
             background: #dc3545;
             color: white;
         }
+
         .add-new-btn {
             background: #28a745;
             color: white;
@@ -120,22 +135,26 @@ unset($_SESSION['success'], $_SESSION['error']);
             display: inline-block;
             margin-bottom: 20px;
         }
+
         .empty-state {
             text-align: center;
             padding: 60px 20px;
             background: white;
             border-radius: 10px;
         }
+
         .alert {
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 5px;
         }
+
         .alert-success {
             background: #d4edda;
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+
         .alert-error {
             background: #f8d7da;
             color: #721c24;
@@ -143,6 +162,7 @@ unset($_SESSION['success'], $_SESSION['error']);
         }
     </style>
 </head>
+
 <body>
     <div class="admin-wrapper">
         <!-- Sidebar -->
@@ -170,6 +190,12 @@ unset($_SESSION['success'], $_SESSION['error']);
                     </a>
                 </li>
                 <li>
+                    <a href="crm/index.php">
+                        <span class="icon">📊</span>
+                        <span>CRM Sistemi</span>
+                    </a>
+                </li>
+                <li>
                     <a href="my-profile.php">
                         <span class="icon">👤</span>
                         <span>Profilim</span>
@@ -192,16 +218,16 @@ unset($_SESSION['success'], $_SESSION['error']);
 
             <div class="content">
                 <!-- Mesajlar -->
-                <?php if($success): ?>
+                <?php if ($success): ?>
                     <div class="alert alert-success"><?php echo $success; ?></div>
                 <?php endif; ?>
-                <?php if($error): ?>
+                <?php if ($error): ?>
                     <div class="alert alert-error"><?php echo $error; ?></div>
                 <?php endif; ?>
 
                 <a href="properties/add-step1.php" class="add-new-btn">➕ Yeni İlan Ekle</a>
-                
-                <?php if(count($properties) > 0): ?>
+
+                <?php if (count($properties) > 0): ?>
                     <div class="properties-table">
                         <table>
                             <thead>
@@ -217,39 +243,39 @@ unset($_SESSION['success'], $_SESSION['error']);
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach($properties as $property): ?>
-                                <tr>
-                                    <td>
-                                        <?php if($property['image_path']): ?>
-                                            <img src="../<?php echo $property['image_path']; ?>" 
-                                                 alt="<?php echo $property['baslik']; ?>" 
-                                                 class="property-thumb">
-                                        <?php else: ?>
-                                            <div class="no-image">📷</div>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td><?php echo $property['ilan_no']; ?></td>
-                                    <td><?php echo htmlspecialchars($property['baslik']); ?></td>
-                                    <td><?php echo number_format($property['fiyat'], 0, ',', '.'); ?> ₺</td>
-                                    <td><?php echo $property['kategori']; ?></td>
-                                    <td><?php echo $property['ilce']; ?></td>
-                                    <td>
-                                        <span class="status-badge <?php echo $property['durum'] == 'aktif' ? 'status-active' : 'status-passive'; ?>">
-                                            <?php echo ucfirst($property['durum']); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <a href="my-property-edit.php?id=<?php echo $property['id']; ?>" 
-                                               class="btn-small btn-edit">Düzenle</a>
-                                            <a href="../pages/detail.php?id=<?php echo $property['id']; ?>" 
-                                               target="_blank" 
-                                               class="btn-small btn-view">Görüntüle</a>
-                                            <button onclick="deleteProperty(<?php echo $property['id']; ?>)" 
+                                <?php foreach ($properties as $property): ?>
+                                    <tr>
+                                        <td>
+                                            <?php if ($property['image_path']): ?>
+                                                <img src="../<?php echo $property['image_path']; ?>"
+                                                    alt="<?php echo $property['baslik']; ?>"
+                                                    class="property-thumb">
+                                            <?php else: ?>
+                                                <div class="no-image">📷</div>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?php echo $property['ilan_no']; ?></td>
+                                        <td><?php echo htmlspecialchars($property['baslik']); ?></td>
+                                        <td><?php echo number_format($property['fiyat'], 0, ',', '.'); ?> ₺</td>
+                                        <td><?php echo $property['kategori']; ?></td>
+                                        <td><?php echo $property['ilce']; ?></td>
+                                        <td>
+                                            <span class="status-badge <?php echo $property['durum'] == 'aktif' ? 'status-active' : 'status-passive'; ?>">
+                                                <?php echo ucfirst($property['durum']); ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a href="my-property-edit.php?id=<?php echo $property['id']; ?>"
+                                                    class="btn-small btn-edit">Düzenle</a>
+                                                <a href="../pages/detail.php?id=<?php echo $property['id']; ?>"
+                                                    target="_blank"
+                                                    class="btn-small btn-view">Görüntüle</a>
+                                                <button onclick="deleteProperty(<?php echo $property['id']; ?>)"
                                                     class="btn-small btn-delete">Sil</button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
@@ -268,11 +294,12 @@ unset($_SESSION['success'], $_SESSION['error']);
     </div>
 
     <script>
-    function deleteProperty(id) {
-        if(confirm('Bu ilanı silmek istediğinize emin misiniz?')) {
-            window.location.href = 'my-property-delete.php?id=' + id;
+        function deleteProperty(id) {
+            if (confirm('Bu ilanı silmek istediğinize emin misiniz?')) {
+                window.location.href = 'my-property-delete.php?id=' + id;
+            }
         }
-    }
     </script>
 </body>
+
 </html>

@@ -167,6 +167,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <li><a href="../dashboard.php">🏠 Ana Sayfa</a></li>
                 <li><a href="../properties/list.php">🏢 İlanlar</a></li>
                 <li><a href="list.php" class="active">👥 Kullanıcılar</a></li>
+                <li><a href="../crm/index.php">📊 CRM Sistemi</a></li>
                 <li><a href="../settings.php">⚙️ Ayarlar</a></li>
             </ul>
         </nav>

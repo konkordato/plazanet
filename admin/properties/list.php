@@ -1,6 +1,6 @@
 <?php
 session_start();
-if(!isset($_SESSION['admin_logged_in'])) {
+if (!isset($_SESSION['admin_logged_in'])) {
     header("Location: ../index.php");
     exit();
 }
@@ -17,6 +17,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,11 +29,13 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             background: white;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
         }
+
         .properties-table thead {
             background: #f8f9fa;
         }
+
         .properties-table th {
             padding: 15px;
             text-align: left;
@@ -40,16 +43,19 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             color: #495057;
             border-bottom: 2px solid #dee2e6;
         }
+
         .properties-table td {
             padding: 12px 15px;
             border-bottom: 1px solid #dee2e6;
         }
+
         .property-thumb {
             width: 60px;
             height: 45px;
             object-fit: cover;
             border-radius: 4px;
         }
+
         .no-image {
             width: 60px;
             height: 45px;
@@ -60,24 +66,29 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             justify-content: center;
             color: #adb5bd;
         }
+
         .status-badge {
             padding: 4px 10px;
             border-radius: 4px;
             font-size: 0.85rem;
             font-weight: 500;
         }
+
         .status-active {
             background: #d4edda;
             color: #155724;
         }
+
         .status-passive {
             background: #f8d7da;
             color: #721c24;
         }
+
         .action-buttons {
             display: flex;
             gap: 8px;
         }
+
         .btn-small {
             padding: 6px 12px;
             font-size: 0.9rem;
@@ -87,18 +98,22 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             border: none;
             cursor: pointer;
         }
+
         .btn-edit {
             background: #ffc107;
             color: #212529;
         }
+
         .btn-view {
             background: #17a2b8;
             color: white;
         }
+
         .btn-delete {
             background: #dc3545;
             color: white;
         }
+
         .add-new-btn {
             background: #28a745;
             color: white;
@@ -110,6 +125,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     </style>
 </head>
+
 <body>
     <div class="admin-wrapper">
         <!-- Sidebar -->
@@ -136,6 +152,12 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <span>İlan Ekle</span>
                     </a>
                 </li>
+                <li>
+                    <a href="crm/index.php">
+                        <span class="icon">📊</span>
+                        <span>CRM Sistemi</span>
+                    </a>
+                </li>
             </ul>
         </nav>
 
@@ -153,10 +175,10 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             <div class="content">
                 <a href="add-step1.php" class="add-new-btn">➕ Yeni İlan Ekle</a>
-                
-                <?php if(isset($_SESSION['success'])): ?>
+
+                <?php if (isset($_SESSION['success'])): ?>
                     <div class="alert alert-success">
-                        <?php 
+                        <?php
                         echo $_SESSION['success'];
                         unset($_SESSION['success']);
                         ?>
@@ -178,40 +200,40 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if(count($properties) > 0): ?>
-                                <?php foreach($properties as $property): ?>
-                                <tr>
-                                    <td>
-                                        <?php if($property['image_path']): ?>
-                                            <img src="../../<?php echo $property['image_path']; ?>" 
-                                                 alt="<?php echo $property['baslik']; ?>" 
-                                                 class="property-thumb">
-                                        <?php else: ?>
-                                            <div class="no-image">📷</div>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td><?php echo $property['ilan_no']; ?></td>
-                                    <td><?php echo htmlspecialchars($property['baslik']); ?></td>
-                                    <td><?php echo number_format($property['fiyat'], 0, ',', '.'); ?> ₺</td>
-                                    <td><?php echo $property['kategori']; ?></td>
-                                    <td><?php echo $property['ilce']; ?></td>
-                                    <td>
-                                        <span class="status-badge <?php echo $property['durum'] == 'aktif' ? 'status-active' : 'status-passive'; ?>">
-                                            <?php echo ucfirst($property['durum']); ?>
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="action-buttons">
-                                            <a href="edit.php?id=<?php echo $property['id']; ?>" 
-                                               class="btn-small btn-edit">Düzenle</a>
-                                            <a href="../../pages/detail.php?id=<?php echo $property['id']; ?>" 
-                                               target="_blank" 
-                                               class="btn-small btn-view">Görüntüle</a>
-                                            <button onclick="deleteProperty(<?php echo $property['id']; ?>)" 
+                            <?php if (count($properties) > 0): ?>
+                                <?php foreach ($properties as $property): ?>
+                                    <tr>
+                                        <td>
+                                            <?php if ($property['image_path']): ?>
+                                                <img src="../../<?php echo $property['image_path']; ?>"
+                                                    alt="<?php echo $property['baslik']; ?>"
+                                                    class="property-thumb">
+                                            <?php else: ?>
+                                                <div class="no-image">📷</div>
+                                            <?php endif; ?>
+                                        </td>
+                                        <td><?php echo $property['ilan_no']; ?></td>
+                                        <td><?php echo htmlspecialchars($property['baslik']); ?></td>
+                                        <td><?php echo number_format($property['fiyat'], 0, ',', '.'); ?> ₺</td>
+                                        <td><?php echo $property['kategori']; ?></td>
+                                        <td><?php echo $property['ilce']; ?></td>
+                                        <td>
+                                            <span class="status-badge <?php echo $property['durum'] == 'aktif' ? 'status-active' : 'status-passive'; ?>">
+                                                <?php echo ucfirst($property['durum']); ?>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="action-buttons">
+                                                <a href="edit.php?id=<?php echo $property['id']; ?>"
+                                                    class="btn-small btn-edit">Düzenle</a>
+                                                <a href="../../pages/detail.php?id=<?php echo $property['id']; ?>"
+                                                    target="_blank"
+                                                    class="btn-small btn-view">Görüntüle</a>
+                                                <button onclick="deleteProperty(<?php echo $property['id']; ?>)"
                                                     class="btn-small btn-delete">Sil</button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
@@ -228,11 +250,12 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <script>
-    function deleteProperty(id) {
-        if(confirm('Bu ilanı silmek istediğinize emin misiniz?')) {
-            window.location.href = 'ajax/delete-property.php?id=' + id;
+        function deleteProperty(id) {
+            if (confirm('Bu ilanı silmek istediğinize emin misiniz?')) {
+                window.location.href = 'ajax/delete-property.php?id=' + id;
+            }
         }
-    }
     </script>
 </body>
+
 </html>

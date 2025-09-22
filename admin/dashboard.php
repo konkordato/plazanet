@@ -3,7 +3,7 @@
 session_start();
 
 // Admin girişi kontrolü
-if(!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header("Location: index.php");
     exit();
 }
@@ -43,12 +43,14 @@ $recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yönetim Paneli - Plazanet Emlak</title>
     <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
+
 <body>
     <div class="admin-wrapper">
         <!-- Sidebar -->
@@ -87,32 +89,39 @@ $recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <span>Ayarlar</span>
                     </a>
                 </li>
+                <!-- CRM SİSTEMİ MENÜSÜ -->
                 <li>
-    <a href="portfolio/closing.php">
-        <span class="icon">💰</span>
-        <span>Portföy Kapatma</span>
-    </a>
-</li>
-<li>
-    <a href="portfolio/closing-list.php">
-        <span class="icon">📋</span>
-        <span>Kapatma Listesi</span>
-    </a>
-</li>
-<li>
-    <a href="portfolio/reports.php">
-        <span class="icon">📊</span>
-        <span>Satış Raporları</span>
-    </a>
-</li>
-<?php if($_SESSION['user_role'] === 'admin'): ?>
-<li>
-    <a href="portfolio/commission-settings.php">
-        <span class="icon">⚙️</span>
-        <span>Prim Ayarları</span>
-    </a>
-</li>
-<?php endif; ?>
+                    <a href="crm/index.php">
+                        <span class="icon">📊</span>
+                        <span>CRM Sistemi</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="portfolio/closing.php">
+                        <span class="icon">💰</span>
+                        <span>Portföy Kapatma</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="portfolio/closing-list.php">
+                        <span class="icon">📋</span>
+                        <span>Kapatma Listesi</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="portfolio/reports.php">
+                        <span class="icon">📊</span>
+                        <span>Satış Raporları</span>
+                    </a>
+                </li>
+                <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                    <li>
+                        <a href="portfolio/commission-settings.php">
+                            <span class="icon">⚙️</span>
+                            <span>Prim Ayarları</span>
+                        </a>
+                    </li>
+                <?php endif; ?>
             </ul>
         </nav>
 
@@ -160,7 +169,7 @@ $recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <!-- Son Eklenen İlanlar -->
                 <div class="card">
                     <h3 style="margin-bottom: 20px;">Son Eklenen İlanlar</h3>
-                    <?php if(count($recentProperties) > 0): ?>
+                    <?php if (count($recentProperties) > 0): ?>
                         <table style="width: 100%; border-collapse: collapse;">
                             <thead>
                                 <tr style="background: #f8f9fa;">
@@ -172,38 +181,38 @@ $recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach($recentProperties as $property): ?>
-                                <tr style="border-bottom: 1px solid #dee2e6;">
-                                    <td style="padding: 10px;">
-                                        <?php echo htmlspecialchars($property['baslik']); ?>
-                                    </td>
-                                    <td style="padding: 10px;">
-                                        <?php echo number_format($property['fiyat'], 0, ',', '.'); ?> ₺
-                                    </td>
-                                    <td style="padding: 10px;">
-                                        <span style="background: <?php echo $property['kategori'] == 'Satılık' ? '#f39c12' : '#e74c3c'; ?>; 
+                                <?php foreach ($recentProperties as $property): ?>
+                                    <tr style="border-bottom: 1px solid #dee2e6;">
+                                        <td style="padding: 10px;">
+                                            <?php echo htmlspecialchars($property['baslik']); ?>
+                                        </td>
+                                        <td style="padding: 10px;">
+                                            <?php echo number_format($property['fiyat'], 0, ',', '.'); ?> ₺
+                                        </td>
+                                        <td style="padding: 10px;">
+                                            <span style="background: <?php echo $property['kategori'] == 'Satılık' ? '#f39c12' : '#e74c3c'; ?>; 
                                                      color: white; 
                                                      padding: 3px 8px; 
                                                      border-radius: 3px; 
                                                      font-size: 0.85rem;">
-                                            <?php echo $property['kategori']; ?>
-                                        </span>
-                                    </td>
-                                    <td style="padding: 10px;">
-                                        <?php echo date('d.m.Y', strtotime($property['created_at'])); ?>
-                                    </td>
-                                    <td style="padding: 10px; text-align: center;">
-                                        <a href="properties/edit.php?id=<?php echo $property['id']; ?>" 
-                                           style="color: #3498db; text-decoration: none; margin-right: 10px;">
-                                            ✏️ Düzenle
-                                        </a>
-                                        <a href="../pages/detail.php?id=<?php echo $property['id']; ?>" 
-                                           target="_blank"
-                                           style="color: #27ae60; text-decoration: none;">
-                                            👁️ Görüntüle
-                                        </a>
-                                    </td>
-                                </tr>
+                                                <?php echo $property['kategori']; ?>
+                                            </span>
+                                        </td>
+                                        <td style="padding: 10px;">
+                                            <?php echo date('d.m.Y', strtotime($property['created_at'])); ?>
+                                        </td>
+                                        <td style="padding: 10px; text-align: center;">
+                                            <a href="properties/edit.php?id=<?php echo $property['id']; ?>"
+                                                style="color: #3498db; text-decoration: none; margin-right: 10px;">
+                                                ✏️ Düzenle
+                                            </a>
+                                            <a href="../pages/detail.php?id=<?php echo $property['id']; ?>"
+                                                target="_blank"
+                                                style="color: #27ae60; text-decoration: none;">
+                                                👁️ Görüntüle
+                                            </a>
+                                        </td>
+                                    </tr>
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
@@ -212,7 +221,7 @@ $recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             Henüz ilan eklenmemiş.
                         </p>
                     <?php endif; ?>
-                    
+
                     <div style="margin-top: 20px; text-align: center;">
                         <a href="properties/add.php" class="btn btn-primary">Yeni İlan Ekle</a>
                     </div>
@@ -240,4 +249,5 @@ $recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
         </div>
     </div>
 </body>
+
 </html>
