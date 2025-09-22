@@ -84,6 +84,7 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($property['baslik']); ?> - Plaza Emlak</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/sticky-menu.css">
 <style>
 /* SADECE BU SAYFAYA ÖZEL - DİĞER SAYFALARLA ÇAKIŞMAZ */
 .detail-page-custom .detail-container { 
@@ -156,6 +157,36 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
 </style>
 </head>
 <body class="detail-page-custom" style="background: #f4f4f4;">
+<!-- HEADER BÖLÜMÜ - STICKY MENU İÇİN -->
+<header>
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo-area">
+                <a href="../index.php" class="logo-link">
+                    <img src="../assets/images/plaza-logo-buyuk.png" alt="Plaza Emlak & Yatırım" class="logo-img">
+                </a>
+                <!-- SLOGAN BÖLÜMÜ -->
+                <div class="logo-slogan">
+                    <span class="slogan-text">Geleceğinize İyi Bir Yatırım</span>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="../index.php">Ana Sayfa</a></li>
+                <li><a href="../pages/satilik.php">Satılık</a></li>
+                <li><a href="../pages/kiralik.php">Kiralık</a></li>
+                <li><a href="../pages/hakkimizda.php">Hakkımızda</a></li>
+                <li><a href="../pages/iletisim.php">İletişim</a></li>
+                <li><a href="../admin/" class="admin-btn">Yönetim</a></li>
+            </ul>
+            <div class="mobile-menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+</header>
+<!-- HEADER BİTİŞ -->
     <!-- Üst Bar -->
     <div class="detail-nav">
         <a href="../index.php">← Ana Sayfa</a> / 
@@ -438,5 +469,6 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
     }
 }
     </script>
+<script src="../assets/js/sticky-menu.js"></script>
 </body>
 </html>
