@@ -161,6 +161,90 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                 /* Mobilde daha kısa */
             }
         }
+
+        /* SEKME SİSTEMİ STİLLERİ */
+        .tabs-container {
+            margin-top: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            padding: 0;
+        }
+
+        .tab-button {
+            flex: 1;
+            max-width: 200px;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-button:hover {
+            background: #f5f5f5;
+        }
+
+        .tab-button.active {
+            color: #3498db;
+            border-bottom: 3px solid #3498db;
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            padding: 20px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* HARİTA STİLLERİ */
+        #map {
+            width: 100%;
+            height: 450px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .map-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .map-address {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .get-directions-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .get-directions-btn:hover {
+            background: #2980b9;
+        }
     </style>
 </head>
 
@@ -491,10 +575,46 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
         </div>
         <!-- 3 Kolonlu Grid kapandı - ÖNEMLİ! Bu satır eksikti -->
 
-        <!-- AÇIKLAMA -->
-        <div class="detail-description">
-            <h2>Açıklama</h2>
-            <p><?php echo nl2br(htmlspecialchars($property['aciklama'])); ?></p>
+        <!-- SEKME SİSTEMİ - AÇIKLAMA VE HARİTA -->
+        <div class="tabs-container">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="openTab(event, 'aciklama-tab')">
+                    İlan Detayları
+                </button>
+                <button class="tab-button" onclick="openTab(event, 'konum-tab')">
+                    Konumu ve Sokak Görünümü
+                </button>
+            </div>
+
+            <!-- AÇIKLAMA SEKMESİ -->
+            <div id="aciklama-tab" class="tab-content active">
+                <h2>Açıklama</h2>
+                <p><?php echo nl2br(htmlspecialchars($property['aciklama'])); ?></p>
+            </div>
+
+            <!-- KONUM SEKMESİ -->
+            <div id="konum-tab" class="tab-content">
+                <h2>Konum Bilgileri</h2>
+                <div class="map-info">
+                    <div class="map-address">
+                        📍 <?php
+                            echo $property['mahalle'] ? $property['mahalle'] . ', ' : '';
+                            echo $property['ilce'] . ' / ' . $property['il'];
+                            ?>
+                    </div>
+                    <?php
+                    $fullAddress = '';
+                    if ($property['mahalle']) $fullAddress .= $property['mahalle'] . ', ';
+                    $fullAddress .= $property['ilce'] . ', ' . $property['il'] . ', Türkiye';
+                    ?>
+                    <a href="https://www.google.com/maps/search/?api=1&query=<?php echo urlencode($fullAddress); ?>"
+                        target="_blank"
+                        class="get-directions-btn">
+                        🚗 Nasıl Giderim?
+                    </a>
+                </div>
+                <div id="map" data-address="<?php echo htmlspecialchars($fullAddress); ?>"></div>
+            </div>
         </div>
 
         <!-- BENZER İLANLAR -->
@@ -563,8 +683,89 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                 window.open('https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(whatsappMessage), '_blank');
             }
         }
+        // SEKME FONKSİYONU
+        function openTab(evt, tabName) {
+            var i, tabcontent, tabbuttons;
+
+            // Tüm sekme içeriklerini gizle
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+
+            // Tüm sekme butonlarından active sınıfını kaldır
+            tabbuttons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].classList.remove("active");
+            }
+
+            // Seçili sekmeyi göster ve butonu aktif yap
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+
+            // Harita sekmesi açıldığında haritayı başlat
+            if (tabName === 'konum-tab' && typeof google !== 'undefined' && !window.mapInitialized) {
+                setTimeout(function() {
+                    initPropertyMap();
+                    window.mapInitialized = true;
+                }, 100);
+            }
+        }
+
+        // Harita fonksiyonu
+        function initPropertyMap() {
+            var mapElement = document.getElementById('map');
+            if (!mapElement) return;
+
+            // Adresi data attribute'tan al
+            var address = mapElement.getAttribute('data-address');
+            if (!address) {
+                address = 'Afyonkarahisar, Türkiye';
+            }
+
+            // Geocoding ile adresi koordinatlara çevir
+            var geocoder = new google.maps.Geocoder();
+            geocoder.geocode({
+                'address': address
+            }, function(results, status) {
+                if (status === 'OK') {
+                    // Harita oluştur
+                    var map = new google.maps.Map(mapElement, {
+                        center: results[0].geometry.location,
+                        zoom: 15,
+                        mapTypeControl: true,
+                        streetViewControl: true,
+                        fullscreenControl: true
+                    });
+
+                    // Marker ekle
+                    var marker = new google.maps.Marker({
+                        position: results[0].geometry.location,
+                        map: map,
+                        animation: google.maps.Animation.DROP
+                    });
+
+                    // Bilgi penceresi
+                    var infoWindow = new google.maps.InfoWindow({
+                        content: '<div style="padding:10px;">📍 ' + address + '</div>'
+                    });
+
+                    marker.addListener('click', function() {
+                        infoWindow.open(map, marker);
+                    });
+                } else {
+                    // Hata durumunda mesaj göster
+                    mapElement.innerHTML = '<div style="text-align:center;padding:50px;color:#666;">' +
+                        '<p>Harita yüklenemedi</p>' +
+                        '<p style="font-size:12px;">Adres: ' + address + '</p>' +
+                        '</div>';
+                }
+            });
+        }
     </script>
     <script src="../assets/js/sticky-menu.js"></script>
+    <!-- Google Maps API -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEfetSi8hgru3jatZYeS5WaLjUD_lMED4&language=tr"></script>
 </body>
 
 </html>
