@@ -1,6 +1,6 @@
 <?php
 session_start();
-if(!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header("Location: ../index.php");
     exit();
 }
@@ -9,7 +9,7 @@ require_once '../../config/database.php';
 
 // ID kontrolü
 $id = $_GET['id'] ?? 0;
-if(!$id) {
+if (!$id) {
     $_SESSION['error'] = "Geçersiz ilan ID";
     header("Location: list.php");
     exit();
@@ -20,7 +20,7 @@ $stmt = $db->prepare("SELECT * FROM properties WHERE id = :id");
 $stmt->execute([':id' => $id]);
 $property = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if(!$property) {
+if (!$property) {
     $_SESSION['error'] = "İlan bulunamadı";
     header("Location: list.php");
     exit();
@@ -32,7 +32,7 @@ $stmt->execute([':id' => $id]);
 $images = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Form gönderilmişse güncelle
-if($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     try {
         // İlan bilgilerini güncelle
         $sql = "UPDATE properties SET 
@@ -50,6 +50,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                 isitma = :isitma,
                 banyo_sayisi = :banyo_sayisi,
                 balkon = :balkon,
+                mutfak = :mutfak,
+                asansor = :asansor,
+                otopark = :otopark,
+                site_adi = :site_adi,
                 esyali = :esyali,
                 kullanim_durumu = :kullanim_durumu,
                 site_icerisinde = :site_icerisinde,
@@ -61,7 +65,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                 durum = :durum,
                 takas = :takas
                 WHERE id = :id";
-        
+
         $stmt = $db->prepare($sql);
         $stmt->execute([
             ':baslik' => $_POST['baslik'],
@@ -78,6 +82,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             ':isitma' => $_POST['isitma'] ?: null,
             ':banyo_sayisi' => $_POST['banyo_sayisi'] ?: null,
             ':balkon' => $_POST['balkon'] ?: null,
+            ':mutfak' => $_POST['mutfak'] ?: null,
+            ':asansor' => $_POST['asansor'] ?: null,
+            ':otopark' => $_POST['otopark'] ?: null,
+            ':site_adi' => $_POST['site_adi'] ?: null,
             ':esyali' => $_POST['esyali'],
             ':kullanim_durumu' => $_POST['kullanim_durumu'] ?: null,
             ':site_icerisinde' => $_POST['site_icerisinde'],
@@ -90,39 +98,39 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             ':takas' => $_POST['takas'],
             ':id' => $id
         ]);
-        
+
         // YENİ FOTOĞRAF YÜKLEME
-        if(isset($_FILES['new_photos']) && !empty($_FILES['new_photos']['name'][0])) {
+        if (isset($_FILES['new_photos']) && !empty($_FILES['new_photos']['name'][0])) {
             $uploadDir = '../../assets/uploads/properties/';
-            
-            if(!is_dir($uploadDir)) {
+
+            if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0777, true);
             }
-            
+
             $totalPhotos = count($_FILES['new_photos']['name']);
             $currentPhotoCount = count($images);
-            
-            for($i = 0; $i < $totalPhotos; $i++) {
-                if($_FILES['new_photos']['error'][$i] == 0) {
+
+            for ($i = 0; $i < $totalPhotos; $i++) {
+                if ($_FILES['new_photos']['error'][$i] == 0) {
                     $fileName = $_FILES['new_photos']['name'][$i];
                     $tempFile = $_FILES['new_photos']['tmp_name'][$i];
                     $fileExt = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-                    
+
                     // Dosya tipi kontrolü
                     $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-                    if(!in_array($fileExt, $allowedTypes)) {
+                    if (!in_array($fileExt, $allowedTypes)) {
                         continue;
                     }
-                    
+
                     // Yeni dosya adı
                     $newFileName = 'prop_' . $id . '_' . time() . '_' . $i . '.' . $fileExt;
                     $uploadPath = $uploadDir . $newFileName;
-                    
-                    if(move_uploaded_file($tempFile, $uploadPath)) {
+
+                    if (move_uploaded_file($tempFile, $uploadPath)) {
                         // Veritabanına ekle
                         $isMain = ($currentPhotoCount == 0 && $i == 0) ? 1 : 0;
                         $dbPath = 'assets/uploads/properties/' . $newFileName;
-                        
+
                         $stmt = $db->prepare("INSERT INTO property_images (property_id, image_path, image_name, is_main, display_order) 
                                             VALUES (:pid, :path, :name, :main, :order)");
                         $stmt->execute([
@@ -136,18 +144,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                 }
             }
         }
-        
+
         $_SESSION['success'] = "İlan başarıyla güncellendi!";
         header("Location: edit.php?id=" . $id);
         exit();
-        
-    } catch(PDOException $e) {
+    } catch (PDOException $e) {
         $error = "Güncelleme hatası: " . $e->getMessage();
     }
 }
 ?>
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -164,24 +172,28 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             justify-content: space-between;
             align-items: center;
         }
+
         .photo-section {
             background: #f8f9fa;
             padding: 20px;
             border-radius: 8px;
             margin-bottom: 20px;
         }
+
         .photo-section h2 {
             color: #333;
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 2px solid #3498db;
         }
+
         .existing-photos {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
         }
+
         .photo-item {
             position: relative;
             border: 2px solid #ddd;
@@ -189,14 +201,17 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             overflow: hidden;
             background: white;
         }
+
         .photo-item img {
             width: 100%;
             height: 120px;
             object-fit: cover;
         }
+
         .photo-item.main-photo {
             border-color: #27ae60;
         }
+
         .main-badge {
             position: absolute;
             top: 5px;
@@ -207,6 +222,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             border-radius: 4px;
             font-size: 11px;
         }
+
         .photo-actions {
             position: absolute;
             top: 5px;
@@ -214,6 +230,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             display: flex;
             gap: 5px;
         }
+
         .btn-photo {
             width: 30px;
             height: 30px;
@@ -225,17 +242,21 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             align-items: center;
             justify-content: center;
         }
+
         .btn-delete-photo {
             background: rgba(231, 76, 60, 0.9);
             color: white;
         }
+
         .btn-main-photo {
             background: rgba(52, 152, 219, 0.9);
             color: white;
         }
+
         .btn-photo:hover {
             transform: scale(1.1);
         }
+
         .upload-new-photos {
             border: 2px dashed #3498db;
             padding: 30px;
@@ -244,9 +265,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             background: white;
             cursor: pointer;
         }
+
         .upload-new-photos:hover {
             background: #f0f8ff;
         }
+
         .photo-count-info {
             background: #e8f4f8;
             padding: 10px;
@@ -254,6 +277,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             margin-bottom: 15px;
             color: #2c3e50;
         }
+
         .no-photos {
             text-align: center;
             padding: 40px;
@@ -263,6 +287,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     </style>
 </head>
+
 <body>
     <div class="admin-wrapper">
         <!-- Sidebar -->
@@ -289,39 +314,40 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
 
             <div class="content">
-                <?php if(isset($_SESSION['success'])): ?>
+                <?php if (isset($_SESSION['success'])): ?>
                     <div class="alert alert-success">
-                        <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+                        <?php echo $_SESSION['success'];
+                        unset($_SESSION['success']); ?>
                     </div>
                 <?php endif; ?>
 
-                <?php if(isset($error)): ?>
+                <?php if (isset($error)): ?>
                     <div class="alert alert-error"><?php echo $error; ?></div>
                 <?php endif; ?>
 
                 <!-- FOTOĞRAF YÖNETİMİ -->
                 <div class="photo-section">
                     <h2>📷 Fotoğraf Yönetimi</h2>
-                    
+
                     <div class="photo-count-info">
                         💡 Mevcut fotoğraf sayısı: <strong><?php echo count($images); ?></strong> / 50
                     </div>
 
-                    <?php if(count($images) > 0): ?>
+                    <?php if (count($images) > 0): ?>
                         <div class="existing-photos">
-                            <?php foreach($images as $img): ?>
-                            <div class="photo-item <?php echo $img['is_main'] ? 'main-photo' : ''; ?>">
-                                <img src="../../<?php echo $img['image_path']; ?>" alt="Fotoğraf">
-                                <?php if($img['is_main']): ?>
-                                    <span class="main-badge">Ana Foto</span>
-                                <?php endif; ?>
-                                <div class="photo-actions">
-                                    <?php if(!$img['is_main']): ?>
-                                        <button onclick="setMainPhoto(<?php echo $img['id']; ?>)" class="btn-photo btn-main-photo" title="Ana fotoğraf yap">★</button>
+                            <?php foreach ($images as $img): ?>
+                                <div class="photo-item <?php echo $img['is_main'] ? 'main-photo' : ''; ?>">
+                                    <img src="../../<?php echo $img['image_path']; ?>" alt="Fotoğraf">
+                                    <?php if ($img['is_main']): ?>
+                                        <span class="main-badge">Ana Foto</span>
                                     <?php endif; ?>
-                                    <button onclick="deletePhoto(<?php echo $img['id']; ?>)" class="btn-photo btn-delete-photo" title="Sil">×</button>
+                                    <div class="photo-actions">
+                                        <?php if (!$img['is_main']): ?>
+                                            <button onclick="setMainPhoto(<?php echo $img['id']; ?>)" class="btn-photo btn-main-photo" title="Ana fotoğraf yap">★</button>
+                                        <?php endif; ?>
+                                        <button onclick="deletePhoto(<?php echo $img['id']; ?>)" class="btn-photo btn-delete-photo" title="Sil">×</button>
+                                    </div>
                                 </div>
-                            </div>
                             <?php endforeach; ?>
                         </div>
                     <?php else: ?>
@@ -348,7 +374,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <!-- Temel Bilgiler -->
                     <div class="form-section">
                         <h2 class="section-title">Temel Bilgiler</h2>
-                        
+
                         <div class="form-group">
                             <label class="required">İlan Başlığı</label>
                             <input type="text" name="baslik" value="<?php echo htmlspecialchars($property['baslik']); ?>" required>
@@ -387,9 +413,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                                 <label>Oda Sayısı</label>
                                 <select name="oda_sayisi">
                                     <option value="">Seçiniz</option>
-                                    <?php 
-                                    $odalar = ['1+0','1+1','2+1','3+1','4+1','5+1'];
-                                    foreach($odalar as $oda): ?>
+                                    <?php
+                                    $odalar = ['1+0', '1+1', '2+1', '3+1', '4+1', '5+1'];
+                                    foreach ($odalar as $oda): ?>
                                         <option value="<?php echo $oda; ?>" <?php echo $property['oda_sayisi'] == $oda ? 'selected' : ''; ?>><?php echo $oda; ?></option>
                                     <?php endforeach; ?>
                                 </select>
@@ -439,8 +465,40 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                                     <option value="Yok" <?php echo $property['balkon'] == 'Yok' ? 'selected' : ''; ?>>Yok</option>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label>Mutfak</label>
+                                <select name="mutfak">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Açık" <?php echo ($property['mutfak'] ?? '') == 'Açık' ? 'selected' : ''; ?>>Açık</option>
+                                    <option value="Kapalı" <?php echo ($property['mutfak'] ?? '') == 'Kapalı' ? 'selected' : ''; ?>>Kapalı</option>
+                                    <option value="Amerikan" <?php echo ($property['mutfak'] ?? '') == 'Amerikan' ? 'selected' : ''; ?>>Amerikan</option>
+                                </select>
+                            </div>
                         </div>
-
+                        <!-- Yeni satır - Asansör, Otopark, Site Adı -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Asansör</label>
+                                <select name="asansor">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Var" <?php echo ($property['asansor'] ?? '') == 'Var' ? 'selected' : ''; ?>>Var</option>
+                                    <option value="Yok" <?php echo ($property['asansor'] ?? '') == 'Yok' ? 'selected' : ''; ?>>Yok</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Otopark</label>
+                                <select name="otopark">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Yok" <?php echo ($property['otopark'] ?? 'Yok') == 'Yok' ? 'selected' : ''; ?>>Yok</option>
+                                    <option value="Açık" <?php echo ($property['otopark'] ?? '') == 'Açık' ? 'selected' : ''; ?>>Açık Otopark</option>
+                                    <option value="Kapalı" <?php echo ($property['otopark'] ?? '') == 'Kapalı' ? 'selected' : ''; ?>>Kapalı Otopark</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Site Adı</label>
+                                <input type="text" name="site_adi" value="<?php echo htmlspecialchars($property['site_adi'] ?? ''); ?>" placeholder="Site içindeyse adını yazın">
+                            </div>
+                        </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Site İçerisinde</label>
@@ -483,31 +541,31 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
 
                     <!-- Adres Bilgileri -->
                     <div class="form-section">
-                    <h2 class="section-title">Adres Bilgileri</h2>
-       
+                        <h2 class="section-title">Adres Bilgileri</h2>
+
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="required">İl</label>
-                                <input type="text" name="il" value="<?php echo htmlspecialchars($property['il']); ?>" required 
+                                <input type="text" name="il" value="<?php echo htmlspecialchars($property['il']); ?>" required
                                     placeholder="İl adını yazın">
                             </div>
-                    <div class="form-group">
-                        <label class="required">İlçe</label>
-                            <input type="text" name="ilce" value="<?php echo htmlspecialchars($property['ilce']); ?>" required 
-                            placeholder="İlçe adını yazın">
-                    </div>
-           <div class="form-group">
-               <label>Mahalle</label>
-               <input type="text" name="mahalle" value="<?php echo htmlspecialchars($property['mahalle'] ?? ''); ?>" 
-                      placeholder="Mahalle adını yazın">
-           </div>
-       </div>
+                            <div class="form-group">
+                                <label class="required">İlçe</label>
+                                <input type="text" name="ilce" value="<?php echo htmlspecialchars($property['ilce']); ?>" required
+                                    placeholder="İlçe adını yazın">
+                            </div>
+                            <div class="form-group">
+                                <label>Mahalle</label>
+                                <input type="text" name="mahalle" value="<?php echo htmlspecialchars($property['mahalle'] ?? ''); ?>"
+                                    placeholder="Mahalle adını yazın">
+                            </div>
+                        </div>
 
-       <div class="form-group">
-           <label>Açık Adres</label>
-           <textarea name="adres" rows="3"><?php echo htmlspecialchars($property['adres']); ?></textarea>
-       </div>
-   </div>
+                        <div class="form-group">
+                            <label>Açık Adres</label>
+                            <textarea name="adres" rows="3"><?php echo htmlspecialchars($property['adres']); ?></textarea>
+                        </div>
+                    </div>
 
                     <!-- Butonlar -->
                     <div class="buttons">
@@ -520,39 +578,40 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
     <script>
-    // Ana fotoğraf yapma
-    function setMainPhoto(photoId) {
-        if(confirm('Bu fotoğrafı ana fotoğraf yapmak istiyor musunuz?')) {
-            window.location.href = 'ajax/set-main-photo.php?id=' + photoId + '&property_id=<?php echo $id; ?>';
-        }
-    }
-    
-    // Fotoğraf silme
-    function deletePhoto(photoId) {
-        if(confirm('Bu fotoğrafı silmek istediğinize emin misiniz?')) {
-            window.location.href = 'ajax/delete-photo.php?id=' + photoId + '&property_id=<?php echo $id; ?>';
-        }
-    }
-    
-    // Dosya seçildiğinde önizleme
-    document.getElementById('new_photos').addEventListener('change', function(e) {
-        const fileCount = e.target.files.length;
-        const currentCount = <?php echo count($images); ?>;
-        const totalCount = currentCount + fileCount;
-        
-        if(totalCount > 50) {
-            alert('Toplam fotoğraf sayısı 50\'yi geçemez! Mevcut: ' + currentCount + ', Eklemeye çalıştığınız: ' + fileCount);
-            e.target.value = '';
-            return;
-        }
-        
-        if(fileCount > 0) {
-            if(confirm(fileCount + ' adet fotoğraf yüklenecek. Devam etmek istiyor musunuz?')) {
-                // Formu otomatik gönder
-                this.form.submit();
+        // Ana fotoğraf yapma
+        function setMainPhoto(photoId) {
+            if (confirm('Bu fotoğrafı ana fotoğraf yapmak istiyor musunuz?')) {
+                window.location.href = 'ajax/set-main-photo.php?id=' + photoId + '&property_id=<?php echo $id; ?>';
             }
         }
-    });
+
+        // Fotoğraf silme
+        function deletePhoto(photoId) {
+            if (confirm('Bu fotoğrafı silmek istediğinize emin misiniz?')) {
+                window.location.href = 'ajax/delete-photo.php?id=' + photoId + '&property_id=<?php echo $id; ?>';
+            }
+        }
+
+        // Dosya seçildiğinde önizleme
+        document.getElementById('new_photos').addEventListener('change', function(e) {
+            const fileCount = e.target.files.length;
+            const currentCount = <?php echo count($images); ?>;
+            const totalCount = currentCount + fileCount;
+
+            if (totalCount > 50) {
+                alert('Toplam fotoğraf sayısı 50\'yi geçemez! Mevcut: ' + currentCount + ', Eklemeye çalıştığınız: ' + fileCount);
+                e.target.value = '';
+                return;
+            }
+
+            if (fileCount > 0) {
+                if (confirm(fileCount + ' adet fotoğraf yüklenecek. Devam etmek istiyor musunuz?')) {
+                    // Formu otomatik gönder
+                    this.form.submit();
+                }
+            }
+        });
     </script>
 </body>
+
 </html>

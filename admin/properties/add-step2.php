@@ -1,6 +1,6 @@
 <?php
 session_start();
-if(!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true) {
+if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true) {
     header("Location: ../index.php");
     exit();
 }
@@ -23,56 +23,63 @@ $mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri
 ?>
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İlan Detayları | Plaza Emlak</title>
     <link rel="stylesheet" href="../../assets/css/admin-form.css">
     <style>
-    .preview-area {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-        gap: 15px;
-        margin-top: 20px;
-    }
-    .preview-item {
-        position: relative;
-        border-radius: 8px;
-        overflow: hidden;
-        border: 2px solid #e0e0e0;
-        background: #f5f5f5;
-    }
-    .preview-item img {
-        width: 100%;
-        height: 100px;
-        object-fit: cover;
-        display: block;
-    }
-    .preview-item .remove-btn {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        width: 25px;
-        height: 25px;
-        background: rgba(231, 76, 60, 0.9);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        font-size: 18px;
-        line-height: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .preview-item .remove-btn:hover {
-        background: #c0392b;
-    }
-    .upload-area {
-        transition: all 0.3s;
-    }
+        .preview-area {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 2px solid #e0e0e0;
+            background: #f5f5f5;
+        }
+
+        .preview-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .preview-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            width: 25px;
+            height: 25px;
+            background: rgba(231, 76, 60, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-item .remove-btn:hover {
+            background: #c0392b;
+        }
+
+        .upload-area {
+            transition: all 0.3s;
+        }
     </style>
 </head>
+
 <body>
     <div class="header">
         <div class="container">
@@ -113,28 +120,28 @@ $mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri
     <div class="container">
         <div class="content">
             <div class="breadcrumb">
-                Emlak > <?php echo ucfirst($emlak_tipi); ?> > <?php echo ucfirst($kategori); ?> 
-                <?php if($alt_kategori): ?>> <?php echo ucfirst($alt_kategori); ?><?php endif; ?>
+                Emlak > <?php echo ucfirst($emlak_tipi); ?> > <?php echo ucfirst($kategori); ?>
+                <?php if ($alt_kategori): ?>> <?php echo ucfirst($alt_kategori); ?><?php endif; ?>
             </div>
 
             <h1 class="page-title">İlan Detayları</h1>
-            
+
             <form id="detailForm" method="POST" action="add-step3.php" enctype="multipart/form-data">
                 <!-- TEMEL BİLGİLER -->
                 <div class="form-section">
                     <h2 class="section-title">Temel Bilgiler</h2>
-                    
+
                     <div class="form-group">
                         <label class="required">İlan Başlığı</label>
-                        <input type="text" name="baslik" maxlength="100" required 
-                               placeholder="Örn: <?php echo $emlak_tipi == 'arsa' ? 'Satılık İmarlı Arsa' : 'Plaza\'dan Merkez\'de 3+1 Kiralık Daire'; ?>">
+                        <input type="text" name="baslik" maxlength="100" required
+                            placeholder="Örn: <?php echo $emlak_tipi == 'arsa' ? 'Satılık İmarlı Arsa' : 'Plaza\'dan Merkez\'de 3+1 Kiralık Daire'; ?>">
                         <small>Maksimum 100 karakter</small>
                     </div>
 
                     <div class="form-group">
                         <label class="required">Açıklama</label>
-                        <textarea name="aciklama" rows="8" required 
-                                  placeholder="İlanınız hakkında detaylı bilgi verin..."></textarea>
+                        <textarea name="aciklama" rows="8" required
+                            placeholder="İlanınız hakkında detaylı bilgi verin..."></textarea>
                     </div>
 
                     <div class="form-row">
@@ -152,7 +159,7 @@ $mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri
                         </div>
                     </div>
 
-                    <?php if($emlak_tipi == 'arsa'): ?>
+                    <?php if ($emlak_tipi == 'arsa'): ?>
                         <!-- ARSA İÇİN ÖZEL ALANLAR -->
                         <div class="form-row">
                             <div class="form-group">
@@ -286,7 +293,7 @@ $mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri
                                     <option value="Bahçe Katı">Bahçe Katı</option>
                                     <option value="Giriş Katı">Giriş Katı</option>
                                     <option value="Yüksek Giriş">Yüksek Giriş</option>
-                                    <?php for($i=1; $i<=30; $i++): ?>
+                                    <?php for ($i = 1; $i <= 30; $i++): ?>
                                         <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
                                     <?php endfor; ?>
                                 </select>
@@ -295,7 +302,7 @@ $mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri
                                 <label>Kat Sayısı</label>
                                 <select name="kat_sayisi">
                                     <option value="">Seçiniz</option>
-                                    <?php for($i=1; $i<=30; $i++): ?>
+                                    <?php for ($i = 1; $i <= 30; $i++): ?>
                                         <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
                                     <?php endfor; ?>
                                 </select>
@@ -339,7 +346,35 @@ $mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri
                                 </select>
                             </div>
                         </div>
-
+                        <!-- YENİ SATIR - Mutfak, Asansör, Otopark -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Mutfak</label>
+                                <select name="mutfak">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Açık">Açık</option>
+                                    <option value="Kapalı">Kapalı</option>
+                                    <option value="Amerikan">Amerikan</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Asansör</label>
+                                <select name="asansor">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Var">Var</option>
+                                    <option value="Yok">Yok</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Otopark</label>
+                                <select name="otopark">
+                                    <option value="">Seçiniz</option>
+                                    <option value="Yok">Yok</option>
+                                    <option value="Açık">Açık Otopark</option>
+                                    <option value="Kapalı">Kapalı Otopark</option>
+                                </select>
+                            </div>
+                        </div>
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Eşyalı</label>
@@ -363,69 +398,74 @@ $mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri
                                     <option value="Evet">Evet</option>
                                 </select>
                             </div>
+                            <div class="form-group">
+                                <label>Site Adı</label>
+                                <input type="text" name="site_adi" id="site_adi" placeholder="Site içindeyse adını yazın">
+                                <small>Site içerisinde ise site adını belirtin</small>
+                            </div>
                         </div>
 
-                        <?php if($kategori == 'kiralik'): ?>
-                        <div class="form-group">
-                            <label>Aidat (TL)</label>
-                            <input type="number" name="aidat" placeholder="0">
-                        </div>
+                        <?php if ($kategori == 'kiralik'): ?>
+                            <div class="form-group">
+                                <label>Aidat (TL)</label>
+                                <input type="number" name="aidat" placeholder="0">
+                            </div>
                         <?php endif; ?>
                     <?php endif; ?>
                 </div>
 
                 <!-- ADRES BİLGİLERİ -->
-   <div class="form-section">
-       <h2 class="section-title">Adres Bilgileri</h2>
-       
-       <div class="form-row">
-    <div class="form-group">
-        <label class="required">İl</label>
-        <input type="text" name="il" id="il" value="Afyonkarahisar" required 
-               placeholder="İl adını yazın" list="il-listesi"
-               style="text-transform: capitalize;">
-        <datalist id="il-listesi">
-            <?php foreach($il_onerileri as $il): ?>
-                <option value="<?php echo htmlspecialchars($il); ?>">
-            <?php endforeach; ?>
-        </datalist>
-        <small>İlk harf büyük, diğerleri küçük yazın</small>
-    </div>
-    <div class="form-group">
-        <label class="required">İlçe</label>
-        <input type="text" name="ilce" id="ilce" required 
-               placeholder="İlçe adını yazın" list="ilce-listesi"
-               style="text-transform: capitalize;">
-        <datalist id="ilce-listesi">
-            <?php foreach($ilce_onerileri as $ilce): ?>
-                <option value="<?php echo htmlspecialchars($ilce); ?>">
-            <?php endforeach; ?>
-        </datalist>
-        <small>İlk harf büyük yazın</small>
-    </div>
-    <div class="form-group">
-        <label>Mahalle/Köy</label>
-        <input type="text" name="mahalle" id="mahalle"
-               placeholder="Mahalle veya köy adını yazın" list="mahalle-listesi"
-               style="text-transform: capitalize;">
-        <datalist id="mahalle-listesi">
-            <?php foreach($mahalle_onerileri as $mahalle): ?>
-                <option value="<?php echo htmlspecialchars($mahalle); ?>">
-            <?php endforeach; ?>
-        </datalist>
-        <small>İlk harf büyük yazın</small>
-    </div>
-</div>
+                <div class="form-section">
+                    <h2 class="section-title">Adres Bilgileri</h2>
 
-       <div class="form-group">
-           <label>Açık Adres</label>
-           <textarea name="adres" rows="3" placeholder="Cadde, sokak, bina no vb."></textarea>
-       </div>
-   </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="required">İl</label>
+                            <input type="text" name="il" id="il" value="Afyonkarahisar" required
+                                placeholder="İl adını yazın" list="il-listesi"
+                                style="text-transform: capitalize;">
+                            <datalist id="il-listesi">
+                                <?php foreach ($il_onerileri as $il): ?>
+                                    <option value="<?php echo htmlspecialchars($il); ?>">
+                                    <?php endforeach; ?>
+                            </datalist>
+                            <small>İlk harf büyük, diğerleri küçük yazın</small>
+                        </div>
+                        <div class="form-group">
+                            <label class="required">İlçe</label>
+                            <input type="text" name="ilce" id="ilce" required
+                                placeholder="İlçe adını yazın" list="ilce-listesi"
+                                style="text-transform: capitalize;">
+                            <datalist id="ilce-listesi">
+                                <?php foreach ($ilce_onerileri as $ilce): ?>
+                                    <option value="<?php echo htmlspecialchars($ilce); ?>">
+                                    <?php endforeach; ?>
+                            </datalist>
+                            <small>İlk harf büyük yazın</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Mahalle/Köy</label>
+                            <input type="text" name="mahalle" id="mahalle"
+                                placeholder="Mahalle veya köy adını yazın" list="mahalle-listesi"
+                                style="text-transform: capitalize;">
+                            <datalist id="mahalle-listesi">
+                                <?php foreach ($mahalle_onerileri as $mahalle): ?>
+                                    <option value="<?php echo htmlspecialchars($mahalle); ?>">
+                                    <?php endforeach; ?>
+                            </datalist>
+                            <small>İlk harf büyük yazın</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Açık Adres</label>
+                        <textarea name="adres" rows="3" placeholder="Cadde, sokak, bina no vb."></textarea>
+                    </div>
+                </div>
                 <!-- DANIŞMAN ÖZEL ALANLARI -->
                 <div class="form-section special">
                     <h2 class="section-title">🔒 Danışman Bilgileri (Sadece Siz Görebilirsiniz)</h2>
-                    
+
                     <div class="form-row">
                         <div class="form-group">
                             <label>Anahtar Numarası</label>
@@ -441,8 +481,8 @@ $mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri
 
                     <div class="form-group">
                         <label>Danışman Notu</label>
-                        <textarea name="danisman_notu" rows="3" 
-                                  placeholder="Özel notlarınız, dikkat edilmesi gerekenler vb."></textarea>
+                        <textarea name="danisman_notu" rows="3"
+                            placeholder="Özel notlarınız, dikkat edilmesi gerekenler vb."></textarea>
                     </div>
                 </div>
 
@@ -450,8 +490,8 @@ $mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri
                 <div class="form-section">
                     <h2 class="section-title">Fotoğraflar</h2>
                     <div class="photo-upload">
-                        <input type="file" name="photos[]" id="photos" 
-                               multiple accept="image/*" style="display:none">
+                        <input type="file" name="photos[]" id="photos"
+                            multiple accept="image/*" style="display:none">
                         <div class="upload-area" onclick="document.getElementById('photos').click()">
                             <div class="upload-icon">📷</div>
                             <div class="upload-text">
@@ -479,28 +519,29 @@ $mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri
     </div>
 
     <script src="../../assets/js/property-form.js"></script>
-<script>
-// İl, ilçe, mahalle format kontrolü
-function formatText(text) {
-    if(!text) return '';
-    // Her kelimenin ilk harfi büyük, diğerleri küçük
-    return text.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
-}
+    <script>
+        // İl, ilçe, mahalle format kontrolü
+        function formatText(text) {
+            if (!text) return '';
+            // Her kelimenin ilk harfi büyük, diğerleri küçük
+            return text.toLowerCase().replace(/\b\w/g, l => l.toUpperCase());
+        }
 
-document.getElementById('il').addEventListener('blur', function() {
-    this.value = formatText(this.value);
-});
+        document.getElementById('il').addEventListener('blur', function() {
+            this.value = formatText(this.value);
+        });
 
-document.getElementById('ilce').addEventListener('blur', function() {
-    this.value = formatText(this.value);
-});
+        document.getElementById('ilce').addEventListener('blur', function() {
+            this.value = formatText(this.value);
+        });
 
-var mahalleInput = document.getElementById('mahalle');
-if(mahalleInput) {
-    mahalleInput.addEventListener('blur', function() {
-        this.value = formatText(this.value);
-    });
-}
-</script>
+        var mahalleInput = document.getElementById('mahalle');
+        if (mahalleInput) {
+            mahalleInput.addEventListener('blur', function() {
+                this.value = formatText(this.value);
+            });
+        }
+    </script>
 </body>
+
 </html>
