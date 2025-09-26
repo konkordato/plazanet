@@ -161,6 +161,133 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                 /* Mobilde daha kısa */
             }
         }
+
+        /* SEKME SİSTEMİ STİLLERİ */
+        .tabs-container {
+            margin-top: 30px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            padding: 0;
+        }
+
+        .tab-button {
+            flex: 1;
+            max-width: 200px;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #666;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-button:hover {
+            background: #f5f5f5;
+        }
+
+        .tab-button.active {
+            color: #3498db;
+            border-bottom: 3px solid #3498db;
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .tab-content {
+            padding: 20px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* HARİTA STİLLERİ */
+        #map {
+            width: 100%;
+            height: 450px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .map-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .map-address {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .get-directions-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .get-directions-btn:hover {
+            background: #2980b9;
+        }
+    </style>
+    <style>
+        /* Lightbox animasyonu */
+        #modalImage {
+            animation: zoom 0.6s;
+        }
+
+        @keyframes zoom {
+            from {
+                transform: scale(0.5)
+            }
+
+            to {
+                transform: scale(1)
+            }
+        }
+
+        #imageModal {
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Hover efektleri */
+        .gallery-main:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+            transition: all 0.3s;
+        }
+
+        .gallery-thumb:hover {
+            border-color: #3498db !important;
+            transform: scale(1.05);
+            transition: all 0.3s;
+        }
     </style>
 </head>
 
@@ -491,10 +618,46 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
         </div>
         <!-- 3 Kolonlu Grid kapandı - ÖNEMLİ! Bu satır eksikti -->
 
-        <!-- AÇIKLAMA -->
-        <div class="detail-description">
-            <h2>Açıklama</h2>
-            <p><?php echo nl2br(htmlspecialchars($property['aciklama'])); ?></p>
+        <!-- SEKME SİSTEMİ - AÇIKLAMA VE HARİTA -->
+        <div class="tabs-container">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="openTab(event, 'aciklama-tab')">
+                    İlan Detayları
+                </button>
+                <button class="tab-button" onclick="openTab(event, 'konum-tab')">
+                    Konumu ve Sokak Görünümü
+                </button>
+            </div>
+
+            <!-- AÇIKLAMA SEKMESİ -->
+            <div id="aciklama-tab" class="tab-content active">
+                <h2>Açıklama</h2>
+                <p><?php echo nl2br(htmlspecialchars($property['aciklama'])); ?></p>
+            </div>
+
+            <!-- KONUM SEKMESİ -->
+            <div id="konum-tab" class="tab-content">
+                <h2>Konum Bilgileri</h2>
+                <div class="map-info">
+                    <div class="map-address">
+                        📍 <?php
+                            echo $property['mahalle'] ? $property['mahalle'] . ', ' : '';
+                            echo $property['ilce'] . ' / ' . $property['il'];
+                            ?>
+                    </div>
+                    <?php
+                    $fullAddress = '';
+                    if ($property['mahalle']) $fullAddress .= $property['mahalle'] . ', ';
+                    $fullAddress .= $property['ilce'] . ', ' . $property['il'] . ', Türkiye';
+                    ?>
+                    <a href="https://www.google.com/maps/search/?api=1&query=<?php echo urlencode($fullAddress); ?>"
+                        target="_blank"
+                        class="get-directions-btn">
+                        🚗 Nasıl Giderim?
+                    </a>
+                </div>
+                <div id="map" data-address="<?php echo htmlspecialchars($fullAddress); ?>"></div>
+            </div>
         </div>
 
         <!-- BENZER İLANLAR -->
@@ -563,8 +726,148 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                 window.open('https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(whatsappMessage), '_blank');
             }
         }
+        // SEKME FONKSİYONU
+        function openTab(evt, tabName) {
+            var i, tabcontent, tabbuttons;
+
+            // Tüm sekme içeriklerini gizle
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+
+            // Tüm sekme butonlarından active sınıfını kaldır
+            tabbuttons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].classList.remove("active");
+            }
+
+            // Seçili sekmeyi göster ve butonu aktif yap
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+
+            // Harita sekmesi açıldığında haritayı başlat
+            if (tabName === 'konum-tab' && typeof google !== 'undefined' && !window.mapInitialized) {
+                setTimeout(function() {
+                    initPropertyMap();
+                    window.mapInitialized = true;
+                }, 100);
+            }
+        }
+
+        // Harita fonksiyonu
+        function initPropertyMap() {
+            var mapElement = document.getElementById('map');
+            if (!mapElement) return;
+
+            // Koordinatlar varsa kullan
+            var lat = <?php echo $property['latitude'] ?: 'null'; ?>;
+            var lng = <?php echo $property['longitude'] ?: 'null'; ?>;
+
+            if (lat && lng) {
+                var location = {
+                    lat: parseFloat(lat),
+                    lng: parseFloat(lng)
+                };
+
+                var map = new google.maps.Map(mapElement, {
+                    center: location,
+                    zoom: 15,
+                    mapTypeControl: true,
+                    streetViewControl: true,
+                    fullscreenControl: true
+                });
+
+                new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    title: '<?php echo htmlspecialchars($property['baslik']); ?>'
+                });
+            } else {
+                mapElement.innerHTML = '<div style="text-align:center;padding:50px;color:#999;">📍 Konum bilgisi henüz eklenmemiş</div>';
+            }
+        }
     </script>
     <script src="../assets/js/sticky-menu.js"></script>
+    <!-- Google Maps API -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEfetSi8hgru3jatZYeS5WaLjUD_lMED4&language=tr"></script>
+    <script>
+        // Tab fonksiyonu
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        // Galeri fonksiyonu
+        function changeMainImage(src) {
+            document.getElementById('mainImage').src = src;
+        }
+    </script>
+    <script>
+        // LIGHTBOX SİSTEMİ - DETAY SAYFASI İÇİN
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lightbox HTML'i oluştur
+            const lightboxHTML = `
+        <div id="imageModal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.95);">
+            <span onclick="closeModal()" style="position:absolute; top:20px; right:40px; color:#fff; font-size:40px; font-weight:bold; cursor:pointer;">&times;</span>
+            <img id="modalImage" style="margin:auto; display:block; max-width:90%; max-height:90%; margin-top:50px;">
+            <div id="caption" style="margin:auto; display:block; width:80%; max-width:700px; text-align:center; color:#ccc; padding:10px 0;"></div>
+        </div>
+    `;
+            document.body.insertAdjacentHTML('beforeend', lightboxHTML);
+
+            // Ana resme tıklama eventi
+            const mainImg = document.getElementById('mainImage');
+            if (mainImg) {
+                mainImg.style.cursor = 'pointer';
+                mainImg.onclick = function() {
+                    document.getElementById('imageModal').style.display = 'block';
+                    document.getElementById('modalImage').src = this.src;
+                }
+            }
+
+            // Küçük resimlere tıklama
+            const thumbs = document.querySelectorAll('.gallery-thumb');
+            thumbs.forEach(function(thumb) {
+                thumb.style.cursor = 'pointer';
+                thumb.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // Önce ana resmi değiştir
+                    if (mainImg) {
+                        mainImg.src = this.src;
+                    }
+                });
+
+                // Çift tıklama ile büyütme
+                thumb.addEventListener('dblclick', function(e) {
+                    e.stopPropagation();
+                    document.getElementById('imageModal').style.display = 'block';
+                    document.getElementById('modalImage').src = this.src;
+                });
+            });
+        });
+
+        // Modal kapatma
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // ESC tuşu ile kapatma
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
 </body>
 
 </html>

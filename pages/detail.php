@@ -79,7 +79,6 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
 ?>
 <!DOCTYPE html>
 <html lang="tr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -87,20 +86,16 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
     <link rel="stylesheet" href="../assets/css/style.css">
     <link rel="stylesheet" href="../assets/css/sticky-menu.css">
     <style>
-        /* SADECE BU SAYFAYA ÖZEL - DİĞER SAYFALARLA ÇAKIŞMAZ */
         .detail-page-custom .detail-container {
             max-width: 1400px !important;
-            /* Sadece bu sayfada genişlet */
         }
 
         .detail-page-custom .detail-grid {
             display: grid !important;
             grid-template-columns: 48% 30% 20% !important;
-            /* Güvenli oranlar */
             gap: 1% !important;
         }
 
-        /* Sadece bu sayfadaki galeriye özel */
         .detail-page-custom .detail-gallery {
             position: relative;
         }
@@ -108,7 +103,6 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
         .detail-page-custom .detail-gallery img.gallery-main {
             width: 100% !important;
             height: 480px !important;
-            /* Resim yüksekliği */
             object-fit: cover !important;
             border-radius: 8px !important;
         }
@@ -128,18 +122,15 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
             cursor: pointer !important;
         }
 
-        /* Orta sütun ayarları */
         .detail-page-custom .detail-info .detail-table {
             width: 100% !important;
         }
 
         .detail-page-custom .detail-table td {
             padding: 7px 8px !important;
-            /* Tabloda boşlukları azalt */
             font-size: 13px !important;
         }
 
-        /* Sağ sütun (danışman) ayarları */
         .detail-page-custom .detail-agent {
             padding: 15px !important;
         }
@@ -149,20 +140,17 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
             padding: 10px 12px !important;
         }
 
-        /* Mobil görünüm koruması */
         @media (max-width: 768px) {
             .detail-page-custom .detail-grid {
                 grid-template-columns: 1fr !important;
-                /* Mobilde alt alta */
             }
 
             .detail-page-custom .detail-gallery img.gallery-main {
                 height: 300px !important;
-                /* Mobilde daha kısa */
             }
         }
 
-        /* SEKME SİSTEMİ STİLLERİ */
+        /* SEKME SİSTEMİ */
         .tabs-container {
             margin-top: 30px;
             background: white;
@@ -245,21 +233,15 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
         .get-directions-btn:hover {
             background: #2980b9;
         }
-    </style>
-    <style>
+
         /* Lightbox animasyonu */
         #modalImage {
             animation: zoom 0.6s;
         }
 
         @keyframes zoom {
-            from {
-                transform: scale(0.5)
-            }
-
-            to {
-                transform: scale(1)
-            }
+            from { transform: scale(0.5) }
+            to { transform: scale(1) }
         }
 
         #imageModal {
@@ -267,16 +249,10 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        /* Hover efektleri */
         .gallery-main:hover {
             opacity: 0.9;
             transform: scale(1.02);
@@ -292,7 +268,7 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
 </head>
 
 <body class="detail-page-custom" style="background: #f4f4f4;">
-    <!-- HEADER BÖLÜMÜ - STICKY MENU İÇİN -->
+    <!-- HEADER BÖLÜMÜ -->
     <header>
         <nav class="navbar">
             <div class="container">
@@ -300,7 +276,6 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                     <a href="../index.php" class="logo-link">
                         <img src="../assets/images/plaza-logo-buyuk.png" alt="Plaza Emlak & Yatırım" class="logo-img">
                     </a>
-                    <!-- SLOGAN BÖLÜMÜ -->
                     <div class="logo-slogan">
                         <span class="slogan-text">Geleceğinize İyi Bir Yatırım</span>
                     </div>
@@ -321,7 +296,7 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
             </div>
         </nav>
     </header>
-    <!-- HEADER BİTİŞ -->
+
     <!-- Üst Bar -->
     <div class="detail-nav">
         <a href="../index.php">← Ana Sayfa</a> /
@@ -461,33 +436,6 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                                 <td>Isıtma</td>
                                 <td><?php echo $property['isitma']; ?></td>
                             </tr>
-                            <?php if (isset($property['mutfak']) && $property['mutfak']): ?>
-                                <tr>
-                                    <td>Mutfak</td>
-                                    <td><?php echo $property['mutfak']; ?></td>
-                                </tr>
-                            <?php endif; ?>
-
-                            <?php if (isset($property['asansor']) && $property['asansor']): ?>
-                                <tr>
-                                    <td>Asansör</td>
-                                    <td><?php echo $property['asansor']; ?></td>
-                                </tr>
-                            <?php endif; ?>
-
-                            <?php if (isset($property['otopark']) && $property['otopark'] && $property['otopark'] != 'Yok'): ?>
-                                <tr>
-                                    <td>Otopark</td>
-                                    <td><?php echo $property['otopark']; ?></td>
-                                </tr>
-                            <?php endif; ?>
-
-                            <?php if ($property['site_icerisinde'] == 'Evet' && isset($property['site_adi']) && $property['site_adi']): ?>
-                                <tr>
-                                    <td>Site Adı</td>
-                                    <td><?php echo $property['site_adi']; ?></td>
-                                </tr>
-                            <?php endif; ?>
                         <?php endif; ?>
                     <?php endif; ?>
 
@@ -517,24 +465,20 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
             <!-- SAĞ: Danışman -->
             <div class="detail-agent">
                 <div class="agent-header">
-                    <?php
-                    // Profil resmini kontrol et
-                    if (!empty($userInfo['profile_image']) && file_exists('../' . $userInfo['profile_image'])):
-                    ?>
+                    <?php if (!empty($userInfo['profile_image']) && file_exists('../' . $userInfo['profile_image'])): ?>
                         <img src="../<?php echo htmlspecialchars($userInfo['profile_image']); ?>"
                             alt="<?php echo htmlspecialchars($userInfo['full_name'] ?? $userInfo['username']); ?>"
                             style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #3498db;">
                     <?php else: ?>
                         <div class="agent-avatar">
                             <?php
-                            // full_name varsa onu, yoksa username'i kullan
                             $displayName = $userInfo['full_name'] ?? $userInfo['username'];
                             $nameParts = explode(' ', $displayName);
                             $initials = '';
                             foreach ($nameParts as $part) {
                                 $initials .= mb_strtoupper(mb_substr($part, 0, 1, 'UTF-8'), 'UTF-8');
                             }
-                            echo substr($initials, 0, 2); // Maksimum 2 harf
+                            echo substr($initials, 0, 2);
                             ?>
                         </div>
                     <?php endif; ?>
@@ -552,7 +496,6 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                 <?php endif; ?>
 
                 <?php
-                // Kullanıcının kendi telefonu varsa göster, yoksa varsayılan
                 $mobileNumber = !empty($userInfo['mobile']) ? $userInfo['mobile'] : (!empty($userInfo['phone']) ? $userInfo['phone'] : '0552 653 03 03');
                 ?>
                 <a href="tel:<?php echo preg_replace('/[^0-9]/', '', $mobileNumber); ?>" class="agent-phone">
@@ -580,6 +523,7 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                         </p>
                     <?php endif; ?>
                 </div>
+
                 <!-- Bütçe Arama Kutusu -->
                 <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e0e0e0;">
                     <h4 style="color: #2c3e50; margin-bottom: 12px; font-size: 16px; text-align: center; font-weight: 600;">
@@ -611,12 +555,7 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                     </form>
                 </div>
             </div>
-            <!-- Danışman bölümü kapandı -->
-
-
-
         </div>
-        <!-- 3 Kolonlu Grid kapandı - ÖNEMLİ! Bu satır eksikti -->
 
         <!-- SEKME SİSTEMİ - AÇIKLAMA VE HARİTA -->
         <div class="tabs-container">
@@ -710,6 +649,7 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
     </div>
 
     <script>
+        // Galeri fonksiyonları
         function changeImage(thumb, num) {
             document.getElementById('mainImage').src = thumb.src;
             document.getElementById('currentImg').textContent = num;
@@ -720,12 +660,12 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
         function sendMessage(agentName, propertyNo) {
             var message = prompt('Mesajınızı yazın:');
             if (message && message.trim() !== '') {
-                // WhatsApp'a yönlendir
-                var whatsappNumber = '905526530303'; // +90 olmadan
+                var whatsappNumber = '905526530303';
                 var whatsappMessage = 'Merhaba ' + agentName + ', ' + propertyNo + ' nolu ilan hakkında bilgi almak istiyorum. Mesajım: ' + message;
                 window.open('https://wa.me/' + whatsappNumber + '?text=' + encodeURIComponent(whatsappMessage), '_blank');
             }
         }
+
         // SEKME FONKSİYONU
         function openTab(evt, tabName) {
             var i, tabcontent, tabbuttons;
@@ -747,82 +687,99 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
             evt.currentTarget.classList.add("active");
 
             // Harita sekmesi açıldığında haritayı başlat
-            if (tabName === 'konum-tab' && typeof google !== 'undefined' && !window.mapInitialized) {
+            if (tabName === 'konum-tab' && typeof google !== 'undefined') {
                 setTimeout(function() {
                     initPropertyMap();
-                    window.mapInitialized = true;
-                }, 100);
+                }, 300);
             }
         }
 
-        // Harita fonksiyonu
+        // Harita başlatma fonksiyonu
         function initPropertyMap() {
             var mapElement = document.getElementById('map');
-            if (!mapElement) return;
+            if (!mapElement || typeof google === 'undefined') {
+                console.log('Harita elementi bulunamadı veya Google Maps yüklenmedi');
+                return;
+            }
 
-            // Koordinatlar varsa kullan
-            var lat = <?php echo $property['latitude'] ?: 'null'; ?>;
-            var lng = <?php echo $property['longitude'] ?: 'null'; ?>;
+            // Adresi data attribute'tan al
+            var address = mapElement.getAttribute('data-address');
+            if (!address) {
+                address = 'Afyonkarahisar, Türkiye';
+            }
 
-            if (lat && lng) {
-                var location = {
-                    lat: parseFloat(lat),
-                    lng: parseFloat(lng)
-                };
+            console.log('Harita için adres:', address);
 
-                var map = new google.maps.Map(mapElement, {
-                    center: location,
-                    zoom: 15,
-                    mapTypeControl: true,
-                    streetViewControl: true,
-                    fullscreenControl: true
-                });
+            // Geocoding ile adresi koordinatlara çevir
+            var geocoder = new google.maps.Geocoder();
+            geocoder.geocode({'address': address}, function(results, status) {
+                if (status === 'OK') {
+                    // Harita oluştur
+                    var map = new google.maps.Map(mapElement, {
+                        center: results[0].geometry.location,
+                        zoom: 15,
+                        mapTypeControl: true,
+                        streetViewControl: true,
+                        fullscreenControl: true,
+                        zoomControl: true,
+                        scaleControl: true
+                    });
 
-                new google.maps.Marker({
-                    position: location,
-                    map: map,
-                    title: '<?php echo htmlspecialchars($property['baslik']); ?>'
-                });
-            } else {
-                mapElement.innerHTML = '<div style="text-align:center;padding:50px;color:#999;">📍 Konum bilgisi henüz eklenmemiş</div>';
+                    // Marker ekle
+                    var marker = new google.maps.Marker({
+                        position: results[0].geometry.location,
+                        map: map,
+                        title: address,
+                        animation: google.maps.Animation.DROP
+                    });
+
+                    // Bilgi penceresi
+                    var infoWindow = new google.maps.InfoWindow({
+                        content: '<div style="padding:10px;"><strong>📍 Konum</strong><br>' + address + '</div>'
+                    });
+
+                    // Marker'a tıklandığında bilgi penceresi aç
+                    marker.addListener('click', function() {
+                        infoWindow.open(map, marker);
+                    });
+
+                    // Harita yüklendiğinde marker'ı göster
+                    setTimeout(function() {
+                        infoWindow.open(map, marker);
+                    }, 1000);
+
+                } else {
+                    // Hata durumunda mesaj göster
+                    console.error('Geocode hatası:', status);
+                    mapElement.innerHTML = '<div style="text-align:center;padding:50px;color:#666;">' +
+                        '<h3>⚠️ Harita Yüklenemedi</h3>' +
+                        '<p>Adres: ' + address + '</p>' +
+                        '<p style="font-size:12px;color:#999;">Hata: ' + status + '</p>' +
+                        '</div>';
+                }
+            });
+        }
+
+        // Google Maps yüklendiğinde çalışacak
+        function initMap() {
+            console.log('Google Maps API yüklendi');
+            // Eğer harita sekmesi açıksa haritayı başlat
+            var konumTab = document.getElementById('konum-tab');
+            if (konumTab && konumTab.classList.contains('active')) {
+                initPropertyMap();
             }
         }
-    </script>
-    <script src="../assets/js/sticky-menu.js"></script>
-    <!-- Google Maps API -->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEfetSi8hgru3jatZYeS5WaLjUD_lMED4&language=tr"></script>
-    <script>
-        // Tab fonksiyonu
-        function openTab(evt, tabName) {
-            var i, tabcontent, tablinks;
-            tabcontent = document.getElementsByClassName("tab-content");
-            for (i = 0; i < tabcontent.length; i++) {
-                tabcontent[i].style.display = "none";
-            }
-            tablinks = document.getElementsByClassName("tab-button");
-            for (i = 0; i < tablinks.length; i++) {
-                tablinks[i].className = tablinks[i].className.replace(" active", "");
-            }
-            document.getElementById(tabName).style.display = "block";
-            evt.currentTarget.className += " active";
-        }
 
-        // Galeri fonksiyonu
-        function changeMainImage(src) {
-            document.getElementById('mainImage').src = src;
-        }
-    </script>
-    <script>
-        // LIGHTBOX SİSTEMİ - DETAY SAYFASI İÇİN
+        // LIGHTBOX SİSTEMİ
         document.addEventListener('DOMContentLoaded', function() {
             // Lightbox HTML'i oluştur
             const lightboxHTML = `
-        <div id="imageModal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.95);">
-            <span onclick="closeModal()" style="position:absolute; top:20px; right:40px; color:#fff; font-size:40px; font-weight:bold; cursor:pointer;">&times;</span>
-            <img id="modalImage" style="margin:auto; display:block; max-width:90%; max-height:90%; margin-top:50px;">
-            <div id="caption" style="margin:auto; display:block; width:80%; max-width:700px; text-align:center; color:#ccc; padding:10px 0;"></div>
-        </div>
-    `;
+                <div id="imageModal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.95);">
+                    <span onclick="closeModal()" style="position:absolute; top:20px; right:40px; color:#fff; font-size:40px; font-weight:bold; cursor:pointer;">&times;</span>
+                    <img id="modalImage" style="margin:auto; display:block; max-width:90%; max-height:90%; margin-top:50px;">
+                    <div id="caption" style="margin:auto; display:block; width:80%; max-width:700px; text-align:center; color:#ccc; padding:10px 0;"></div>
+                </div>
+            `;
             document.body.insertAdjacentHTML('beforeend', lightboxHTML);
 
             // Ana resme tıklama eventi
@@ -834,26 +791,6 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
                     document.getElementById('modalImage').src = this.src;
                 }
             }
-
-            // Küçük resimlere tıklama
-            const thumbs = document.querySelectorAll('.gallery-thumb');
-            thumbs.forEach(function(thumb) {
-                thumb.style.cursor = 'pointer';
-                thumb.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    // Önce ana resmi değiştir
-                    if (mainImg) {
-                        mainImg.src = this.src;
-                    }
-                });
-
-                // Çift tıklama ile büyütme
-                thumb.addEventListener('dblclick', function(e) {
-                    e.stopPropagation();
-                    document.getElementById('imageModal').style.display = 'block';
-                    document.getElementById('modalImage').src = this.src;
-                });
-            });
         });
 
         // Modal kapatma
@@ -868,6 +805,14 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
             }
         });
     </script>
-</body>
 
+    <!-- Sticky Menu JavaScript -->
+    <script src="../assets/js/sticky-menu.js"></script>
+    
+    <!-- Google Maps API - TEK SEFER YÜKLE -->
+    <script async defer 
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEfetSi8hgru3jatZYeS5WaLjUD_lMED4&callback=initMap&language=tr&region=TR">
+    </script>
+
+</body>
 </html>

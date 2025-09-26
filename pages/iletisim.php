@@ -153,8 +153,8 @@ require_once '../config/database.php';
                     
                     <div class="contact-item">
                         <h3>📍 Adres</h3>
-                        <p>Burmalı Mahallesi Milli Birlik Caddesi<br>
-                           İl Özel İdare İşhanı Kat:6 No:702<br>
+                        <p>Burmalı Mh. İl Özel İdare İşhanı<br>
+                           Kat:6 No:702<br>
                            Merkez / AFYONKARAHİSAR</p>
                     </div>
                     
@@ -180,14 +180,30 @@ require_once '../config/database.php';
                 <div class="map-container">
                     <h2>📍 Konum</h2>
                     <div id="map">
+                        <!-- Google Maps iframe - Tam koordinatlarla -->
                         <iframe 
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3128.1234567890123!2d30.54321!3d38.72543!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzjCsDQzJzMxLjUiTiAzMMKwMzInMzUuNiJF!5e0!3m2!1str!2str!4v1234567890123!5m2!1str!2str"
                             width="100%" 
                             height="400" 
                             style="border:0; border-radius: 10px;" 
-                            allowfullscreen="" 
-                            loading="lazy">
+                            loading="lazy" 
+                            allowfullscreen
+                            referrerpolicy="no-referrer-when-downgrade"
+                            src="https://maps.google.com/maps?q=38.755407188057156,30.539306153007434&t=&z=17&ie=UTF8&iwloc=&output=embed">
                         </iframe>
+                        
+                        <!-- Yol tarifi butonu -->
+                        <div style="margin-top: 15px; text-align: center;">
+                            <a href="https://www.google.com/maps/dir//38.755407188057156,30.539306153007434/@38.755407,30.539306,17z" 
+                               target="_blank" 
+                               style="background: #4285f4; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                                🚗 Yol Tarifi Al
+                            </a>
+                            <a href="https://www.google.com/maps/place/38%C2%B045'19.5%22N+30%C2%B032'21.5%22E/@38.755407188057156,30.539306153007434,17z" 
+                               target="_blank" 
+                               style="background: #34a853; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin-left: 10px;">
+                                📍 Google Maps'te Aç
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
