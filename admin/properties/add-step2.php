@@ -77,6 +77,14 @@ $mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri
         .upload-area {
             transition: all 0.3s;
         }
+
+        /* HARİTA STİLLERİ */
+        #map-container {
+            height: 400px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 
@@ -461,6 +469,26 @@ $mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri
                         <label>Açık Adres</label>
                         <textarea name="adres" rows="3" placeholder="Cadde, sokak, bina no vb."></textarea>
                     </div>
+                    <!-- HARİTA İLE KONUM SEÇİMİ -->
+                    <div class="form-group" style="margin-top: 20px;">
+                        <label>📍 Haritada Konum Belirle</label>
+                        <div style="margin-bottom: 10px;">
+                            <input type="text" id="map-search" placeholder="Adres ara... (örn: Afyon merkez)"
+                                style="width: 70%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <button type="button" onclick="searchAddress()"
+                                style="padding: 8px 15px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                Ara
+                            </button>
+                        </div>
+                        <div id="map-container"></div>
+
+                        <input type="hidden" name="latitude" id="latitude">
+                        <input type="hidden" name="longitude" id="longitude">
+
+                        <div style="margin-top: 10px; padding: 10px; background: #f0f8ff; border-radius: 5px;">
+                            <small><strong>Kullanım:</strong> Haritada istediğiniz noktaya tıklayın veya üstteki arama kutusunu kullanın.</small>
+                        </div>
+                    </div>
                 </div>
                 <!-- DANIŞMAN ÖZEL ALANLARI -->
                 <div class="form-section special">
@@ -541,6 +569,82 @@ $mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri
                 this.value = formatText(this.value);
             });
         }
+    </script>
+    <script>
+        var map;
+        var marker;
+
+        function initMap() {
+            // Varsayılan konum (Afyonkarahisar)
+            var defaultLocation = {
+                lat: 38.7507,
+                lng: 30.5567
+            };
+
+            map = new google.maps.Map(document.getElementById('map-container'), {
+                center: defaultLocation,
+                zoom: 13,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true
+            });
+
+            // Haritaya tıklama olayı
+            map.addListener('click', function(event) {
+                placeMarker(event.latLng);
+            });
+        }
+
+        function placeMarker(location) {
+            // Eski marker varsa kaldır
+            if (marker) {
+                marker.setMap(null);
+            }
+
+            // Yeni marker ekle
+            marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                draggable: true,
+                animation: google.maps.Animation.DROP
+            });
+
+            // Koordinatları form alanlarına yaz
+            document.getElementById('latitude').value = location.lat();
+            document.getElementById('longitude').value = location.lng();
+
+            // Marker sürüklendiğinde koordinatları güncelle
+            marker.addListener('dragend', function(event) {
+                document.getElementById('latitude').value = event.latLng.lat();
+                document.getElementById('longitude').value = event.latLng.lng();
+            });
+        }
+
+        function searchAddress() {
+            var address = document.getElementById('map-search').value;
+            if (!address) {
+                alert('Lütfen bir adres girin');
+                return;
+            }
+
+            var geocoder = new google.maps.Geocoder();
+            geocoder.geocode({
+                'address': address + ', Türkiye'
+            }, function(results, status) {
+                if (status === 'OK') {
+                    map.setCenter(results[0].geometry.location);
+                    map.setZoom(15);
+                    placeMarker(results[0].geometry.location);
+                } else {
+                    alert('Adres bulunamadı. Daha detaylı yazın veya haritada tıklayın.');
+                }
+            });
+        }
+    </script>
+
+    <!-- Google Maps API -->
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEfetSi8hgru3jatZYeS5WaLjUD_lMED4&callback=initMap&language=tr">
     </script>
 </body>
 

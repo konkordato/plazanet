@@ -717,50 +717,32 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
             var mapElement = document.getElementById('map');
             if (!mapElement) return;
 
-            // Adresi data attribute'tan al
-            var address = mapElement.getAttribute('data-address');
-            if (!address) {
-                address = 'Afyonkarahisar, Türkiye';
+            // Koordinatlar varsa kullan
+            var lat = <?php echo $property['latitude'] ?: 'null'; ?>;
+            var lng = <?php echo $property['longitude'] ?: 'null'; ?>;
+
+            if (lat && lng) {
+                var location = {
+                    lat: parseFloat(lat),
+                    lng: parseFloat(lng)
+                };
+
+                var map = new google.maps.Map(mapElement, {
+                    center: location,
+                    zoom: 15,
+                    mapTypeControl: true,
+                    streetViewControl: true,
+                    fullscreenControl: true
+                });
+
+                new google.maps.Marker({
+                    position: location,
+                    map: map,
+                    title: '<?php echo htmlspecialchars($property['baslik']); ?>'
+                });
+            } else {
+                mapElement.innerHTML = '<div style="text-align:center;padding:50px;color:#999;">📍 Konum bilgisi henüz eklenmemiş</div>';
             }
-
-            // Geocoding ile adresi koordinatlara çevir
-            var geocoder = new google.maps.Geocoder();
-            geocoder.geocode({
-                'address': address
-            }, function(results, status) {
-                if (status === 'OK') {
-                    // Harita oluştur
-                    var map = new google.maps.Map(mapElement, {
-                        center: results[0].geometry.location,
-                        zoom: 15,
-                        mapTypeControl: true,
-                        streetViewControl: true,
-                        fullscreenControl: true
-                    });
-
-                    // Marker ekle
-                    var marker = new google.maps.Marker({
-                        position: results[0].geometry.location,
-                        map: map,
-                        animation: google.maps.Animation.DROP
-                    });
-
-                    // Bilgi penceresi
-                    var infoWindow = new google.maps.InfoWindow({
-                        content: '<div style="padding:10px;">📍 ' + address + '</div>'
-                    });
-
-                    marker.addListener('click', function() {
-                        infoWindow.open(map, marker);
-                    });
-                } else {
-                    // Hata durumunda mesaj göster
-                    mapElement.innerHTML = '<div style="text-align:center;padding:50px;color:#666;">' +
-                        '<p>Harita yüklenemedi</p>' +
-                        '<p style="font-size:12px;">Adres: ' + address + '</p>' +
-                        '</div>';
-                }
-            });
         }
     </script>
     <script src="../assets/js/sticky-menu.js"></script>
