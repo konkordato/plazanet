@@ -18,6 +18,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -89,15 +90,46 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
         /* Ultra optimize kolon genişlikleri */
-        .col-img { width: 50px; text-align: center; }
-        .col-no { width: 70px; }
-        .col-title { width: 200px; }
-        .col-price { width: 85px; text-align: right; }
-        .col-type { width: 60px; text-align: center; }
-        .col-district { width: 70px; }
-        .col-advisor { width: 90px; }
-        .col-status { width: 55px; text-align: center; }
-        .col-actions { width: 120px; text-align: center; }
+        .col-img {
+            width: 50px;
+            text-align: center;
+        }
+
+        .col-no {
+            width: 70px;
+        }
+
+        .col-title {
+            width: 200px;
+        }
+
+        .col-price {
+            width: 85px;
+            text-align: right;
+        }
+
+        .col-type {
+            width: 60px;
+            text-align: center;
+        }
+
+        .col-district {
+            width: 70px;
+        }
+
+        .col-advisor {
+            width: 90px;
+        }
+
+        .col-status {
+            width: 55px;
+            text-align: center;
+        }
+
+        .col-actions {
+            width: 120px;
+            text-align: center;
+        }
 
         /* Başlık ve danışman kısaltma */
         .text-truncate {
@@ -247,10 +279,15 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             .properties-table {
                 min-width: auto;
             }
-            
-            .col-title { width: 250px; }
-            .col-advisor { width: 120px; }
-            
+
+            .col-title {
+                width: 250px;
+            }
+
+            .col-advisor {
+                width: 120px;
+            }
+
             .properties-table th,
             .properties-table td {
                 padding: 8px 6px;
@@ -263,10 +300,18 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             .properties-table {
                 min-width: 800px;
             }
-            
-            .col-title { width: 180px; }
-            .col-price { width: 80px; }
-            .col-actions { width: 100px; }
+
+            .col-title {
+                width: 180px;
+            }
+
+            .col-price {
+                width: 80px;
+            }
+
+            .col-actions {
+                width: 100px;
+            }
         }
 
         /* Küçük laptop (1200px) */
@@ -275,7 +320,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 margin-left: 200px;
                 width: calc(100% - 200px);
             }
-            
+
             .sidebar {
                 width: 200px;
             }
@@ -302,10 +347,15 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
             .properties-table {
                 min-width: 700px;
             }
-            
-            .col-type { display: none; }
+
+            .col-type {
+                display: none;
+            }
+
             .properties-table th:nth-child(5),
-            .properties-table td:nth-child(5) { display: none; }
+            .properties-table td:nth-child(5) {
+                display: none;
+            }
         }
 
         /* Mobil (768px) */
@@ -343,7 +393,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 border: 1px solid #dee2e6;
                 border-radius: 8px;
                 padding: 12px;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
             }
 
             .properties-table td {
@@ -409,6 +459,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     </style>
 </head>
+
 <body>
     <div class="admin-wrapper">
         <!-- Sidebar -->
@@ -439,6 +490,13 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <a href="../crm/index.php">
                         <span class="icon">📊</span>
                         <span>CRM Sistemi</span>
+                    </a>
+                </li>
+                <!-- SEO YÖNETİMİ - YENİ EKLENEN -->
+                <li>
+                    <a href="../seo/">
+                        <span class="icon">🎯</span>
+                        <span>SEO Yönetimi</span>
                     </a>
                 </li>
             </ul>
@@ -514,20 +572,20 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             <?php echo $property['ilce']; ?>
                                         </td>
                                         <td class="col-advisor" data-label="Danışman">
-                                            <span class="text-truncate" title="<?php 
-                                                $danisman = $property['full_name'] ?? $property['username'] ?? 'Plaza Emlak';
-                                                echo htmlspecialchars($danisman);
-                                            ?>">
-                                                <?php 
+                                            <span class="text-truncate" title="<?php
+                                                                                $danisman = $property['full_name'] ?? $property['username'] ?? 'Plaza Emlak';
+                                                                                echo htmlspecialchars($danisman);
+                                                                                ?>">
+                                                <?php
                                                 $danisman_adi = $property['full_name'] ?? $property['username'] ?? 'Plaza Emlak';
                                                 // İsmi kısalt - sadece ad ve soyadın ilk harfi
                                                 $parcalar = explode(' ', $danisman_adi);
-                                                if(count($parcalar) > 1) {
+                                                if (count($parcalar) > 1) {
                                                     $kisa_isim = $parcalar[0] . ' ' . mb_substr(end($parcalar), 0, 1) . '.';
                                                 } else {
                                                     $kisa_isim = $danisman_adi;
                                                 }
-                                                echo htmlspecialchars($kisa_isim); 
+                                                echo htmlspecialchars($kisa_isim);
                                                 ?>
                                             </span>
                                         </td>
@@ -571,4 +629,5 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     </script>
 </body>
+
 </html>

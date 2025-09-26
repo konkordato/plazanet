@@ -89,6 +89,13 @@ $recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <span>Ayarlar</span>
                     </a>
                 </li>
+                <!-- SEO YÖNETİMİ - YENİ EKLENEN -->
+                <li>
+                    <a href="seo/">
+                        <span class="icon">🎯</span>
+                        <span>SEO Yönetimi</span>
+                    </a>
+                </li>
                 <!-- CRM SİSTEMİ MENÜSÜ -->
                 <li>
                     <a href="crm/index.php">
