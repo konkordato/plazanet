@@ -1,4 +1,12 @@
 <?php
+// Gzip sıkıştırmayı başlat
+if (!ob_start("ob_gzhandler")) ob_start();
+
+// Performans helper'ı dahil et
+require_once 'includes/performance.php';
+
+// Cache headers ayarla
+PerformanceHelper::setCacheHeaders('dynamic', 3600);
 // SEO ve veritabanı bağlantıları
 require_once 'config/database.php';
 require_once 'includes/SeoHelper.php';
@@ -270,6 +278,8 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
     </style>
     <?php echo getAnalyticsCode(); ?>
+    <!-- Lazy Loading JavaScript -->
+    <script src="assets/js/lazy-load.js" defer></script>
 </head>
 
 <body>
@@ -391,7 +401,11 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <a href="pages/detail.php?id=<?php echo $property['id']; ?>">
                                 <div class="property-image">
                                     <?php if ($property['image_path']): ?>
-                                        <img src="<?php echo $property['image_path']; ?>" alt="<?php echo htmlspecialchars($property['baslik']); ?>">
+                                        <img class="lazy"
+                                            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3C/svg%3E"
+                                            data-src="<?php echo $property['image_path']; ?>"
+                                            alt="<?php echo htmlspecialchars($property['baslik']); ?>"
+                                            loading="lazy">
                                     <?php else: ?>
                                         <div class="no-image">
                                             <span>📷</span>
