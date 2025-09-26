@@ -246,6 +246,49 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
             background: #2980b9;
         }
     </style>
+    <style>
+        /* Lightbox animasyonu */
+        #modalImage {
+            animation: zoom 0.6s;
+        }
+
+        @keyframes zoom {
+            from {
+                transform: scale(0.5)
+            }
+
+            to {
+                transform: scale(1)
+            }
+        }
+
+        #imageModal {
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Hover efektleri */
+        .gallery-main:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+            transition: all 0.3s;
+        }
+
+        .gallery-thumb:hover {
+            border-color: #3498db !important;
+            transform: scale(1.05);
+            transition: all 0.3s;
+        }
+    </style>
 </head>
 
 <body class="detail-page-custom" style="background: #f4f4f4;">
@@ -748,6 +791,83 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
     <script src="../assets/js/sticky-menu.js"></script>
     <!-- Google Maps API -->
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAEfetSi8hgru3jatZYeS5WaLjUD_lMED4&language=tr"></script>
+    <script>
+        // Tab fonksiyonu
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+            }
+            tablinks = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+        }
+
+        // Galeri fonksiyonu
+        function changeMainImage(src) {
+            document.getElementById('mainImage').src = src;
+        }
+    </script>
+    <script>
+        // LIGHTBOX SİSTEMİ - DETAY SAYFASI İÇİN
+        document.addEventListener('DOMContentLoaded', function() {
+            // Lightbox HTML'i oluştur
+            const lightboxHTML = `
+        <div id="imageModal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.95);">
+            <span onclick="closeModal()" style="position:absolute; top:20px; right:40px; color:#fff; font-size:40px; font-weight:bold; cursor:pointer;">&times;</span>
+            <img id="modalImage" style="margin:auto; display:block; max-width:90%; max-height:90%; margin-top:50px;">
+            <div id="caption" style="margin:auto; display:block; width:80%; max-width:700px; text-align:center; color:#ccc; padding:10px 0;"></div>
+        </div>
+    `;
+            document.body.insertAdjacentHTML('beforeend', lightboxHTML);
+
+            // Ana resme tıklama eventi
+            const mainImg = document.getElementById('mainImage');
+            if (mainImg) {
+                mainImg.style.cursor = 'pointer';
+                mainImg.onclick = function() {
+                    document.getElementById('imageModal').style.display = 'block';
+                    document.getElementById('modalImage').src = this.src;
+                }
+            }
+
+            // Küçük resimlere tıklama
+            const thumbs = document.querySelectorAll('.gallery-thumb');
+            thumbs.forEach(function(thumb) {
+                thumb.style.cursor = 'pointer';
+                thumb.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // Önce ana resmi değiştir
+                    if (mainImg) {
+                        mainImg.src = this.src;
+                    }
+                });
+
+                // Çift tıklama ile büyütme
+                thumb.addEventListener('dblclick', function(e) {
+                    e.stopPropagation();
+                    document.getElementById('imageModal').style.display = 'block';
+                    document.getElementById('modalImage').src = this.src;
+                });
+            });
+        });
+
+        // Modal kapatma
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        // ESC tuşu ile kapatma
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
 </body>
 
 </html>
