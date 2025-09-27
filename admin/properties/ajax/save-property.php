@@ -159,6 +159,7 @@ try {
             error_log("Upload başarılı: " . $successCount . " fotoğraf yüklendi.");
         }
     }
+    
     // Lokasyon önerilerine ekle/güncelle
     if (!empty($data['il']) && !empty($data['ilce'])) {
         $il_formatted = ucwords(strtolower(trim($data['il'])));
@@ -184,6 +185,7 @@ try {
             error_log("Lokasyon kayıt hatası: " . $e->getMessage());
         }
     }
+    
     // Session temizle
     unset($_SESSION['temp_photos']);
     unset($_SESSION['property_data']);
@@ -195,6 +197,7 @@ try {
     $_SESSION['new_property_id'] = $property_id;
     $_SESSION['new_property_no'] = $ilan_no;
     $_SESSION['success'] = "İlan başarıyla eklendi! İlan No: " . $ilan_no;
+    
     // ============ SMS SİSTEMİ BAŞLANGIÇ ============
     try {
         // SMS sistemi aktifse devam et
@@ -205,8 +208,8 @@ try {
             // NetGSM sınıfını dahil et
             require_once '../../../classes/NetGSM.php';
 
-            // İlan linkini oluştur
-            $base_url = "http://localhost/plazanet"; // Canlıda değiştirin
+            // İlan linkini oluştur - GERÇEK DOMAIN
+            $base_url = "https://www.plazaemlak.net"; // Canlı site adresi
             $ilan_link = $base_url . "/pages/detail.php?id=" . $property_id;
 
             // Kullanıcı bilgilerini al
@@ -227,14 +230,61 @@ try {
             $danismanlar = $danisman_stmt->fetchAll(PDO::FETCH_ASSOC);
 
             foreach ($danismanlar as $danisman) {
-                $sms_mesaj = "Plaza Emlak Yeni İlan: " . $data['baslik'] . " - " . number_format($data['fiyat'], 0, ',', '.') . " TL";
+                // SMS mesajını hazırla - İLAN LİNKİ EKLENDİ
+                $sms_mesaj = "YENİ İLAN: " . mb_substr($data['baslik'], 0, 40) . "\n";
+                $sms_mesaj .= number_format($data['fiyat'], 0, ',', '.') . " TL\n";
+                
+                // İlçe ve mahalle bilgisi
+                if (!empty($data['mahalle'])) {
+                    $sms_mesaj .= $data['ilce'] . "/" . $data['mahalle'] . "\n";
+                } else {
+                    $sms_mesaj .= $data['ilce'] . "\n";
+                }
+                
+                // İlan linki
+                $sms_mesaj .= "Detay: " . $ilan_link . "\n";
+                $sms_mesaj .= "Plaza Emlak";
 
-                $netgsm->sendSMS($danisman['mobile'], $sms_mesaj, 'yeni_ilan', $user_id, [
+                // SMS'i gönder
+                $netgsm->sendSMS($danisman['mobile'], $sms_mesaj, 'yeni_ilan', $current_user_id, [
                     'type' => 'danisman',
                     'id' => $danisman['id'],
                     'name' => $danisman['full_name'],
                     'property_id' => $property_id
                 ]);
+            }
+
+            // 2. BÜTÇEYE UYGUN MÜŞTERİLERE SMS (Opsiyonel)
+            if (isset($data['fiyat']) && $data['fiyat'] > 0) {
+                $musteri_sql = "SELECT id, ad, soyad, telefon 
+                               FROM crm_alici_musteriler 
+                               WHERE durum = 'aktif' 
+                               AND sms_permission = 1
+                               AND mersis_permission = 1
+                               AND telefon IS NOT NULL 
+                               AND telefon != ''
+                               AND :fiyat BETWEEN min_butce AND max_butce";
+
+                $musteri_stmt = $db->prepare($musteri_sql);
+                $musteri_stmt->execute([':fiyat' => $data['fiyat']]);
+                $musteriler = $musteri_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                foreach ($musteriler as $musteri) {
+                    // Müşteri SMS mesajı
+                    $musteri_sms = "Sayın " . $musteri['ad'] . " " . mb_substr($musteri['soyad'], 0, 1) . ".\n";
+                    $musteri_sms .= "Bütçenize uygun:\n";
+                    $musteri_sms .= mb_substr($data['baslik'], 0, 35) . "\n";
+                    $musteri_sms .= number_format($data['fiyat'], 0, ',', '.') . " TL\n";
+                    $musteri_sms .= $ilan_link . "\n";
+                    $musteri_sms .= "Plaza Emlak";
+
+                    $netgsm->sendSMS($musteri['telefon'], $musteri_sms, 'musteri_bilgi', $current_user_id, [
+                        'type' => 'alici',
+                        'id' => $musteri['id'],
+                        'name' => $musteri['ad'] . ' ' . $musteri['soyad'],
+                        'property_id' => $property_id
+                    ]);
+                }
             }
 
             error_log("İlan #" . $property_id . " için SMS gönderimi tamamlandı.");
@@ -244,11 +294,14 @@ try {
         error_log("SMS gönderim hatası: " . $e->getMessage());
     }
     // ============ SMS SİSTEMİ BİTİŞ ============
+    
     // Herkes için tebrikler sayfasına git
     header("Location: ../add-step4.php");
     exit();
+    
 } catch (Exception $e) {
     $_SESSION['error'] = "Hata: " . $e->getMessage();
     header("Location: ../add-step3.php");
     exit();
 }
+?>

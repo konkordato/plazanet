@@ -55,47 +55,128 @@ class SeoHelper {
         
         if (!$property) return null;
         
+        // KATEGORİ ve EMLAK_TİPİ kontrolü ekle
+        $kategori = isset($property['kategori']) ? $property['kategori'] : 'Satılık';
+        $emlak_tipi = isset($property['emlak_tipi']) ? $property['emlak_tipi'] : 'Daire';
+        $alt_kategori = isset($property['alt_kategori']) ? $property['alt_kategori'] : '';
+        
         // Otomatik başlık oluştur
         if (empty($property['meta_title'])) {
-            $title = $property['satis_durumu'] . " " . 
-                     $property['oda_sayisi'] . " " . 
-                     $property['konut_tipi'] . " - " . 
-                     $property['ilce'] . ", " . $property['mahalle'] . " - " . 
-                     number_format($property['fiyat'], 0, ',', '.') . " TL";
+            $title = $kategori . " ";
+            
+            // Oda sayısı varsa ekle
+            if (!empty($property['oda_sayisi'])) {
+                $title .= $property['oda_sayisi'] . " ";
+            }
+            
+            // Emlak tipini veya alt kategoriyi ekle
+            if (!empty($alt_kategori)) {
+                $title .= $alt_kategori . " - ";
+            } else {
+                $title .= $emlak_tipi . " - ";
+            }
+            
+            // Lokasyon bilgileri
+            $title .= $property['ilce'];
+            if (!empty($property['mahalle'])) {
+                $title .= ", " . $property['mahalle'];
+            }
+            
+            // Fiyat
+            $title .= " - " . number_format($property['fiyat'], 0, ',', '.') . " TL";
+            
             $property['meta_title'] = mb_substr($title, 0, 160);
         }
         
         // Otomatik açıklama oluştur
         if (empty($property['meta_description'])) {
-            $desc = $property['ilce'] . " " . $property['mahalle'] . " bölgesinde " . 
-                    $property['satis_durumu'] . " " . $property['brut_metrekare'] . "m² " . 
-                    $property['oda_sayisi'] . " " . $property['konut_tipi'] . ". " . 
-                    "Fiyat: " . number_format($property['fiyat'], 0, ',', '.') . " TL. ";
+            $desc = $property['ilce'];
+            
+            // Mahalle varsa ekle
+            if (!empty($property['mahalle'])) {
+                $desc .= " " . $property['mahalle'];
+            }
+            
+            $desc .= " bölgesinde " . $kategori . " ";
+            
+            // Metrekare bilgisi
+            if (!empty($property['brut_metrekare'])) {
+                $desc .= $property['brut_metrekare'] . "m² ";
+            }
+            
+            // Oda sayısı
+            if (!empty($property['oda_sayisi'])) {
+                $desc .= $property['oda_sayisi'] . " ";
+            }
+            
+            // Emlak tipi veya alt kategori
+            if (!empty($alt_kategori)) {
+                $desc .= $alt_kategori;
+            } else {
+                $desc .= $emlak_tipi;
+            }
+            
+            $desc .= ". Fiyat: " . number_format($property['fiyat'], 0, ',', '.') . " TL. ";
+            
+            // Açıklamadan bir kısım ekle
+            if (!empty($property['aciklama'])) {
+                $desc .= mb_substr(strip_tags($property['aciklama']), 0, 100) . "...";
+            }
+            
             $property['meta_description'] = mb_substr($desc, 0, 300);
         }
         
         // Otomatik anahtar kelimeler
         if (empty($property['meta_keywords'])) {
-            $keywords = [
-                $property['satis_durumu'],
-                $property['konut_tipi'],
-                $property['ilce'] . " " . $property['satis_durumu'] . " " . $property['konut_tipi'],
-                $property['mahalle'] . " emlak",
-                $property['oda_sayisi'],
-                "afyon " . $property['satis_durumu'] . " daire"
-            ];
+            $keywords = [];
+            
+            // Kategori bazlı anahtar kelimeler
+            $keywords[] = $kategori;
+            $keywords[] = $emlak_tipi;
+            
+            if (!empty($alt_kategori)) {
+                $keywords[] = $alt_kategori;
+            }
+            
+            // Lokasyon bazlı
+            $keywords[] = $property['ilce'] . " " . $kategori . " " . $emlak_tipi;
+            
+            if (!empty($property['mahalle'])) {
+                $keywords[] = $property['mahalle'] . " emlak";
+            }
+            
+            // Oda sayısı varsa
+            if (!empty($property['oda_sayisi'])) {
+                $keywords[] = $property['oda_sayisi'];
+            }
+            
+            // Afyon ile kombinasyon
+            $keywords[] = "afyon " . $kategori . " " . $emlak_tipi;
+            
             $property['meta_keywords'] = implode(', ', $keywords);
         }
         
         // URL oluştur
         if (empty($property['slug'])) {
-            $slug = $this->createSlug(
-                $property['satis_durumu'] . "-" . 
-                $property['konut_tipi'] . "-" . 
-                $property['ilce'] . "-" . 
-                $property['mahalle'] . "-" . 
-                $property['id']
-            );
+            $slug_parts = [];
+            
+            $slug_parts[] = $kategori;
+            
+            if (!empty($alt_kategori)) {
+                $slug_parts[] = $alt_kategori;
+            } else {
+                $slug_parts[] = $emlak_tipi;
+            }
+            
+            $slug_parts[] = $property['ilce'];
+            
+            if (!empty($property['mahalle'])) {
+                $slug_parts[] = $property['mahalle'];
+            }
+            
+            $slug_parts[] = $property['id'];
+            
+            $slug = $this->createSlug(implode("-", $slug_parts));
             
             // Veritabanına kaydet
             $this->savePropertySlug($property_id, $slug);
@@ -107,12 +188,17 @@ class SeoHelper {
     
     // Slug'ı kaydet
     private function savePropertySlug($property_id, $slug) {
-        $stmt = $this->db->prepare("
-            INSERT INTO property_seo (property_id, slug) 
-            VALUES (:id, :slug) 
-            ON DUPLICATE KEY UPDATE slug = :slug
-        ");
-        $stmt->execute([':id' => $property_id, ':slug' => $slug]);
+        try {
+            $stmt = $this->db->prepare("
+                INSERT INTO property_seo (property_id, slug) 
+                VALUES (:id, :slug) 
+                ON DUPLICATE KEY UPDATE slug = :slug
+            ");
+            $stmt->execute([':id' => $property_id, ':slug' => $slug]);
+        } catch (PDOException $e) {
+            // Hata olursa sessizce devam et
+            return false;
+        }
     }
     
     // HTML meta taglarını oluştur

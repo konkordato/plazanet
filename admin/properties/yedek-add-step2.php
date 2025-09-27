@@ -7,28 +7,15 @@ if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true)
 
 require_once '../../config/database.php';
 
-// POST'tan gelen verileri SESSION'a kaydet ve GET ile yönlendir
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['emlak_tipi'])) {
-    $_SESSION['emlak_tipi'] = $_POST['emlak_tipi'];
-    $_SESSION['kategori'] = $_POST['kategori'];
-    $_SESSION['alt_kategori'] = $_POST['alt_kategori'] ?? '';
-    
-    // POST-REDIRECT-GET pattern ile yönlendir
-    header("Location: add-step2.php");
-    exit();
-}
+// Önceki adımdan gelen veriler
+$emlak_tipi = $_POST['emlak_tipi'] ?? $_SESSION['emlak_tipi'] ?? '';
+$kategori = $_POST['kategori'] ?? $_SESSION['kategori'] ?? '';
+$alt_kategori = $_POST['alt_kategori'] ?? $_SESSION['alt_kategori'] ?? '';
 
-// Session'dan verileri al
-$emlak_tipi = $_SESSION['emlak_tipi'] ?? '';
-$kategori = $_SESSION['kategori'] ?? '';
-$alt_kategori = $_SESSION['alt_kategori'] ?? '';
-
-// Eğer session'da veri yoksa step1'e yönlendir
-if (empty($emlak_tipi) || empty($kategori)) {
-    header("Location: add-step1.php");
-    exit();
-}
-
+// Session'a kaydet
+$_SESSION['emlak_tipi'] = $emlak_tipi;
+$_SESSION['kategori'] = $kategori;
+$_SESSION['alt_kategori'] = $alt_kategori;
 // Lokasyon önerilerini çek
 $il_onerileri = $db->query("SELECT DISTINCT il FROM lokasyon_onerileri ORDER BY kullanim_sayisi DESC, il ASC")->fetchAll(PDO::FETCH_COLUMN);
 $ilce_onerileri = $db->query("SELECT DISTINCT ilce FROM lokasyon_onerileri ORDER BY kullanim_sayisi DESC, ilce ASC")->fetchAll(PDO::FETCH_COLUMN);
@@ -552,7 +539,7 @@ $mahalle_onerileri = $db->query("SELECT DISTINCT mahalle FROM lokasyon_onerileri
 
                 <!-- Butonlar -->
                 <div class="buttons">
-                    <a href="add-step1.php" class="btn btn-back">← Geri</a>
+                    <button type="button" class="btn btn-back" onclick="history.back()">← Geri</button>
                     <button type="submit" class="btn btn-next">Devam →</button>
                 </div>
             </form>
