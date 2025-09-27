@@ -355,6 +355,25 @@ unset($_SESSION['success'], $_SESSION['error']);
                         <span>CRM Sistemi</span>
                     </a>
                 </li>
+                <!-- SMS SİSTEMİ MENÜSÜ -->
+                <li>
+                    <a href="sms/send.php">
+                        <span class="icon">📤</span>
+                        <span>SMS Gönder</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="sms/logs.php">
+                        <span class="icon">📋</span>
+                        <span>SMS Logları</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="sms/settings.php">
+                        <span class="icon">⚙️</span>
+                        <span>SMS Ayarları</span>
+                    </a>
+                </li>
                 <li>
                     <a href="my-profile.php">
                         <span class="icon">👤</span>

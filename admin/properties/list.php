@@ -492,6 +492,25 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <span>CRM Sistemi</span>
                     </a>
                 </li>
+                <!-- SMS SİSTEMİ MENÜSÜ -->
+                <li>
+                    <a href="sms/send.php">
+                        <span class="icon">📤</span>
+                        <span>SMS Gönder</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="sms/logs.php">
+                        <span class="icon">📋</span>
+                        <span>SMS Logları</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="sms/settings.php">
+                        <span class="icon">⚙️</span>
+                        <span>SMS Ayarları</span>
+                    </a>
+                </li>
                 <!-- SEO YÖNETİMİ - YENİ EKLENEN -->
                 <li>
                     <a href="../seo/">

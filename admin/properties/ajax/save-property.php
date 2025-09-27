@@ -195,7 +195,55 @@ try {
     $_SESSION['new_property_id'] = $property_id;
     $_SESSION['new_property_no'] = $ilan_no;
     $_SESSION['success'] = "İlan başarıyla eklendi! İlan No: " . $ilan_no;
+    // ============ SMS SİSTEMİ BAŞLANGIÇ ============
+    try {
+        // SMS sistemi aktifse devam et
+        $sms_check = $db->query("SELECT is_active, test_mode FROM sms_settings WHERE id = 1");
+        $sms_settings = $sms_check->fetch(PDO::FETCH_ASSOC);
 
+        if ($sms_settings && $sms_settings['is_active'] == 1) {
+            // NetGSM sınıfını dahil et
+            require_once '../../../classes/NetGSM.php';
+
+            // İlan linkini oluştur
+            $base_url = "http://localhost/plazanet"; // Canlıda değiştirin
+            $ilan_link = $base_url . "/pages/detail.php?id=" . $property_id;
+
+            // Kullanıcı bilgilerini al
+            $user_name = $_SESSION['user_fullname'] ?? $_SESSION['admin_username'] ?? 'Plaza Emlak';
+
+            // NetGSM'i başlat
+            $netgsm = new NetGSM($db);
+
+            // 1. TÜM DANIŞMANLARA SMS GÖNDER
+            $danisman_sql = "SELECT id, full_name, mobile, sms_permission 
+                        FROM users 
+                        WHERE status = 'active' 
+                        AND mobile IS NOT NULL 
+                        AND mobile != ''
+                        AND sms_permission = 1";
+
+            $danisman_stmt = $db->query($danisman_sql);
+            $danismanlar = $danisman_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($danismanlar as $danisman) {
+                $sms_mesaj = "Plaza Emlak Yeni İlan: " . $data['baslik'] . " - " . number_format($data['fiyat'], 0, ',', '.') . " TL";
+
+                $netgsm->sendSMS($danisman['mobile'], $sms_mesaj, 'yeni_ilan', $user_id, [
+                    'type' => 'danisman',
+                    'id' => $danisman['id'],
+                    'name' => $danisman['full_name'],
+                    'property_id' => $property_id
+                ]);
+            }
+
+            error_log("İlan #" . $property_id . " için SMS gönderimi tamamlandı.");
+        }
+    } catch (Exception $e) {
+        // SMS hatası ilan eklemeyi engellemesin
+        error_log("SMS gönderim hatası: " . $e->getMessage());
+    }
+    // ============ SMS SİSTEMİ BİTİŞ ============
     // Herkes için tebrikler sayfasına git
     header("Location: ../add-step4.php");
     exit();
