@@ -9,7 +9,7 @@ class Database {
     private $host = "localhost";
     private $db_name = "plazanet";
     private $username = "root";
-    private $password = "hi-fi-ahm3t"; // MEVCUT ŞİFRENİZ
+    private $password = ""; // MEVCUT ŞİFRENİZ
     public $conn;
 
     // Veritabanına bağlan
