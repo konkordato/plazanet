@@ -1,0 +1,70 @@
+/* LINE-CLAMP DÜZELTMESİ - Terminal Hatası Çözümü */
+/* Bu dosyayı assets/css klasörüne ekleyin */
+
+/* Standart line-clamp desteği */
+.property-title {
+    /* Webkit için (Chrome, Safari) */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    
+    /* Standart CSS için (Firefox ve diğerleri) */
+    line-clamp: 2;
+    box-orient: vertical;
+    
+    /* Taşmayı gizle */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    /* Diğer stil özellikleri */
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+    
+    /* Yükseklik sınırlaması - fallback */
+    max-height: 3em; /* 2 satır için yaklaşık yükseklik */
+    line-height: 1.5em;
+}
+
+/* Firefox ve desteklemeyen tarayıcılar için alternatif */
+@supports not (-webkit-line-clamp: 2) {
+    .property-title {
+        display: block;
+        max-height: 3em;
+        line-height: 1.5em;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    /* Fade efekti ile kesme */
+    .property-title::after {
+        content: '...';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        padding-left: 20px;
+        background: linear-gradient(to right, transparent, white 50%);
+    }
+}
+
+/* Diğer metin kesme alanları için */
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.text-truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    line-clamp: 3;
+    box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

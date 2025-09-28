@@ -93,6 +93,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <!-- CSS Dosyaları -->
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/override.css">
+    <link rel="stylesheet" href="assets/css/logo-fix.css"> <!-- YENİ EKLENEN -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -300,6 +301,7 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <li><a href="index.php" class="active">Ana Sayfa</a></li>
                     <li><a href="pages/satilik.php">Satılık</a></li>
                     <li><a href="pages/kiralik.php">Kiralık</a></li>
+                    <li><a href="pages/hizmetlerimiz.php">Verdiğimiz Hizmetler</a></li>
                     <li><a href="pages/hakkimizda.php">Hakkımızda</a></li>
                     <li><a href="pages/iletisim.php">İletişim</a></li>
                     <li><a href="admin/" class="admin-btn">Yönetim</a></li>
@@ -458,6 +460,14 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php include 'includes/footer.php'; ?>
 
     <script src="assets/js/main.js"></script>
+    <!-- Mobil Menü JavaScript -->
+    <script>
+        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+            document.querySelector('.nav-menu').classList.toggle('active');
+        });
+    </script>
+    <script src="assets/js/menu.js"></script>
 </body>
 
 </html>

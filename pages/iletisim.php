@@ -8,7 +8,9 @@ require_once '../config/database.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>İletişim - Plaza Emlak & Yatırım</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/logo-fix.css">
     <link rel="stylesheet" href="../assets/css/pages.css">
+    <link rel="stylesheet" href="../assets/css/override.css">
     <style>
         .contact-container {
             display: grid;
@@ -127,10 +129,16 @@ require_once '../config/database.php';
                     <li><a href="../index.php">Ana Sayfa</a></li>
                     <li><a href="satilik.php">Satılık</a></li>
                     <li><a href="kiralik.php">Kiralık</a></li>
+                    <li><a href="hizmetlerimiz.php">Verdiğimiz Hizmetler</a></li>
                     <li><a href="hakkimizda.php">Hakkımızda</a></li>
                     <li><a href="iletisim.php" class="active">İletişim</a></li>
                     <li><a href="../admin/" class="admin-btn">Yönetim</a></li>
                 </ul>
+                <div class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </div>
         </nav>
     </header>
@@ -245,5 +253,14 @@ require_once '../config/database.php';
 
     <!-- Footer -->
     <?php include '../includes/footer.php'; ?>
+    
+    <!-- Mobil Menü JavaScript -->
+    <script>
+    document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+        this.classList.toggle('active');
+        document.querySelector('.nav-menu').classList.toggle('active');
+    });
+    </script>
+    <script src="assets/js/menu.js"></script>
 </body>
 </html>

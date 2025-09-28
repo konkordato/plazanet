@@ -257,6 +257,7 @@ $digerIlanSayisi = $stmt->fetch(PDO::FETCH_ASSOC)['toplam'];
 
 <!-- CSS Dosyaları -->
 <link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/logo-fix.css">
 <link rel="stylesheet" href="../assets/css/sticky-menu.css">
 
 <style>
@@ -1258,6 +1259,14 @@ echo trackPropertyView(
         });
     </script>
 
+    <!-- Mobil Menü JavaScript -->
+    <script>
+        document.querySelector('.mobile-menu-toggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+            document.querySelector('.nav-menu').classList.toggle('active');
+        });
+    </script>
+    <script src="assets/js/menu.js"></script>
 </body>
 
 </html>

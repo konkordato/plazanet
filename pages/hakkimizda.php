@@ -13,7 +13,9 @@ $consultants = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hakkımızda - Plaza Emlak & Yatırım</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/logo-fix.css">
     <link rel="stylesheet" href="../assets/css/pages.css">
+    <link rel="stylesheet" href="../assets/css/override.css">
     <style>
         .about-content {
             background: white;
@@ -127,10 +129,16 @@ $consultants = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <li><a href="../index.php">Ana Sayfa</a></li>
                     <li><a href="satilik.php">Satılık</a></li>
                     <li><a href="kiralik.php">Kiralık</a></li>
+                    <li><a href="hizmetlerimiz.php">Verdiğimiz Hizmetler</a></li>
                     <li><a href="hakkimizda.php" class="active">Hakkımızda</a></li>
                     <li><a href="iletisim.php">İletişim</a></li>
                     <li><a href="../admin/" class="admin-btn">Yönetim</a></li>
                 </ul>
+                <div class="mobile-menu-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
             </div>
         </nav>
     </header>
@@ -230,5 +238,20 @@ $consultants = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <!-- Footer -->
     <?php include '../includes/footer.php'; ?>
+    
+    <!-- Mobil Menü JavaScript - DÜZELTİLDİ -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggleButton = document.querySelector('.mobile-menu-toggle');
+        var navMenu = document.querySelector('.nav-menu');
+        
+        if(toggleButton && navMenu) {
+            toggleButton.addEventListener('click', function() {
+                this.classList.toggle('active');
+                navMenu.classList.toggle('active');
+            });
+        }
+    });
+    </script>
 </body>
 </html>

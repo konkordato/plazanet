@@ -8,6 +8,23 @@ Options -Indexes
 RewriteEngine On
 
 # ====================================
+# RESİM DOSYALARINA ERİŞİM İZNİ (YENİ EKLENEN)
+# ====================================
+# Upload klasöründeki resimlere erişim izni
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico|bmp)$">
+    Order Allow,Deny
+    Allow from all
+    Satisfy Any
+</FilesMatch>
+
+# CSS ve JS dosyalarına izin
+<FilesMatch "\.(css|js|woff|woff2|ttf|eot)$">
+    Order Allow,Deny
+    Allow from all
+    Satisfy Any
+</FilesMatch>
+
+# ====================================
 # TEMEL GÜVENLİK
 # ====================================
 
@@ -71,3 +88,16 @@ RewriteEngine On
 php_value upload_max_filesize 10M
 php_value post_max_size 10M
 php_value max_execution_time 300
+
+# ====================================
+# MIME TYPE AYARLARI (YENİ EKLENEN)
+# ====================================
+<IfModule mod_mime.c>
+    AddType image/jpeg .jpg .jpeg
+    AddType image/png .png
+    AddType image/gif .gif
+    AddType image/webp .webp
+    AddType image/svg+xml .svg
+    AddType text/css .css
+    AddType application/javascript .js
+</IfModule>
