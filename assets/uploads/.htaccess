@@ -1,0 +1,17 @@
+# PHP dosyalarını engelle
+<FilesMatch "\.ph(p[2-7]?|tml)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Sadece resim dosyalarına izin ver
+<FilesMatch "\.(?i:gif|jpe?g|png|webp)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Diğer tüm dosyaları engelle
+<FilesMatch "^.*$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>

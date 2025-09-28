@@ -1,57 +1,101 @@
 <?php
-session_start();
+// GÜVENLİK GÜNCELLEMELERİ EKLENDİ
+require_once '../config/database.php';
 
-// KULLANICI GİRİŞİ KONTROLÜ - ÖNEMLİ DÜZELTME!
-// Kullanıcı giriş yapmamışsa index.php'ye yönlendir
+// KULLANICI GİRİŞ KONTROLÜ - GÜVENLİ
 if (!isset($_SESSION['user_logged_in']) || $_SESSION['user_logged_in'] !== true) {
-    header("Location: index.php");
+    session_unset();
+    session_destroy();
+    header("Location: index.php?error=unauthorized");
     exit();
 }
 
-// Eğer kullanıcı rolü 'user' değilse ve 'admin' ise admin paneline yönlendir
+// Session hijacking kontrolü
+if (isset($_SESSION['user_ip']) && $_SESSION['user_ip'] !== $_SERVER['REMOTE_ADDR']) {
+    session_unset();
+    session_destroy();
+    header("Location: index.php?error=session_hijacked");
+    exit();
+}
+
+// Session timeout kontrolü (30 dakika)
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
+    session_unset();
+    session_destroy();
+    header("Location: index.php?error=session_timeout");
+    exit();
+}
+$_SESSION['last_activity'] = time();
+
+// Rol kontrolü - Admin ise admin paneline yönlendir
 if ($_SESSION['user_role'] === 'admin') {
     header("Location: dashboard.php");
     exit();
 }
 
-// Normal kullanıcı değilse de index'e yönlendir
+// Normal kullanıcı değilse index'e yönlendir
 if ($_SESSION['user_role'] !== 'user') {
-    header("Location: index.php");
+    header("Location: index.php?error=invalid_role");
     exit();
 }
 
-require_once '../config/database.php';
+// Kullanıcı bilgilerini güvenli al
+$user_id = intval($_SESSION['user_id']); // SQL Injection koruması
+$user_name = htmlspecialchars($_SESSION['user_fullname'], ENT_QUOTES, 'UTF-8');
+$username = htmlspecialchars($_SESSION['user_username'], ENT_QUOTES, 'UTF-8');
 
-// Kullanıcı bilgileri
-$user_id = $_SESSION['user_id'];
-$user_name = $_SESSION['user_fullname'];
-$username = $_SESSION['user_username'];
+// CSRF Token oluştur (form işlemleri için)
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+$csrf_token = $_SESSION['csrf_token'];
 
-// Kullanıcının ilanlarını çek (son 5 ilan)
-$query = "SELECT p.*, pi.image_path 
-          FROM properties p 
-          LEFT JOIN property_images pi ON p.id = pi.property_id AND pi.is_main = 1
-          WHERE p.user_id = :user_id
-          ORDER BY p.created_at DESC
-          LIMIT 5";
-$stmt = $db->prepare($query);
-$stmt->execute([':user_id' => $user_id]);
-$recent_properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
+try {
+    // Kullanıcının ilanlarını güvenli şekilde çek (SQL Injection koruması)
+    $query = "SELECT p.*, pi.image_path 
+              FROM properties p 
+              LEFT JOIN property_images pi ON p.id = pi.property_id AND pi.is_main = 1
+              WHERE p.user_id = :user_id
+              ORDER BY p.created_at DESC
+              LIMIT 5";
+    $stmt = $db->prepare($query);
+    $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stmt->execute();
+    $recent_properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// İstatistikleri çek
-$stats_query = "SELECT 
-    COUNT(*) as total_properties,
-    SUM(CASE WHEN durum = 'aktif' THEN 1 ELSE 0 END) as active_properties,
-    SUM(CASE WHEN durum = 'pasif' THEN 1 ELSE 0 END) as passive_properties
-    FROM properties WHERE user_id = :user_id";
-$stats_stmt = $db->prepare($stats_query);
-$stats_stmt->execute([':user_id' => $user_id]);
-$stats = $stats_stmt->fetch(PDO::FETCH_ASSOC);
+    // İstatistikleri güvenli şekilde çek
+    $stats_query = "SELECT 
+        COUNT(*) as total_properties,
+        SUM(CASE WHEN durum = 'aktif' THEN 1 ELSE 0 END) as active_properties,
+        SUM(CASE WHEN durum = 'pasif' THEN 1 ELSE 0 END) as passive_properties
+        FROM properties WHERE user_id = :user_id";
+    $stats_stmt = $db->prepare($stats_query);
+    $stats_stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+    $stats_stmt->execute();
+    $stats = $stats_stmt->fetch(PDO::FETCH_ASSOC);
+    
+} catch(PDOException $e) {
+    // Hata durumunda varsayılan değerler (hata detayını gösterme)
+    $recent_properties = [];
+    $stats = [
+        'total_properties' => 0,
+        'active_properties' => 0,
+        'passive_properties' => 0
+    ];
+    
+    // Hata logu (opsiyonel - canlıda aktif edilmeli)
+    error_log("Dashboard Error for User $user_id: " . $e->getMessage());
+}
 
-// Mesajları göster
-$success = $_SESSION['success'] ?? '';
-$error = $_SESSION['error'] ?? '';
+// Mesajları güvenli şekilde göster ve temizle
+$success = isset($_SESSION['success']) ? htmlspecialchars($_SESSION['success'], ENT_QUOTES, 'UTF-8') : '';
+$error = isset($_SESSION['error']) ? htmlspecialchars($_SESSION['error'], ENT_QUOTES, 'UTF-8') : '';
 unset($_SESSION['success'], $_SESSION['error']);
+
+// XSS koruması için yardımcı fonksiyon
+function safe_output($data) {
+    return htmlspecialchars($data ?? '', ENT_QUOTES, 'UTF-8');
+}
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -59,8 +103,17 @@ unset($_SESSION['success'], $_SESSION['error']);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kullanıcı Paneli - <?php echo htmlspecialchars($user_name); ?></title>
+    <meta name="robots" content="noindex, nofollow">
+    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    
+    <title>Kullanıcı Paneli - <?php echo safe_output($user_name); ?></title>
     <link rel="stylesheet" href="../assets/css/admin.css">
+    
+    <!-- CSRF Token for AJAX requests -->
+    <meta name="csrf-token" content="<?php echo $csrf_token; ?>">
+    
     <style>
         /* Dashboard özel stilleri */
         .dashboard-welcome {
@@ -320,6 +373,21 @@ unset($_SESSION['success'], $_SESSION['error']);
                 transform: translateY(0);
             }
         }
+        
+        /* Güvenlik için logout butonu */
+        .btn-logout {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .btn-logout:hover {
+            background: #c82333;
+        }
     </style>
 </head>
 
@@ -402,8 +470,8 @@ unset($_SESSION['success'], $_SESSION['error']);
                     <h3>Kullanıcı Paneli</h3>
                 </div>
                 <div class="navbar-right">
-                    <span>👤 <?php echo htmlspecialchars($user_name); ?></span>
-                    <a href="logout.php" class="btn-logout">Çıkış</a>
+                    <span>👤 <?php echo safe_output($user_name); ?></span>
+                    <a href="logout.php" class="btn-logout" onclick="return confirm('Çıkmak istediğinizden emin misiniz?')">Çıkış</a>
                 </div>
             </div>
 
@@ -418,7 +486,7 @@ unset($_SESSION['success'], $_SESSION['error']);
 
                 <!-- Hoşgeldin Mesajı -->
                 <div class="dashboard-welcome">
-                    <h1>Hoş Geldiniz, <?php echo htmlspecialchars($user_name); ?>!</h1>
+                    <h1>Hoş Geldiniz, <?php echo safe_output($user_name); ?>!</h1>
                     <p>Kullanıcı panelinizden ilanlarınızı yönetebilir, yeni ilan ekleyebilirsiniz.</p>
                 </div>
 
@@ -426,17 +494,17 @@ unset($_SESSION['success'], $_SESSION['error']);
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-icon">📊</div>
-                        <div class="stat-value"><?php echo $stats['total_properties'] ?? 0; ?></div>
+                        <div class="stat-value"><?php echo intval($stats['total_properties']); ?></div>
                         <div class="stat-label">Toplam İlan</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">✅</div>
-                        <div class="stat-value"><?php echo $stats['active_properties'] ?? 0; ?></div>
+                        <div class="stat-value"><?php echo intval($stats['active_properties']); ?></div>
                         <div class="stat-label">Aktif İlan</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-icon">⏸️</div>
-                        <div class="stat-value"><?php echo $stats['passive_properties'] ?? 0; ?></div>
+                        <div class="stat-value"><?php echo intval($stats['passive_properties']); ?></div>
                         <div class="stat-label">Pasif İlan</div>
                     </div>
                 </div>
@@ -455,7 +523,7 @@ unset($_SESSION['success'], $_SESSION['error']);
                         <span class="quick-action-icon">👤</span>
                         <span class="quick-action-title">Profilimi Düzenle</span>
                     </a>
-                    <a href="../index.php" target="_blank" class="quick-action-btn">
+                    <a href="../index.php" target="_blank" class="quick-action-btn" rel="noopener noreferrer">
                         <span class="quick-action-icon">🌐</span>
                         <span class="quick-action-title">Siteyi Görüntüle</span>
                     </a>
@@ -474,39 +542,44 @@ unset($_SESSION['success'], $_SESSION['error']);
                         <div class="property-list">
                             <?php foreach ($recent_properties as $property): ?>
                                 <div class="property-item">
-                                    <?php if ($property['image_path']): ?>
-                                        <img src="../<?php echo $property['image_path']; ?>"
-                                            alt="<?php echo htmlspecialchars($property['baslik'] ?? $property['title'] ?? ''); ?>"
-                                            class="property-thumb">
+                                    <?php if (!empty($property['image_path'])): ?>
+                                        <img src="../<?php echo safe_output($property['image_path']); ?>"
+                                            alt="<?php echo safe_output($property['baslik'] ?? $property['title'] ?? ''); ?>"
+                                            class="property-thumb"
+                                            onerror="this.onerror=null; this.src='../assets/images/no-image.jpg';">
                                     <?php else: ?>
                                         <div class="no-image">📷</div>
                                     <?php endif; ?>
 
                                     <div class="property-info">
                                         <div class="property-title">
-                                            <?php echo htmlspecialchars($property['baslik'] ?? $property['title'] ?? 'İsimsiz İlan'); ?>
+                                            <?php echo safe_output($property['baslik'] ?? $property['title'] ?? 'İsimsiz İlan'); ?>
                                         </div>
                                         <div class="property-meta">
-                                            📍 <?php echo htmlspecialchars(($property['ilce'] ?? '') . ', ' . ($property['mahalle'] ?? '')); ?>
-                                            | 🏠 <?php echo $property['oda_sayisi'] ?? ''; ?>
-                                            | 📐 <?php echo $property['metrekare'] ?? ''; ?>m²
+                                            📍 <?php echo safe_output(($property['ilce'] ?? '') . ', ' . ($property['mahalle'] ?? '')); ?>
+                                            | 🏠 <?php echo safe_output($property['oda_sayisi'] ?? ''); ?>
+                                            | 📐 <?php echo safe_output($property['metrekare'] ?? ''); ?>m²
                                         </div>
                                     </div>
 
                                     <div class="property-price">
-                                        <?php echo number_format($property['fiyat'] ?? $property['price'] ?? 0, 0, ',', '.'); ?> ₺
+                                        <?php echo number_format(floatval($property['fiyat'] ?? $property['price'] ?? 0), 0, ',', '.'); ?> ₺
                                     </div>
 
                                     <div class="property-actions">
-                                        <a href="my-property-edit.php?id=<?php echo $property['id']; ?>" class="btn-small btn-edit">Düzenle</a>
-                                        <a href="../pages/detail.php?id=<?php echo $property['id']; ?>" target="_blank" class="btn-small btn-view">Görüntüle</a>
+                                        <a href="my-property-edit.php?id=<?php echo intval($property['id']); ?>" 
+                                           class="btn-small btn-edit">Düzenle</a>
+                                        <a href="../pages/detail.php?id=<?php echo intval($property['id']); ?>" 
+                                           target="_blank" 
+                                           rel="noopener noreferrer"
+                                           class="btn-small btn-view">Görüntüle</a>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
                     <?php else: ?>
                         <div class="empty-state">
-                            <div class="empty-state-icon">📭</div>
+                            <div class="empty-state-icon">🔭</div>
                             <h3>Henüz ilan eklenmemiş</h3>
                             <p>Hemen ilk ilanınızı ekleyin!</p>
                             <a href="properties/add-step1.php" class="btn btn-success" style="margin-top: 20px;">
@@ -518,6 +591,32 @@ unset($_SESSION['success'], $_SESSION['error']);
             </div>
         </div>
     </div>
+    
+    <script>
+        // Otomatik çıkış için zamanlayıcı (30 dakika)
+        let inactivityTimer;
+        
+        function resetTimer() {
+            clearTimeout(inactivityTimer);
+            inactivityTimer = setTimeout(function() {
+                alert('Oturumunuz güvenlik nedeniyle sonlandırıldı.');
+                window.location.href = 'logout.php';
+            }, 30 * 60 * 1000); // 30 dakika
+        }
+        
+        // Kullanıcı aktivitelerini izle
+        document.addEventListener('mousemove', resetTimer);
+        document.addEventListener('keypress', resetTimer);
+        document.addEventListener('click', resetTimer);
+        document.addEventListener('scroll', resetTimer);
+        
+        // Sayfa yüklendiğinde zamanlayıcıyı başlat
+        resetTimer();
+        
+        // XSS koruması için konsol uyarısı
+        console.log('%cDUR!', 'color: red; font-size: 50px; font-weight: bold;');
+        console.log('%cBu tarayıcı konsolu geliştiriciler içindir. Buraya yapıştırılan kodlar hesabınızın güvenliğini tehlikeye atabilir!', 'color: red; font-size: 16px;');
+    </script>
 </body>
 
 </html>

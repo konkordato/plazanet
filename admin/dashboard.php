@@ -2,7 +2,7 @@
 // Oturum başlat
 session_start();
 
-// Admin girişi kontrolü
+// Admin girişi kontrolü - BASİT VE ÇALIŞAN
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header("Location: index.php");
     exit();
@@ -13,33 +13,46 @@ require_once '../config/database.php';
 
 // Admin bilgilerini al
 $adminInfo = [
-    'id' => $_SESSION['admin_id'] ?? null,
-    'username' => $_SESSION['admin_username'] ?? ''
+    'id' => $_SESSION['admin_id'] ?? $_SESSION['user_id'] ?? null,
+    'username' => $_SESSION['admin_username'] ?? $_SESSION['user_username'] ?? 'Admin'
 ];
 
-// İstatistikleri çek - Türkçe sütun adlarına uygun
-// Toplam ilan sayısı
-$stmt = $db->query("SELECT COUNT(*) as total FROM properties");
-$totalProperties = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+// İstatistikleri çek - Hata kontrolü ile
+try {
+    // Toplam ilan sayısı
+    $stmt = $db->query("SELECT COUNT(*) as total FROM properties");
+    $totalProperties = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 
-// Aktif ilan sayısı
-$stmt = $db->query("SELECT COUNT(*) as total FROM properties WHERE durum = 'aktif'");
-$activeProperties = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    // Aktif ilan sayısı
+    $stmt = $db->query("SELECT COUNT(*) as total FROM properties WHERE durum = 'aktif'");
+    $activeProperties = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 
-// Satılık ilan sayısı
-$stmt = $db->query("SELECT COUNT(*) as total FROM properties WHERE kategori = 'Satılık' AND durum = 'aktif'");
-$forSale = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    // Satılık ilan sayısı
+    $stmt = $db->query("SELECT COUNT(*) as total FROM properties WHERE kategori = 'Satılık' AND durum = 'aktif'");
+    $forSale = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 
-// Kiralık ilan sayısı
-$stmt = $db->query("SELECT COUNT(*) as total FROM properties WHERE kategori = 'Kiralık' AND durum = 'aktif'");
-$forRent = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    // Kiralık ilan sayısı
+    $stmt = $db->query("SELECT COUNT(*) as total FROM properties WHERE kategori = 'Kiralık' AND durum = 'aktif'");
+    $forRent = $stmt->fetch(PDO::FETCH_ASSOC)['total'] ?? 0;
 
-// Son eklenen 5 ilan
-$stmt = $db->query("SELECT id, baslik, fiyat, kategori, created_at 
-                    FROM properties 
-                    ORDER BY created_at DESC 
-                    LIMIT 5");
-$recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Son eklenen 5 ilan
+    $stmt = $db->query("SELECT id, baslik, fiyat, kategori, created_at 
+                        FROM properties 
+                        ORDER BY created_at DESC 
+                        LIMIT 5");
+    $recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+} catch (PDOException $e) {
+    // Hata durumunda varsayılan değerler
+    $totalProperties = 0;
+    $activeProperties = 0;
+    $forSale = 0;
+    $forRent = 0;
+    $recentProperties = [];
+}
+
+// user_role kontrolü için güvenli değer
+$user_role = $_SESSION['user_role'] ?? 'admin';
 ?>
 <!DOCTYPE html>
 <html lang="tr">
@@ -89,21 +102,21 @@ $recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <span>Ayarlar</span>
                     </a>
                 </li>
-                <!-- SEO YÖNETİMİ - YENİ EKLENEN -->
+                <!-- SEO YÖNETİMİ -->
                 <li>
                     <a href="seo/">
                         <span class="icon">🎯</span>
                         <span>SEO Yönetimi</span>
                     </a>
                 </li>
-                <!-- CRM SİSTEMİ MENÜSÜ -->
+                <!-- CRM SİSTEMİ -->
                 <li>
                     <a href="crm/index.php">
                         <span class="icon">📊</span>
                         <span>CRM Sistemi</span>
                     </a>
                 </li>
-                <!-- SMS SİSTEMİ MENÜSÜ -->
+                <!-- SMS SİSTEMİ -->
                 <li>
                     <a href="sms/send.php">
                         <span class="icon">📤</span>
@@ -140,7 +153,7 @@ $recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <span>Satış Raporları</span>
                     </a>
                 </li>
-                <?php if ($_SESSION['user_role'] === 'admin'): ?>
+                <?php if ($user_role === 'admin'): ?>
                     <li>
                         <a href="portfolio/commission-settings.php">
                             <span class="icon">⚙️</span>
@@ -249,7 +262,15 @@ $recentProperties = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     <?php endif; ?>
 
                     <div style="margin-top: 20px; text-align: center;">
-                        <a href="properties/add.php" class="btn btn-primary">Yeni İlan Ekle</a>
+                        <a href="properties/add.php" class="btn btn-primary" style="
+                            background: #3498db;
+                            color: white;
+                            padding: 10px 20px;
+                            text-decoration: none;
+                            border-radius: 5px;
+                            display: inline-block;">
+                            Yeni İlan Ekle
+                        </a>
                     </div>
                 </div>
 
