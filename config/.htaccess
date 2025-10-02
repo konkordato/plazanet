@@ -1,3 +1,8 @@
+<<<<<<< HEAD
 # Config klasörüne erişimi tamamen engelle
 Order deny,allow
+=======
+# Config klasörüne erişimi tamamen engelle
+Order deny,allow
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
 Deny from all

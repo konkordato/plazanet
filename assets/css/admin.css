@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* Admin Panel Responsive CSS - Masaüstü Görünüm Korunuyor */
+=======
+/* Admin Panel Genel Stiller */
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
 :root {
     --admin-primary: #2c3e50;
     --admin-secondary: #34495e;
@@ -9,7 +13,10 @@
     --admin-light: #ecf0f1;
     --admin-dark: #2c3e50;
     --sidebar-width: 250px;
+<<<<<<< HEAD
     --sidebar-width-mobile: 60px;
+=======
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
 }
 
 * {
@@ -21,7 +28,105 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #f5f6fa;
+<<<<<<< HEAD
     overflow-x: hidden;
+=======
+}
+
+/* Giriş Sayfası Stilleri */
+.login-page {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.login-box {
+    background: white;
+    border-radius: 10px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+}
+
+.login-logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-logo h1 {
+    color: var(--admin-primary);
+    font-size: 2.5rem;
+    margin-bottom: 5px;
+}
+
+.login-logo p {
+    color: #7f8c8d;
+    font-size: 1rem;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--admin-dark);
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--admin-accent);
+}
+
+.btn-login {
+    width: 100%;
+    padding: 14px;
+    background: var(--admin-accent);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-login:hover {
+    background: #2980b9;
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.login-footer a {
+    color: #7f8c8d;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.login-footer a:hover {
+    color: var(--admin-accent);
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
 }
 
 /* Dashboard Layout */
@@ -36,6 +141,7 @@ body {
     background: var(--admin-dark);
     position: fixed;
     height: 100vh;
+<<<<<<< HEAD
     left: 0;
     top: 0;
     overflow-y: auto;
@@ -60,6 +166,10 @@ body {
 
 .sidebar::-webkit-scrollbar-thumb:hover {
     background: rgba(255,255,255,0.5);
+=======
+    overflow-y: auto;
+    transition: all 0.3s;
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
 }
 
 .sidebar-header {
@@ -67,15 +177,52 @@ body {
     padding: 20px;
     text-align: center;
     border-bottom: 1px solid rgba(255,255,255,0.1);
+<<<<<<< HEAD
     position: sticky;
     top: 0;
     z-index: 10;
+=======
+}
+
+.sidebar-header h2 {
+    color: white;
+    font-size: 1.5rem;
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
 }
 
 .sidebar-menu {
     list-style: none;
+<<<<<<< HEAD
     padding: 20px 0 50px 0; /* Alt boşluk eklendi */
     margin: 0;
+=======
+    padding: 20px 0;
+}
+
+.sidebar-menu li {
+    margin-bottom: 5px;
+}
+
+.sidebar-menu a {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    color: #b8c7ce;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.sidebar-menu a:hover,
+.sidebar-menu a.active {
+    background: var(--admin-secondary);
+    color: white;
+    border-left: 3px solid var(--admin-accent);
+}
+
+.sidebar-menu .icon {
+    margin-right: 10px;
+    font-size: 1.2rem;
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
 }
 
 /* Main Content */
@@ -83,7 +230,10 @@ body {
     margin-left: var(--sidebar-width);
     flex: 1;
     min-height: 100vh;
+<<<<<<< HEAD
     transition: all 0.3s;
+=======
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
 }
 
 .top-navbar {
@@ -93,9 +243,12 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+<<<<<<< HEAD
     position: sticky;
     top: 0;
     z-index: 50;
+=======
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
 }
 
 .navbar-left h3 {
@@ -203,6 +356,19 @@ body {
     background: #2980b9;
 }
 
+<<<<<<< HEAD
+=======
+.btn-success {
+    background: var(--admin-success);
+    color: white;
+}
+
+.btn-danger {
+    background: var(--admin-danger);
+    color: white;
+}
+
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
 /* Alert Messages */
 .alert {
     padding: 15px;
@@ -223,6 +389,7 @@ body {
     border-color: var(--admin-danger);
 }
 
+<<<<<<< HEAD
 /* Table Responsive */
 .table-responsive {
     overflow-x: auto;
@@ -591,5 +758,20 @@ table {
         z-index: 1000;
         margin-left: 10px;
         pointer-events: none;
+=======
+/* Responsive */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 0;
+        overflow: hidden;
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .dashboard-cards {
+        grid-template-columns: 1fr;
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
     }
 }

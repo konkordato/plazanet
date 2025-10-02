@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # PLAZANET EMLAK - PRODUCTION .HTACCESS
 
 # ====================================
@@ -307,3 +308,108 @@ php_value upload_max_filesize 10M
 php_value post_max_size 50M
 php_value max_file_uploads 50
 php_value max_execution_time 300
+=======
+# PLAZANET EMLAK - XAMPP UYUMLU .HTACCESS
+# ====================================
+
+# Dizin listelemeyi kapat
+Options -Indexes
+
+# Motor açık
+RewriteEngine On
+
+# ====================================
+# RESİM DOSYALARINA ERİŞİM İZNİ (YENİ EKLENEN)
+# ====================================
+# Upload klasöründeki resimlere erişim izni
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico|bmp)$">
+    Order Allow,Deny
+    Allow from all
+    Satisfy Any
+</FilesMatch>
+
+# CSS ve JS dosyalarına izin
+<FilesMatch "\.(css|js|woff|woff2|ttf|eot)$">
+    Order Allow,Deny
+    Allow from all
+    Satisfy Any
+</FilesMatch>
+
+# ====================================
+# TEMEL GÜVENLİK
+# ====================================
+
+# Hassas dosyalara erişimi engelle
+<FilesMatch "\.(sql|log|ini|env|bak)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# .htaccess dosyasını koru
+<Files .htaccess>
+    Order Allow,Deny
+    Deny from all
+</Files>
+
+# ====================================
+# PERFORMANS - GZIP
+# ====================================
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE application/xml
+</IfModule>
+
+# ====================================
+# CACHE AYARLARI
+# ====================================
+<IfModule mod_expires.c>
+    ExpiresActive On
+    
+    # Resimler - 1 ay cache
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 month"
+    
+    # CSS ve JS - 1 hafta cache  
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+    
+    # HTML - cache yok
+    ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+# ====================================
+# GÜVENLİK BAŞLIKLARI (Basit)
+# ====================================
+<IfModule mod_headers.c>
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-Content-Type-Options "nosniff"
+</IfModule>
+
+# ====================================
+# PHP AYARLARI (XAMPP için)
+# ====================================
+php_value upload_max_filesize 10M
+php_value post_max_size 10M
+php_value max_execution_time 300
+
+# ====================================
+# MIME TYPE AYARLARI (YENİ EKLENEN)
+# ====================================
+<IfModule mod_mime.c>
+    AddType image/jpeg .jpg .jpeg
+    AddType image/png .png
+    AddType image/gif .gif
+    AddType image/webp .webp
+    AddType image/svg+xml .svg
+    AddType text/css .css
+    AddType application/javascript .js
+</IfModule>
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f

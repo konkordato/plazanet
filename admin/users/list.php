@@ -1,12 +1,16 @@
 <?php
 session_start();
+<<<<<<< HEAD
 
 // Admin kontrolü
+=======
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
 if(!isset($_SESSION['admin_logged_in'])) {
     header("Location: ../index.php");
     exit();
 }
 
+<<<<<<< HEAD
 // SADECE ADMİN GÖREBİLİR KONTROLÜ
 if($_SESSION['user_role'] !== 'admin') {
     $_SESSION['error'] = "Bu sayfayı görüntüleme yetkiniz yok!";
@@ -14,6 +18,8 @@ if($_SESSION['user_role'] !== 'admin') {
     exit();
 }
 
+=======
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
 require_once '../../config/database.php';
 
 // Kullanıcıları çek
@@ -163,11 +169,14 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             color: #155724;
             border: 1px solid #c3e6cb;
         }
+<<<<<<< HEAD
         .alert-error {
             background: #f8d7da;
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+=======
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
     </style>
 </head>
 <body>
@@ -205,12 +214,15 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </div>
                 <?php endif; ?>
 
+<<<<<<< HEAD
                 <?php if(isset($_SESSION['error'])): ?>
                     <div class="alert alert-error">
                         <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
                     </div>
                 <?php endif; ?>
 
+=======
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
                 <a href="add.php" class="add-btn">+ Yeni Kullanıcı Ekle</a>
 
                 <?php foreach($users as $user): ?>
@@ -242,7 +254,11 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <span>Kayıt: <?php echo date('d.m.Y', strtotime($user['created_at'] ?? 'now')); ?></span>
                         </div>
                         <div class="detail-item">
+<<<<<<< HEAD
                             <span class="detail-icon">🔑</span>
+=======
+                            <span class="detail-icon">🔒</span>
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
                             <span>Son Giriş: <?php echo $user['last_login'] ? date('d.m.Y H:i', strtotime($user['last_login'])) : 'Henüz giriş yapmadı'; ?></span>
                         </div>
                     </div>
@@ -261,6 +277,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         </div>
                         <div class="stat-item">
                             <div class="stat-value">
+<<<<<<< HEAD
                                 <?php echo $user['role'] == 'admin' ? 'Admin' : 'Kullanıcı'; ?>
                             </div>
                             <div class="stat-label">Rol</div>
@@ -270,6 +287,17 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 <?php echo $user['status'] == 'active' ? 'Aktif' : 'Pasif'; ?>
                             </div>
                             <div class="stat-label">Durum</div>
+=======
+                                <?php echo date('d.m.Y', strtotime($user['created_at'] ?? 'now')); ?>
+                            </div>
+                            <div class="stat-label">Kayıt Tarihi</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">
+                                <?php echo $user['last_login'] ? date('d.m.Y', strtotime($user['last_login'])) : '-'; ?>
+                            </div>
+                            <div class="stat-label">Son Giriş</div>
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
                         </div>
                     </div>
 
@@ -280,10 +308,14 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <button class="btn btn-status <?php echo $user['status'] == 'active' ? '' : 'inactive'; ?>">
                             <?php echo $user['status'] == 'active' ? '✅ Aktif' : '⏸️ Pasif'; ?>
                         </button>
+<<<<<<< HEAD
                         <?php 
                         // Admin kullanıcısını ve kendini silemesin
                         if($user['username'] != 'admin' && $user['role'] != 'admin' && $user['id'] != $_SESSION['admin_id']): 
                         ?>
+=======
+                        <?php if($user['username'] != 'admin'): ?>
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
                         <button onclick="deleteUser(<?php echo $user['id']; ?>)" class="btn btn-delete">
                             🗑️ Sil
                         </button>
@@ -297,7 +329,11 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     <script>
     function deleteUser(id) {
+<<<<<<< HEAD
         if(confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?\n\nDİKKAT: Kullanıcının tüm ilanları pasif hale getirilecektir!')) {
+=======
+        if(confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) {
+>>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
             window.location.href = 'delete.php?id=' + id;
         }
     }
