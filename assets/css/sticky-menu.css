@@ -1,0 +1,87 @@
+/* STICKY MENU STYLES - Sadece Frontend İçin */
+
+/* Normal header stilleri */
+header {
+    transition: all 0.3s ease-in-out;
+    position: relative;
+    z-index: 1000;
+    background: white;
+    width: 100%;
+}
+
+/* Detail sayfasında header'ı bulabilmek için */
+.detail-page-custom header {
+    position: relative;
+}
+
+/* Sticky aktif olduğunda */
+header.sticky-active {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15) !important;
+    animation: slideDown 0.3s ease-in-out;
+}
+
+/* Yukarıdan aşağı kayma animasyonu */
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0.7;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Sticky olduğunda navbar padding ayarı */
+header.sticky-active .navbar {
+    padding: 0.8rem 0;
+}
+
+/* Sticky olduğunda logo küçültme */
+header.sticky-active .logo-img {
+    height: 45px;
+    transition: height 0.3s ease;
+}
+
+/* Sticky olduğunda slogan gizleme */
+header.sticky-active .logo-slogan {
+    display: none;
+}
+
+/* Body padding ayarı */
+.detail-page-custom {
+    padding-top: 0;
+}
+
+/* Sticky aktifken body'ye üst boşluk */
+body.sticky-compensate {
+    padding-top: 80px;
+}
+
+/* Mobil görünümde sticky menu */
+@media (max-width: 768px) {
+    header.sticky-active {
+        position: fixed !important;
+    }
+    
+    header.sticky-active .navbar {
+        padding: 0.6rem 0;
+    }
+    
+    header.sticky-active .logo-img {
+        height: 40px;
+    }
+}
+
+/* Yumuşak geçiş efektleri */
+header .navbar,
+header .logo-img,
+header .logo-slogan,
+header .nav-menu {
+    transition: all 0.3s ease;
+}

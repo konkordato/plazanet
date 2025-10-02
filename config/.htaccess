@@ -1,0 +1,3 @@
+# Config klasörüne erişimi tamamen engelle
+Order deny,allow
+Deny from all

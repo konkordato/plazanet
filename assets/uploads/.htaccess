@@ -1,0 +1,30 @@
+# RESİMLERE İZİN VER, PHP DOSYALARINI ENGELLE
+# =============================================
+
+# PHP dosyalarının çalıştırılmasını engelle
+Options -ExecCGI
+AddHandler cgi-script .php .pl .py .jsp .asp .sh .cgi
+
+# Sadece PHP ve script dosyalarına erişimi engelle
+<FilesMatch "\.(php|pl|py|jsp|asp|sh|cgi)$">
+    Order Deny,Allow
+    Deny from all
+</FilesMatch>
+
+# Resim dosyalarına izin ver
+<FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico)$">
+    Order Allow,Deny
+    Allow from all
+</FilesMatch>
+
+# Dizin listelemeyi kapat
+Options -Indexes
+
+# MIME Type ayarları (resimler için)
+<IfModule mod_mime.c>
+    AddType image/jpeg .jpg .jpeg
+    AddType image/png .png
+    AddType image/gif .gif
+    AddType image/webp .webp
+    AddType image/svg+xml .svg
+</IfModule>
