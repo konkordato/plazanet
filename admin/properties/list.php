@@ -1,5 +1,4 @@
 <?php
-<<<<<<< HEAD
 
 session_start();
 
@@ -1863,13 +1862,24 @@ $properties = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <script>
-        function deleteProperty(id) {
-            if (confirm('Bu ilanı silmek istediğinize emin misiniz?')) {
-                window.location.href = 'ajax/delete-property.php?id=' + id;
-            }
-        }
-    </script>
+function deleteProperty(id) {
+    if (confirm('Bu ilanı silmek istediğinize emin misiniz?')) {
+        // Form ile gönder - daha güvenilir
+        var form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '/plazanet/admin/properties/ajax/delete-property.php';
+        
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'id';
+        input.value = id;
+        
+        form.appendChild(input);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
 </body>
 
->>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
 </html>

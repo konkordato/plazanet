@@ -1,82 +1,3 @@
-<<<<<<< HEAD
-<?php
-// Oturum başlat
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
-
-// Veritabanı bağlantı sınıfı
-class Database {
-    private $host = "localhost";
-    private $db_name = "plazaeml_plazanet";
-    private $username = "plazaeml_ahm3t03";
-    private $password = "hi-fi-ahm3t"; // MEVCUT ŞİFRENİZ
-    public $conn;
-
-    // Veritabanına bağlan
-    public function getConnection() {
-        $this->conn = null;
-
-        try {
-            $this->conn = new PDO(
-                "mysql:host=" . $this->host . ";dbname=" . $this->db_name . ";charset=utf8mb4",
-                $this->username,
-                $this->password,
-                array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
-            );
-            
-            // Türkçe karakterler için UTF-8 ayarı
-            $this->conn->exec("set names utf8mb4");
-            $this->conn->exec("SET CHARACTER SET utf8mb4");
-            $this->conn->exec("SET COLLATION_CONNECTION = 'utf8mb4_unicode_ci'");
-            
-        } catch(PDOException $exception) {
-            echo "Bağlantı hatası: " . $exception->getMessage();
-            echo "<br><br>Lütfen MySQL root şifrenizin 'hi-fi-ahm3t' olduğundan emin olun.";
-            echo "<br>XAMPP Shell'de şu komutu deneyin: mysql -u root -p";
-            echo "<br>Şifre sorduğunda: hi-fi-ahm3t";
-        }
-
-        return $this->conn;
-    }
-}
-
-// Veritabanı bağlantısını başlat
-$database = new Database();
-$db = $database->getConnection();
-
-// Yardımcı fonksiyonları SADECE tanımlı değilse ekle
-if (!function_exists('cleanInput')) {
-    function cleanInput($data) {
-        $data = trim($data);
-        $data = stripslashes($data);
-        $data = htmlspecialchars($data);
-        return $data;
-    }
-}
-
-if (!function_exists('safeOutput')) {
-    function safeOutput($data) {
-        return htmlspecialchars($data);
-    }
-}
-
-// Admin kontrolü - fonksiyon yoksa tanımla
-if (!function_exists('isAdmin')) {
-    function isAdmin() {
-        return isset($_SESSION['admin_logged_in']) && 
-               $_SESSION['admin_logged_in'] === true && 
-               ($_SESSION['user_role'] ?? 'admin') === 'admin';
-    }
-}
-
-// Kullanıcı kontrolü - fonksiyon yoksa tanımla
-if (!function_exists('isUser')) {
-    function isUser() {
-        return isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true;
-    }
-}
-=======
 <?php
 // Oturum başlat
 if (session_status() == PHP_SESSION_NONE) {
@@ -85,10 +6,11 @@ if (session_status() == PHP_SESSION_NONE) {
 
 // Veritabanı bağlantı sınıfı
 class Database {
+    // HOSTING İÇİN AYARLAR
     private $host = "localhost";
-    private $db_name = "plazanet";
-    private $username = "root";
-    private $password = ""; // MEVCUT ŞİFRENİZ
+    private $db_name = "plazaeml_plazanet"; // Hosting'deki veritabanı adı
+    private $username = "plazaeml_ahm3t03";  // Hosting'deki kullanıcı adı
+    private $password = "hi-fi-ahm3t";       // Hosting'deki şifre
     public $conn;
 
     // Veritabanına bağlan
@@ -100,19 +22,24 @@ class Database {
                 "mysql:host=" . $this->host . ";dbname=" . $this->db_name . ";charset=utf8mb4",
                 $this->username,
                 $this->password,
-                array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION)
+                array(
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                    PDO::ATTR_EMULATE_PREPARES => false
+                )
             );
             
             // Türkçe karakterler için UTF-8 ayarı
-            $this->conn->exec("set names utf8mb4");
+            $this->conn->exec("SET NAMES utf8mb4");
             $this->conn->exec("SET CHARACTER SET utf8mb4");
             $this->conn->exec("SET COLLATION_CONNECTION = 'utf8mb4_unicode_ci'");
             
         } catch(PDOException $exception) {
-            echo "Bağlantı hatası: " . $exception->getMessage();
-            echo "<br><br>Lütfen MySQL root şifrenizin 'hi-fi-ahm3t' olduğundan emin olun.";
-            echo "<br>XAMPP Shell'de şu komutu deneyin: mysql -u root -p";
-            echo "<br>Şifre sorduğunda: hi-fi-ahm3t";
+            // Hata mesajını loglayalım ama kullanıcıya detay vermeyelim
+            error_log("Database Connection Error: " . $exception->getMessage());
+            
+            // Kullanıcıya genel hata mesajı
+            die("Veritabanı bağlantı hatası oluştu. Lütfen yönetici ile iletişime geçin.");
         }
 
         return $this->conn;
@@ -123,7 +50,7 @@ class Database {
 $database = new Database();
 $db = $database->getConnection();
 
-// Yardımcı fonksiyonları SADECE tanımlı değilse ekle
+// Yardımcı fonksiyonları tanımla
 if (!function_exists('cleanInput')) {
     function cleanInput($data) {
         $data = trim($data);
@@ -135,11 +62,11 @@ if (!function_exists('cleanInput')) {
 
 if (!function_exists('safeOutput')) {
     function safeOutput($data) {
-        return htmlspecialchars($data);
+        return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
     }
 }
 
-// Admin kontrolü - fonksiyon yoksa tanımla
+// Admin kontrolü
 if (!function_exists('isAdmin')) {
     function isAdmin() {
         return isset($_SESSION['admin_logged_in']) && 
@@ -148,11 +75,18 @@ if (!function_exists('isAdmin')) {
     }
 }
 
-// Kullanıcı kontrolü - fonksiyon yoksa tanımla
+// Kullanıcı kontrolü
 if (!function_exists('isUser')) {
     function isUser() {
         return isset($_SESSION['user_logged_in']) && $_SESSION['user_logged_in'] === true;
     }
 }
->>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
+
+// Güvenli redirect fonksiyonu
+if (!function_exists('redirect')) {
+    function redirect($url) {
+        header("Location: " . $url);
+        exit();
+    }
+}
 ?>

@@ -1,4 +1,13 @@
-/* Menü Düzeltme Dosyası - override.css - KESİN ÇÖZÜM */
+/* override.css - TAM VERSİYON */
+
+/* Ana Sayfa görünürlük düzeltmesi */
+.nav-menu li:first-child a,
+.nav-left li:first-child a {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    color: #2c3e50 !important;
+}
 
 /* Header Genel */
 header {
@@ -64,42 +73,33 @@ header {
     white-space: nowrap;
 }
 
-/* ANA MENÜ - ÖNEMLİ DÜZELTME */
+/* ANA MENÜ DÜZELTME */
 .nav-menu {
     display: flex !important;
     list-style: none !important;
     align-items: center !important;
     margin: 0 !important;
     padding: 0 !important;
-<<<<<<< HEAD
-    gap: 5px !important; /* Daha da azaltıldı */
-=======
-    gap: 8px !important; /* Azaltıldı */
->>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
+    gap: 5px !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
 }
 
 .nav-menu li {
     list-style: none;
     margin: 0;
     padding: 0;
+    display: inline-block !important;
 }
 
-/* MENÜ LİNKLERİ - BOYUT AZALTILDI */
+/* MENÜ LINKLERİ */
 .nav-menu a {
-<<<<<<< HEAD
-    font-size: 13px !important; /* 14px'den 13px'e düşürüldü */
-=======
-    font-size: 14px !important; /* 15px'den 14px'e */
->>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
+    font-size: 13px !important;
     font-weight: 500 !important;
     color: #2c3e50 !important;
     text-decoration: none !important;
     display: inline-block !important;
-<<<<<<< HEAD
-    padding: 5px 8px !important; /* Padding daha da azaltıldı */
-=======
-    padding: 6px 10px !important; /* Padding azaltıldı */
->>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
+    padding: 5px 8px !important;
     transition: all 0.3s ease !important;
     white-space: nowrap !important;
 }
@@ -111,29 +111,27 @@ header {
     border-radius: 5px !important;
 }
 
-/* ADMIN BUTONU - AYNI HIZADA */
+/* ADMIN BUTONU */
+.nav-menu li:last-child a,
+.nav-menu a[href*="admin"],
 .nav-menu .admin-btn {
     background: #ff6b35 !important;
     color: white !important;
-<<<<<<< HEAD
-    padding: 5px 14px !important; /* Yükseklik daha da azaltıldı */
+    padding: 5px 14px !important;
     border-radius: 20px !important;
     font-weight: 600 !important;
-    font-size: 13px !important; /* Font boyutu diğerleriyle aynı */
+    font-size: 13px !important;
     margin-left: 5px !important;
-=======
-    padding: 6px 16px !important; /* Yükseklik azaltıldı */
-    border-radius: 20px !important;
-    font-weight: 600 !important;
-    font-size: 14px !important; /* Font boyutu diğerleriyle aynı */
-    margin-left: 8px !important;
->>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
+    display: inline-block !important;
 }
 
+.nav-menu li:last-child a:hover,
+.nav-menu a[href*="admin"]:hover,
 .nav-menu .admin-btn:hover {
     background: #e55a2b !important;
     transform: translateY(-2px);
     box-shadow: 0 3px 10px rgba(255, 107, 53, 0.25) !important;
+    color: white !important;
 }
 
 /* Mobil Menü Toggle */
@@ -153,9 +151,16 @@ header {
     display: block;
 }
 
-<<<<<<< HEAD
-/* BÜYÜK EKRANLAR İÇİN (1400px ve üzeri) */
+/* BÜYÜK EKRANLAR (1400px ve üzeri) */
 @media (min-width: 1400px) {
+    .navbar .container {
+        max-width: 1300px;
+    }
+    
+    .logo-img {
+        height: 60px;
+    }
+    
     .nav-menu {
         gap: 15px !important;
     }
@@ -165,7 +170,8 @@ header {
         padding: 7px 14px !important;
     }
     
-    .nav-menu .admin-btn {
+    .nav-menu li:last-child a,
+    .nav-menu a[href*="admin"] {
         font-size: 15px !important;
         padding: 7px 18px !important;
     }
@@ -182,7 +188,8 @@ header {
         padding: 6px 10px !important;
     }
     
-    .nav-menu .admin-btn {
+    .nav-menu li:last-child a,
+    .nav-menu a[href*="admin"] {
         font-size: 14px !important;
         padding: 6px 16px !important;
     }
@@ -195,7 +202,7 @@ header {
     }
     
     .logo-slogan {
-        display: none; /* Slogan gizleniyor */
+        display: none;
     }
     
     .nav-menu {
@@ -207,7 +214,8 @@ header {
         padding: 5px 6px !important;
     }
     
-    .nav-menu .admin-btn {
+    .nav-menu li:last-child a,
+    .nav-menu a[href*="admin"] {
         font-size: 12px !important;
         padding: 5px 12px !important;
         margin-left: 4px !important;
@@ -233,48 +241,12 @@ header {
         padding: 4px 5px !important;
     }
     
-    .nav-menu .admin-btn {
+    .nav-menu li:last-child a,
+    .nav-menu a[href*="admin"] {
         font-size: 11px !important;
         padding: 4px 10px !important;
         margin-left: 3px !important;
     }
-=======
-/* BÜYÜK EKRANLAR İÇİN (1200px - 1400px) */
-@media (min-width: 1200px) and (max-width: 1400px) {
-    .nav-menu {
-        gap: 12px !important;
-    }
-    
-    .nav-menu a {
-        padding: 6px 12px !important;
-    }
-}
-
-/* TABLET (768px - 1199px) */
-@media (max-width: 1199px) and (min-width: 769px) {
-    .logo-img {
-        height: 48px;
-    }
-    
-    .nav-menu {
-        gap: 6px !important;
-    }
-    
-    .nav-menu a {
-        font-size: 13px !important;
-        padding: 5px 8px !important;
-    }
-    
-    .nav-menu .admin-btn {
-        padding: 5px 14px !important;
-        font-size: 13px !important;
-    }
-    
-    /* Uzun menü için slogan'ı gizle */
-    .logo-slogan {
-        display: none;
-    }
->>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
 }
 
 /* MOBİL (768px ve altı) */
@@ -318,6 +290,7 @@ header {
     .nav-menu li {
         width: 100% !important;
         text-align: center !important;
+        display: block !important;
     }
     
     .nav-menu a {
@@ -331,7 +304,8 @@ header {
         background: #f8f9fa !important;
     }
     
-    .nav-menu .admin-btn {
+    .nav-menu li:last-child a,
+    .nav-menu a[href*="admin"] {
         margin: 10px 20px !important;
         width: auto !important;
         display: inline-block !important;
@@ -386,7 +360,6 @@ header {
     transform: rotate(45deg) translate(-5px, -6px);
 }
 
-<<<<<<< HEAD
 /* ÖZEL EKRAN GENİŞLİKLERİ İÇİN İNCE AYAR */
 @media (min-width: 1100px) and (max-width: 1199px) {
     .nav-menu a {
@@ -409,45 +382,11 @@ header {
     }
 }
 
-/* MENÜ SIĞMAMA SORUNU İÇİN EK ÇÖZÜM */
-@media (max-width: 1199px) and (min-width: 769px) {
-    /* Uzun menü metinlerini kısalt */
-    .nav-menu a:contains("Verdiğimiz Hizmetler") {
-        font-size: 11px !important;
-    }
-}
-
 /* Flexbox düzeltmesi - menü elemanları sıkışmasın */
 .nav-menu {
-    flex-wrap: nowrap !important; /* Sarmalama olmasın */
-    overflow-x: auto !important; /* Gerekirse yatay kaydırma */
+    overflow-x: hidden !important;
 }
 
 .nav-menu::-webkit-scrollbar {
-    display: none; /* Scrollbar gizle */
-=======
-/* ULTRA GENİŞ EKRANLAR (1400px+) */
-@media (min-width: 1400px) {
-    .navbar .container {
-        max-width: 1300px;
-    }
-    
-    .logo-img {
-        height: 60px;
-    }
-    
-    .nav-menu {
-        gap: 15px !important;
-    }
-    
-    .nav-menu a {
-        font-size: 15px !important;
-        padding: 7px 14px !important;
-    }
-    
-    .nav-menu .admin-btn {
-        padding: 7px 18px !important;
-        font-size: 15px !important;
-    }
->>>>>>> 1b4657b0e4a9c21769cd70a9511bc87296025d5f
+    display: none;
 }
